@@ -1,0 +1,39 @@
+@font-face {
+    font-family: 'yekan';
+    src: url("/static/fonts/Yekan/Yekan.woff");
+}
+.account-left{
+    font-family: yekan, fantasy;
+    float:right;
+    direction: rtl;
+}
+.account-right{
+    font-family: yekan, fantasy;
+    float:left;
+    direction: rtl;
+
+}
+.account{
+    font-family: yekan, fantasy;
+    direction: rtl;
+    /*font-size: 1pt;*/
+    /*text-align:right;*/
+}
+.account-h{
+    /*font-family: yekan, fantasy;*/
+    /*font-size:1pt;*/
+    /*direction: ltr;*/
+}
+
+
+/*placeholder direction*/
+/*::-webkit-input-placeholder {*/
+/*    text-align:right;*/
+/*    font-family: yekan, fantasy;*/
+/*}*/
+
+.center{
+    text-align: center;
+}
+
+

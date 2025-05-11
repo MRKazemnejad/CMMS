@@ -1,0 +1,75 @@
+{% extends "maintenance/layout/base.html" %}
+
+{% block title %} Page 404 {% endblock %}
+
+
+{% block stylesheets %}
+<link rel="stylesheet" href="/static/css/reportStyle.css?v0.1">
+    <script type="text/javascript" src="/static/js/contract.js?v1.7"></script>
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="container-fluid">
+    <div class="row justify-content-center">
+
+        <div class="col-12 ">
+            <div class="card my-4">
+                <div class="card-body">
+                    <h2 class="card-title account">{{ loco }}</h2>
+                </div>
+            </div>
+
+
+                 <div class="row g-1 justify-content-center" >
+                    <div class="col-md-2 my-1">
+                        <a class="text-decoration-none" href="{% url 'maintenance:mainDieselDetails' loco=loco  %}">
+                            <div class="card"
+                                 onclick="selectCard(this);">
+                                <div class="card-body">
+                                    <h5 class="card-title ">سابقه تعمیرات</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-2   my-1">
+                        <div class="card"
+                             onclick="selectCard(this); showReportDetails('گزارش عملکرد کارکنان', 'ارزیابی عملکرد تیم‌های مختلف در پروژه‌های جاری.')">
+                            <div class="card-body">
+                                <h5 class="card-title ">تعویض قطعات</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" col-md-2   my-1">
+                        <div class="card"
+                             onclick="selectCard(this); showReportDetails('گزارش موجودی انبار', 'بررسی موجودی کالاها و نیازهای تدارکاتی انبار.')">
+                            <div class="card-body">
+                                <h5 class="card-title ">آزمایش روغن</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" col-md-2   my-1">
+                        <div class="card"
+                             onclick="selectCard(this); showReportDetails('گزارش رضایت مشتریان', 'تحلیل بازخورد مشتریان از خدمات و محصولات.')">
+                            <div class="card-body">
+                                <h5 class="card-title ">سرویس</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+        </div>
+
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+
+{% block javascripts %}
+
+{% endblock javascripts %}

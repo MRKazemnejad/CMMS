@@ -1,0 +1,123 @@
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-Thin.ttf') format('ttf');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-ExtraLight.ttf') format('ttf');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-Light.ttf') format('ttf');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-Regular.ttf') format('ttf');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-Medium.ttf') format('ttf');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-SemiBold.ttf') format('ttf');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-Bold.ttf') format('ttf');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-ExtraBold.ttf') format('ttf');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vazirmatn;
+  src: url('/static/fonts/vazir/Vazirmatn-Black.ttf') format('ttf');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+body {
+
+            font-family: 'Vazirmatn', sans-serif;
+            min-height: 100vh;
+        }
+
+        .search-box {
+            margin-bottom: 0.75rem;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .card {
+
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .card .card-body {
+            padding: 0.25rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .card .card-title {
+            font-size: 0.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .card.selected {
+            background: #e0f2fe;
+            border: 2px solid #2563eb;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+

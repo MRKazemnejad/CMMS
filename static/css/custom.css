@@ -1,0 +1,145 @@
+/**************************************************************************************/
+/*making responsive screen like 70 zoom*/
+
+:root {
+    --base-font-size: 14px; /* فونت پایه کوچکتر برای شبیه‌سازی زوم 70% */
+}
+
+html {
+    font-size: var(--base-font-size);
+}
+
+/* تنظیمات عمومی برای المان‌ها */
+body {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* کارت‌های بوت‌استرپ */
+.card {
+    font-size: 0.9rem; /* فونت کوچکتر */
+    padding: 0.75rem; /* پدینگ کوچکتر */
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    font-size: 1.2rem;
+}
+
+.card-text {
+    font-size: 0.9rem;
+}
+
+.card-body {
+    padding: 0.75rem;
+}
+
+/* دکمه‌های بوت‌استرپ */
+.btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+}
+
+/* جدول‌های بوت‌استرپ */
+.table {
+    font-size: 0.9rem;
+}
+
+.table th, .table td {
+    padding: 0.5rem; /* پدینگ کوچکتر */
+}
+
+/* فرم‌ها */
+.form-control {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.75rem;
+}
+
+.form-label {
+    font-size: 0.9rem;
+}
+
+/* تنظیمات برای نمایشگرهای لپ‌تاپ (14 اینچ، رزولوشن تقریبی 1366x768 تا 1920x1080) */
+@media (max-width: 1440px) {
+    :root {
+        --base-font-size: 13px; /* کمی کوچکتر برای لپ‌تاپ‌های 14 اینچی */
+    }
+
+    .card {
+        padding: 0.65rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .btn {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.7rem;
+    }
+
+    .table th, .table td {
+        padding: 0.45rem;
+    }
+}
+
+/* تنظیمات برای تبلت‌ها (مثل 768px) */
+@media (max-width: 768px) {
+    :root {
+        --base-font-size: 12px;
+    }
+
+    .card {
+        padding: 0.6rem;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    .btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .table {
+        font-size: 0.85rem;
+    }
+}
+
+/* تنظیمات برای موبایل‌ها (مثل 576px) */
+@media (max-width: 576px) {
+    :root {
+        --base-font-size: 11px;
+    }
+
+    .card {
+        padding: 0.5rem;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .table {
+        font-size: 0.8rem;
+    }
+
+    .table th, .table td {
+        padding: 0.4rem;
+    }
+}
+
+/* جلوگیری از خیلی کوچک شدن */
+html {
+    min-font-size: 10px; /* حداقل اندازه فونت */
+}
+
+.card, .btn, .table, .form-control {
+    min-width: 100px; /* حداقل عرض برای المان‌ها */
+}
