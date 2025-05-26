@@ -7,11 +7,16 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('mainSelectLoco', views.mainSelectLoco, name='mainSelectLoco'),
     path('mainLocoPart/<str:loco>', views.mainLocoPart, name='mainLocoPart'),
+    path('mainLocoPartChange/<str:loco>', views.mainLocoPartChange, name='mainLocoPartChange'),
 
-    path('maintenance/', views.maintenance_create, name='maintenance_create'),
+
     path('mainRecord/', views.mainRecord, name='mainRecord'),
-    # path('mainRecordFailure/', views.mainRecordFailure, name='mainRecordFailure'),
-    # path('mainRecordRepair/', views.mainRecordRepair, name='mainRecordRepair'),
+    path('registerFailure/', views.registerFailure, name='registerFailure'),
+    path('registerRepair/', views.registerRepair, name='registerRepair'),
+
+    path('electricalRepairForm/', views.electricalRepairForm, name='electricalRepairForm'),
+    path('motorizedRepairForm/', views.motorizedRepairForm, name='motorizedRepairForm'),
+    path('dailyCheckForm/', views.dailyCheckForm, name='dailyCheckForm'),
 
     path('mainDieselDetails/<str:loco>', views.mainDieselDetails, name='mainDieselDetails'),
 ]

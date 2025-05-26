@@ -24,6 +24,8 @@
 </head>
 <body>
     <div class="form-container">
+
+
         <h2>فرم ثبت تعمیرات دیزل</h2>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -52,8 +54,8 @@
                 {{ form.location }}
             </div>
             <div class="form-group">
-                <label for="{{ form.symptoms.id_for_label }}">علائم خرابی:</label>
-                {{ form.symptoms }}
+                <label for="{{ form.repair_description.id_for_label }}">علائم خرابی:</label>
+                {{ form.repair_description }}
             </div>
             <div class="form-group">
                 <label for="{{ form.officer.id_for_label }}">مامور خرابی:</label>
@@ -133,3 +135,4 @@
     </script>
 </body>
 </html>
+

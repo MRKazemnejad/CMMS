@@ -33,12 +33,14 @@
                         </a>
                     </div>
                     <div class="col-md-2   my-1">
+                         <a class="text-decoration-none" href="{% url 'maintenance:mainLocoPartChange' loco=loco  %}">
                         <div class="card"
-                             onclick="selectCard(this); showReportDetails('گزارش عملکرد کارکنان', 'ارزیابی عملکرد تیم‌های مختلف در پروژه‌های جاری.')">
+                             onclick="selectCard(this)">
                             <div class="card-body">
                                 <h5 class="card-title ">تعویض قطعات</h5>
                             </div>
                         </div>
+                         </a>
                     </div>
                     <div class=" col-md-2   my-1">
                         <div class="card"

@@ -122,47 +122,36 @@
                                             <p class="card-text account "><span class="font_color">عنوان :</span>{{ data.failure_title }}
                                             </p>
                                         </div>
+
                                         <div>
                                             <h3 class="card-title mb-2"></h3>
-                                            <p class="card-text account extra-item d-none d-sm-block">
-                                                <span class="font_color">محل خرابی :</span>{{ data.location }}
-                                            </p>
+                                            <p class="card-text account "><span class="font_color">تاریخ :</span>{{ data.start_date }}</p>
                                         </div>
-                                        <div>
-                                            <h3 class="card-title mb-2"></h3>
-                                            <p class="card-text account "><span class="font_color">تاریخ شروع :</span>{{ data.start_date }}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <h3 class="card-title mb-2"></h3>
-                                            <p class="card-text account extra-item d-none d-sm-block">
-                                                <span class="font_color">تاریخ پایان :</span>{% if data.end_date %}
-                                                {{ data.end_date }}{% else %}جاری{% endif %}</p>
-                                        </div>
+
                                         <i class="bi bi-chevron-down icon-rotate"></i>
                                     </div>
-                                    <div class="details account">
-                                        <p class="font_color">شرح خرابی :</p>
-                                        <p>{{ data.failure_description }}</p>
-                                    </div>
 
                                     <div class="details account">
-                                        <p class="font_color">رفع خرابی :</p>
-                                        <p>{% if data.repair_description %}{{ data.repair_description }}{% else %}درحال
-                                            تعمیر{% endif %}</p>
-                                     <p class="font_color">مامور رفع خرابی :</p>
-                                    <p>{% if data.officer %}{{ data.officer }}{% else %}نامشخص{% endif %}</p>
-                                    </div>
-                                    <div class="details account">
-                                        <p class="font_color">پیوست ها:</p>
-                                        <div class="row">
-                                            <a href="#" class="text-decoration-none"><p>تصاویر قبل تعمیر</p></a>
-                                            <a href="#" class="text-decoration-none"><p>تصاویر بعد از تعمیر</p></a>
-                                            <a href="#" class="text-decoration-none"><p>فرم کنترل کیفیت</p></a>
+                                        {% for row in rows %}
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <p class="card-text account "><span class="font_color">قطعه :</span>{{ data.start_date }}</p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                     <p class="card-text account "><span class="font_color">سریال :</span>{{ data.start_date }}</p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <p class="card-text account "><span class="font_color">تعداد :</span>{{ data.start_date }}</p>
+                                                </div>
+
+                                            </div>
                                         </div>
+                                            {% endfor %}
+
+                                </div>
 
 
-                                    </div>
                                 </div>
                             </div>
                         </div>

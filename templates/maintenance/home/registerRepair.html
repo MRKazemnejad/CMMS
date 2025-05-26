@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بخش تعمیراتی</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/account.css?v1.0" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px; /* کاهش عرض کانتینر برای متمرکز شدن کارت‌ها */
+        }
+
+        .card {
+            transition: transform 0.2s;
+            cursor: pointer;
+            max-width: 300px; /* عرض کارت در دسکتاپ */
+            margin: 0 auto;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-body {
+            padding: 1rem; /* پدینگ کارت در دسکتاپ */
+        }
+
+        .card-title {
+            font-size: 1.1rem; /* اندازه فونت عنوان در دسکتاپ */
+        }
+
+        .card-text {
+            font-size: 0.85rem; /* اندازه فونت متن در دسکتاپ */
+        }
+
+        .bi {
+            font-size: 2.5rem; /* اندازه آیکون در دسکتاپ */
+        }
+
+        /* استایل دکمه بوت‌استرپ */
+        .btn-custom {
+            padding: 6px 12px; /* پدینگ کوچکتر برای دکمه */
+            font-size: 0.9rem; /* اندازه فونت در دسکتاپ */
+        }
+
+        /* Media Query برای تبلت (تا 991px) */
+        @media (max-width: 991px) {
+            .card {
+                max-width: 100%; /* عرض کامل در تبلت */
+                margin: 0;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .card-title {
+                font-size:1.2rem;
+            }
+
+            .card-text {
+                font-size: 2rem;
+            }
+
+            .bi {
+                font-size: 2.5rem;
+            }
+
+            .btn-custom {
+                padding: 5px 10px; /* کوچکتر شدن دکمه */
+                font-size: 1rem;
+            }
+        }
+
+        /* Media Query برای موبایل (تا 767px) */
+        @media (max-width: 767px) {
+            .card {
+                max-width: 100%; /* عرض کامل در موبایل */
+                margin: 0;
+            }
+
+            .card-body {
+                padding: 0.5rem;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .card-text {
+                font-size: 1rem;
+            }
+
+            .bi {
+                font-size: 2rem;
+            }
+
+            .btn-custom {
+                padding: 4px 8px; /* کوچکتر شدن بیشتر دکمه */
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <!-- دکمه بازگشت بوت‌استرپ در سمت چپ -->
+    <div class="mb-3 text-start">
+        <button class="btn btn-primary btn-sm btn-custom account" onclick="history.back()">
+            بازگشت
+        </button>
+    </div>
+    <h3 class="text-center mb-4 account">واحد تعمیراتی</h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1"> <!-- فاصله کم بین کارت‌ها با g-1 -->
+        <!-- کارت برقی -->
+        <div class="col">
+            <a href="{% url 'maintenance:electricalRepairForm' %}" class="text-decoration-none">
+                <div class="card h-100 text-center account">
+                <div class="card-body">
+                    <i class="bi bi-lightning-charge-fill text-primary mb-2"></i>
+                    <h5 class="card-title">برقی</h5>
+{#                    <p class="card-text">اطلاعات مربوط به سیستم‌های برقی</p>#}
+                </div>
+            </div>
+            </a>
+
+        </div>
+        <!-- کارت موتور -->
+        <div class="col">
+            <a href="{% url 'maintenance:motorizedRepairForm' %}"  class="text-decoration-none">
+                <div class="card h-100 text-center account">
+                <div class="card-body">
+                    <i class="bi bi-gear-fill text-success mb-2"></i>
+                    <h5 class="card-title">موتور</h5>
+{#                    <p class="card-text">جزئیات مربوط به موتور</p>#}
+                </div>
+            </div>
+            </a>
+
+        </div>
+        <!-- کارت شاسی و بدنه -->
+        <div class="col">
+            <div class="card h-100 text-center account" onclick="alert('کارت شاسی و بدنه کلیک شد!')">
+                <div class="card-body">
+                    <i class="bi bi-car-front-fill text-danger mb-2"></i>
+                    <h5 class="card-title">شاسی و بدنه</h5>
+{#                    <p class="card-text">اطلاعات شاسی و بدنه</p>#}
+                </div>
+            </div>
+        </div>
+        <!-- کارت بوژی و تراکشن -->
+        <div class="col">
+            <div class="card h-100 text-center account" onclick="alert('کارت بوژی و تراکشن کلیک شد!')">
+                <div class="card-body">
+                    <i class="bi bi-train-freight-front-fill text-warning mb-2"></i>
+                    <h5 class="card-title">بوژی و تراکشن</h5>
+{#                    <p class="card-text">جزئیات بوژی و سیستم تراکشن</p>#}
+                </div>
+            </div>
+        </div>
+        <!-- کارت سیستم خنک‌کاری -->
+        <div class="col">
+            <div class="card h-100 text-center account" onclick="alert('کارت سیستم خنک‌کاری کلیک شد!')">
+                <div class="card-body">
+                    <i class="bi bi-fan text-info mb-2"></i>
+                    <h5 class="card-title">سیستم خنک‌کاری</h5>
+{#                    <p class="card-text">اطلاعات سیستم خنک‌کاری</p>#}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

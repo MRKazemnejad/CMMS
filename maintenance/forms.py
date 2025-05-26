@@ -27,7 +27,8 @@ class MaintenanceForm(forms.ModelForm):
 
     class Meta:
         model = Maintenance
-        fields = ['diesel_name', 'failure_title', 'failure_description', 'start_date', 'end_date', 'location', 'symptoms', 'officer', 'images', 'image_types']
+        fields = ['diesel_name', 'failure_title', 'failure_description', 'start_date', 'end_date', 'location',
+                  'repair_description', 'officer', 'in_repair', 'images', 'image_types']
         widgets = {
             'failure_description': forms.Textarea(attrs={'rows': 4}),
             'start_date': forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'}),

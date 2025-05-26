@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from maintenance.forms import MaintenanceForm
-from maintenance.models import MaintenanceImage,Maintenance
+from maintenance.models import MaintenanceImage,Maintenance,ChangeParts
 import json
 
 
@@ -22,9 +22,29 @@ def mainLocoPart(request,loco):
     context = {'segment': 'dashboard','loco':loco}
     return render(request, 'maintenance/home/mainLocoPart.html',context)
 
+@login_required
+def mainLocoPartChange(request,loco):
+    datas=ChangeParts.objects.filter(diesel=loco)
+    fail_desc=Maintenance.objects.filter(diesel_name=loco)
+    context = {'segment': 'dashboard', 'loco': loco,'datas':datas,}
+    return render(request, 'maintenance/home/mainLocoPartChange.html', context)
+
 
 @login_required
-def maintenance_create(request):
+def mainDieselDetails(request,loco):
+
+    datas=Maintenance.objects.filter(diesel_name=loco).values()
+    context = {'segment': 'dashboard','datas':datas,'loco':loco}
+    return render(request, 'maintenance/home/mainDieselDetails.html',context)
+
+
+@login_required
+def mainRecord(request):
+    return render(request, 'maintenance/home/mainRecord.html')
+
+
+@login_required
+def registerFailure(request):
     if request.method == 'POST':
         form = MaintenanceForm(request.POST, request.FILES)
         if form.is_valid():
@@ -42,15 +62,27 @@ def maintenance_create(request):
         form = MaintenanceForm()
     return render(request, 'maintenance/home/maintenance_form.html', {'form': form})
 
+@login_required
+def registerRepair(request):
+
+    return render(request, 'maintenance/home/registerRepair.html')
 
 @login_required
-def mainDieselDetails(request,loco):
+def electricalRepairForm(request):
 
-    datas=Maintenance.objects.filter(diesel_name=loco).values()
-    context = {'segment': 'dashboard','datas':datas,'loco':loco}
-    return render(request, 'maintenance/home/mainDieselDetails.html',context)
+    return render(request, 'maintenance/home/electricalRepairForm.html')
 
 
 @login_required
-def mainRecord(request):
-    return render(request, 'maintenance/home/mainRecord.html')
+def motorizedRepairForm(request):
+
+    return render(request, 'maintenance/home/motorizedRepairForm.html')
+
+
+@login_required
+def dailyCheckForm(request):
+
+    return render(request, 'maintenance/home/dailyCheckForm.html')
+
+
+

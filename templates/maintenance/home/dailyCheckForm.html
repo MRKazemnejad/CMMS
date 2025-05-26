@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>کارت‌های بازرسی دوره‌ای</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+         <link href="/static/css/account.css?v1.1" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    .container {
+      max-width: 1000px; /* عرض کانتینر مشابه صفحات قبلی */
+    }
+    .card {
+      max-width: 180px; /* عرض بزرگتر کارت در دسکتاپ */
+      margin: 0; /* حذف کامل حاشیه کارت */
+      border-radius: 8px; /* گوشه‌های گردتر */
+    }
+    .card.clickable {
+      transition: transform 0.3s ease; /* انیمیشن برای کارت سایر */
+      cursor: pointer;
+    }
+    .card.clickable:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .card:hover {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* سایه در هاور */
+    }
+    .card-body {
+      padding: 0.75rem; /* پدینگ بیشتر برای ظاهر بهتر */
+    }
+    .card-title {
+      font-size: 1rem; /* فونت عنوان بزرگتر در دسکتاپ */
+      font-weight: 600;
+    }
+    .bi {
+      font-size: 1.8rem; /* آیکون بزرگتر در دسکتاپ */
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1)); /* سایه ملایم برای آیکون */
+    }
+    /* استایل دکمه‌های داخل کارت */
+    .btn-link {
+      font-size: 0.75rem; /* فونت کوچک برای دکمه‌ها */
+      padding: 4px 8px; /* پدینگ کوچک */
+    }
+    /* حذف پدینگ ستون‌ها برای کاهش فاصله افقی */
+    .no-gutter > .col {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    /* استایل دکمه بازگشت */
+    .btn-custom {
+      padding: 6px 12px; /* پدینگ کوچکتر برای دکمه */
+      font-size: 0.9rem; /* اندازه فونت در دسکتاپ */
+    }
+    /* Media Query برای تبلت (تا 991px) */
+    @media (max-width: 991px) {
+      .card {
+        max-width: 100%; /* عرض کامل در تبلت */
+        margin: 0; /* حذف حاشیه در تبلت */
+      }
+      .card-body {
+        padding: 0.5rem;
+      }
+      .card-title {
+        font-size: 0.9rem;
+      }
+      .bi {
+        font-size: 1.5rem;
+      }
+      .btn-link {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+      }
+      .btn-custom {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+    }
+    /* Media Query برای موبایل (تا 767px) */
+    @media (max-width: 767px) {
+      .card {
+        max-width: 100%; /* عرض کامل در موبایل */
+        margin: 0; /* حذف حاشیه در موبایل */
+      }
+      .card-body {
+        padding: 0.5rem;
+      }
+      .card-title {
+        font-size: 0.85rem;
+      }
+      .bi {
+        font-size: 1.2rem;
+      }
+      .btn-link {
+        font-size: 0.8rem;
+        padding: 2px 5px;
+      }
+      .btn-custom {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <!-- دکمه بازگشت بوت‌استرپ در سمت چپ -->
+    <div class="mb-3 text-start">
+      <button class="btn btn-primary btn-sm btn-custom account" onclick="history.back()">
+        بازگشت
+      </button>
+    </div>
+    <h1 class="text-center mb-4 account"> بازدید دوره‌ای</h1>
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-7 g-1 no-gutter"> <!-- فاصله عمودی اندک با g-1، حذف پدینگ با no-gutter -->
+      <!-- کارت روزانه -->
+      <div class="col">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <i class="bi bi-calendar-day text-primary mb-1"></i>
+            <h5 class="card-title account">روزانه</h5>
+            <div class="mt-2">
+              <button class="btn btn-outline-primary btn-sm btn-link float-start ms-2 account text-decoration-none" onclick="alert('بازرسی روزانه با روغن کلیک شد!')">با روغن</button>
+              <button class="btn btn-outline-primary btn-sm btn-link float-end me-2 account text-decoration-none" onclick="alert('بازرسی روزانه بی روغن کلیک شد!')">بی روغن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- کارت ماهانه -->
+      <div class="col">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <i class="bi bi-calendar-month text-success mb-1"></i>
+            <h5 class="card-title account">ماهانه</h5>
+            <div class="mt-2">
+              <button class="btn btn-outline-primary btn-sm btn-link float-start ms-2 account text-decoration-none" onclick="alert('بازرسی ماهانه با روغن کلیک شد!')">با روغن</button>
+              <button class="btn btn-outline-primary btn-sm btn-link float-end me-2 account text-decoration-none" onclick="alert('بازرسی ماهانه بی روغن کلیک شد!')">بی روغن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- کارت سه ماهه -->
+      <div class="col">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <i class="bi bi-calendar3 text-danger mb-1"></i>
+            <h5 class="card-title account">سه ماهه</h5>
+            <div class="mt-2">
+              <button class="btn btn-outline-primary btn-sm btn-link float-start ms-2 account text-decoration-none" onclick="alert('بازرسی سه ماهه با روغن کلیک شد!')">با روغن</button>
+              <button class="btn btn-outline-primary btn-sm btn-link float-end me-2 account text-decoration-none" onclick="alert('بازرسی سه ماهه بی روغن کلیک شد!')">بی روغن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- کارت شش ماهه -->
+      <div class="col">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <i class="bi bi-calendar-range text-warning mb-1"></i>
+            <h5 class="card-title account">شش ماهه</h5>
+            <div class="mt-2">
+              <button class="btn btn-outline-primary btn-sm btn-link float-start ms-2 account text-decoration-none" onclick="alert('بازرسی شش ماهه با روغن کلیک شد!')">با روغن</button>
+              <button class="btn btn-outline-primary btn-sm btn-link float-end me-2 account text-decoration-none" onclick="alert('بازرسی شش ماهه بی روغن کلیک شد!')">بی روغن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- کارت سالیانه -->
+      <div class="col">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <i class="bi bi-calendar-check text-info mb-1"></i>
+            <h5 class="card-title account">سالیانه</h5>
+            <div class="mt-2">
+              <button class="btn btn-outline-primary btn-sm btn-link float-start ms-2 account text-decoration-none" onclick="alert('بازرسی سالیانه با روغن کلیک شد!')">با روغن</button>
+              <button class="btn btn-outline-primary btn-sm btn-link float-end me-2 account text-decoration-none" onclick="alert('بازرسی سالیانه بی روغن کلیک شد!')">بی روغن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- کارت سه سالیانه -->
+      <div class="col">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <i class="bi bi-calendar3-event text-primary mb-1"></i>
+            <h5 class="card-title account">سه سالیانه</h5>
+            <div class="mt-2">
+              <button class="btn btn-outline-primary btn-sm btn-link float-start ms-2 account text-decoration-none" onclick="alert('بازرسی سه سالیانه با روغن کلیک شد!')">با روغن</button>
+              <button class="btn btn-outline-primary btn-sm btn-link float-end me-2 account text-decoration-none" onclick="alert('بازرسی سه سالیانه بی روغن کلیک شد!')">بی روغن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+        <!-- بازدید چرخ دنده -->
+      <div class="col">
+        <div class="card h-100 text-center clickable" onclick="alert('کارت سایر کلیک شد!')">
+          <div class="card-body">
+            <i class="bi bi-calendar-plus text-secondary mb-1"></i>
+            <h5 class="card-title account">بازدید چرخ دنده</h5>
+          </div>
+        </div>
+      </div>
+      <!-- کارت سایر -->
+      <div class="col">
+        <div class="card h-100 text-center clickable" onclick="alert('کارت سایر کلیک شد!')">
+          <div class="card-body">
+            <i class="bi bi-calendar-plus text-secondary mb-1"></i>
+            <h5 class="card-title account">سایر</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
