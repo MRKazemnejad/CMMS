@@ -1,0 +1,696 @@
+{#{% extends "maintenance/layout/base.html" %}#}
+{##}
+{#{% block title %} برنامه نگهداری {% endblock %}#}
+{##}
+{#{% block stylesheets %}#}
+{#    <!-- Bootstrap CSS -->#}
+{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">#}
+{#    <!-- Bootstrap Icons -->#}
+{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">#}
+{##}
+{#    <style>#}
+{#        body {#}
+{#            background-color: #f8f9fa;#}
+{#            font-family: 'Vazirmatn', sans-serif;#}
+{#        }#}
+{##}
+{#        .font_color {#}
+{#            color: #009dff;#}
+{#            margin-left: 0.5rem; /* فاصله بین لیبل و متن */#}
+{#        }#}
+{##}
+{#        .card {#}
+{#            margin-bottom: 1rem;#}
+{#            border-radius: 10px;#}
+{#            background-color: #e6f3fa; /* تم رنگی هماهنگ */#}
+{#            cursor: pointer; /* نشانگر کلیک */#}
+{#            transition: all 0.3s ease; /* انیمیشن نرم */#}
+{#        }#}
+{##}
+{#        .card:hover {#}
+{#            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* سایه هنگام هاور */#}
+{#        }#}
+{##}
+{#        .card-title {#}
+{#            display: flex;#}
+{#            align-items: center;#}
+{#            gap: 0.5rem; /* فاصله بین آیکون و متن */#}
+{#        }#}
+{##}
+{#        .card-title i {#}
+{#            font-size: 1.25rem;#}
+{#            color: #009dff; /* هم‌رنگ با font_color */#}
+{#        }#}
+{##}
+{#        .card-body {#}
+{#            padding: 1rem;#}
+{#            transition: max-height 0.3s ease;#}
+{#            overflow: hidden;#}
+{#        }#}
+{##}
+{#        .card.expanded .card-body {#}
+{#            max-height: 1000px; /* ارتفاع زیاد برای نمایش محتوا */#}
+{#        }#}
+{##}
+{#        .details {#}
+{#            display: none;#}
+{#            margin-top: 1rem;#}
+{#            padding-top: 1rem;#}
+{#            border-top: 1px solid #dee2e6;#}
+{#            background-color: #ffffff; /* بخش جزئیات سفید */#}
+{#        }#}
+{##}
+{#        .card.expanded .details {#}
+{#            display: block;#}
+{#        }#}
+{##}
+{#        .icon-rotate {#}
+{#            transition: transform 0.3s ease;#}
+{#        }#}
+{##}
+{#        .card.expanded .icon-rotate {#}
+{#            transform: rotate(180deg); /* چرخش آیکون هنگام گسترش */#}
+{#        }#}
+{##}
+{#        @media (max-width: 991.98px) {#}
+{#            .card-title {#}
+{#                font-size: 1.1rem; /* فونت کوچکتر برای تبلت */#}
+{#            }#}
+{##}
+{#            .card-text {#}
+{#                font-size: 0.9rem; /* فونت کوچکتر برای تبلت */#}
+{#            }#}
+{##}
+{#            .details {#}
+{#                font-size: 0.9rem;#}
+{#            }#}
+{#        }#}
+{##}
+{#        @media (max-width: 575.98px) {#}
+{#            .card-title {#}
+{#                font-size: 0.9rem; /* فونت کوچکتر برای موبایل */#}
+{#            }#}
+{##}
+{#            .card-text {#}
+{#                font-size: 0.8rem; /* فونت کوچکتر برای موبایل */#}
+{#            }#}
+{##}
+{#            .details {#}
+{#                font-size: 0.8rem;#}
+{#            }#}
+{#        }#}
+{#    </style>#}
+{#{% endblock stylesheets %}#}
+{##}
+{#{% block content %}#}
+{#    <div class="container-fluid">#}
+{#        <div class="row justify-content-center">#}
+{#            <div class="col-12">#}
+{#                <h2 class="text-center my-4" style="color: #009dff;">برنامه نگهداری</h2>#}
+{#            </div>#}
+{##}
+{#            <div class="row g-3 justify-content-center">#}
+{#                <!-- کارت روزانه -->#}
+{#                <div class="col-12 col-md-6 col-lg-3">#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                <h5 class="card-title">#}
+{#                                    <i class="bi bi-calendar-day"></i> روزانه#}
+{#                                </h5>#}
+{#                                <i class="bi bi-chevron-down icon-rotate"></i>#}
+{#                            </div>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">تاریخ انجام:</span> 1404/03/06#}
+{#                            </p>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">سرویس بعدی:</span> 1404/03/07#}
+{#                            </p>#}
+{#                            <div class="details">#}
+{#                                <p class="font_color">توضیحات:</p>#}
+{#                                <p>بررسی روزانه قطعات و عملکرد سیستم‌ها.</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- کارت ماهانه -->#}
+{#                <div class="col-12 col-md-6 col-lg-3">#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                <h5 class="card-title">#}
+{#                                    <i class="bi bi-calendar-month"></i> ماهانه#}
+{#                                </h5>#}
+{#                                <i class="bi bi-chevron-down icon-rotate"></i>#}
+{#                            </div>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">تاریخ انجام:</span> 1404/03/06#}
+{#                            </p>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">سرویس بعدی:</span> 1404/04/06#}
+{#                            </p>#}
+{#                            <div class="details">#}
+{#                                <p class="font_color">توضیحات:</p>#}
+{#                                <p>بازرسی ماهانه و تعویض فیلترها.</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- کارت سه ماهه -->#}
+{#                <div class="col-12 col-md-6 col-lg-3">#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                <h5 class="card-title">#}
+{#                                    <i class="bi bi-calendar3"></i> سه ماهه#}
+{#                                </h5>#}
+{#                                <i class="bi bi-chevron-down icon-rotate"></i>#}
+{#                            </div>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">تاریخ انجام:</span> 1404/03/06#}
+{#                            </p>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">سرویس بعدی:</span> 1404/06/06#}
+{#                            </p>#}
+{#                            <div class="details">#}
+{#                                <p class="font_color">توضیحات:</p>#}
+{#                                <p>بررسی کامل سیستم‌های مکانیکی.</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- کارت شش ماهه -->#}
+{#                <div class="col-12 col-md-6 col-lg-3">#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                <h5 class="card-title">#}
+{#                                    <i class="bi bi-calendar3-event"></i> شش ماهه#}
+{#                                </h5>#}
+{#                                <i class="bi bi-chevron-down icon-rotate"></i>#}
+{#                            </div>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">تاریخ انجام:</span> 1404/03/06#}
+{#                            </p>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">سرویس بعدی:</span> 1404/09/06#}
+{#                            </p>#}
+{#                            <div class="details">#}
+{#                                <p class="font_color">توضیحات:</p>#}
+{#                                <p>سرویس کامل و تست عملکرد کلی.</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- کارت سالیانه -->#}
+{#                <div class="col-12 col-md-6 col-lg-3">#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                <h5 class="card-title">#}
+{#                                    <i class="bi bi-calendar"></i> سالیانه#}
+{#                                </h5>#}
+{#                                <i class="bi bi-chevron-down icon-rotate"></i>#}
+{#                            </div>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">تاریخ انجام:</span> 1404/03/06#}
+{#                            </p>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">سرویس بعدی:</span> 1405/03/06#}
+{#                            </p>#}
+{#                            <div class="details">#}
+{#                                <p class="font_color">توضیحات:</p>#}
+{#                                <p>بازرسی جامع و تعمیرات اساسی.</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- کارت سه سالیانه -->#}
+{#                <div class="col-12 col-md-6 col-lg-3">#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                <h5 class="card-title">#}
+{#                                    <i class="bi bi-calendar4"></i> سه سالیانه#}
+{#                                </h5>#}
+{#                                <i class="bi bi-chevron-down icon-rotate"></i>#}
+{#                            </div>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">تاریخ انجام:</span> 1404/03/06#}
+{#                            </p>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">سرویس بعدی:</span> 1407/03/06#}
+{#                            </p>#}
+{#                            <div class="details">#}
+{#                                <p class="font_color">توضیحات:</p>#}
+{#                                <p>بازسازی کامل قطعات و سیستم‌ها.</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- کارت بازدید چرخ دنده -->#}
+{#                <div class="col-12 col-md-6 col-lg-3">#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                <h5 class="card-title">#}
+{#                                    <i class="bi bi-gear"></i> بازدید چرخ دنده#}
+{#                                </h5>#}
+{#                                <i class="bi bi-chevron-down icon-rotate"></i>#}
+{#                            </div>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">تاریخ انجام:</span> 1404/03/06#}
+{#                            </p>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">سرویس بعدی:</span> 1404/06/06#}
+{#                            </p>#}
+{#                            <div class="details">#}
+{#                                <p class="font_color">توضیحات:</p>#}
+{#                                <p>بازرسی و روغن‌کاری چرخ‌دنده‌ها.</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- کارت سایر -->#}
+{#                <div class="col-12 col-md-6 col-lg-3">#}
+{#                    <div class="card">#}
+{#                        <div class="card-body">#}
+{#                            <div class="d-flex justify-content-between align-items-center">#}
+{#                                <h5 class="card-title">#}
+{#                                    <i class="bi bi-list-check"></i> سایر#}
+{#                                </h5>#}
+{#                                <i class="bi bi-chevron-down icon-rotate"></i>#}
+{#                            </div>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">تاریخ انجام:</span> 1404/03/06#}
+{#                            </p>#}
+{#                            <p class="card-text">#}
+{#                                <span class="font_color">سرویس بعدی:</span> نامشخص#}
+{#                            </p>#}
+{#                            <div class="details">#}
+{#                                <p class="font_color">توضیحات:</p>#}
+{#                                <p>فعالیت‌های متفرقه نگهداری.</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#{% endblock content %}#}
+{##}
+{#{% block javascripts %}#}
+{#    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>#}
+{#    <script>#}
+{#        // مدیریت کلیک برای گسترش/جمع شدن کارت#}
+{#        document.querySelectorAll('.card').forEach(card => {#}
+{#            card.addEventListener('click', () => {#}
+{#                // تغییر وضعیت فقط برای کارت کلیک‌شده#}
+{#                card.classList.toggle('expanded');#}
+{#            });#}
+{#        });#}
+{#    </script>#}
+{#{% endblock javascripts %}#}
+
+
+{% extends "maintenance/layout/base.html" %}
+
+{% block title %} برنامه نگهداری {% endblock %}
+
+{% block stylesheets %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .font_color {
+            color: #009dff;
+            margin-left: 0.5rem; /* فاصله بین لیبل و متن */
+        }
+
+        .font_color1 {
+            color: #ff002f;
+            margin-right: 2rem; /* فاصله بین لیبل و متن */
+        }
+
+        .card {
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            background-color: #e6f3fa; /* تم رنگی هماهنگ */
+            cursor: pointer; /* نشانگر کلیک */
+            transition: all 0.3s ease; /* انیمیشن نرم */
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* سایه هنگام هاور */
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* فاصله بین آیکون و متن */
+        }
+
+        .card-title i {
+            font-size: 1.25rem;
+            color: #009dff; /* هم‌رنگ با font_color */
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        .modal-title {
+            color: #009dff;
+        }
+
+        @media (max-width: 991.98px) {
+            .card-title {
+                font-size: 1.1rem; /* فونت کوچکتر برای تبلت */
+            }
+
+            .card-text {
+                font-size: 0.9rem; /* فونت کوچکتر برای تبلت */
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .card-title {
+                font-size: 0.9rem; /* فونت کوچکتر برای موبایل */
+            }
+
+            .card-text {
+                font-size: 0.8rem; /* فونت کوچکتر برای موبایل */
+            }
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h2 class="text-center my-4 account" style="color: #009dff;">سرویس ها</h2>
+            </div>
+
+            <div class="row g-3 justify-content-center">
+                <!-- کارت روزانه -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card account" data-bs-toggle="modal" data-bs-target="#modalDaily">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-calendar-day"></i> روزانه
+                            </h5>
+                            <p class="card-text">
+                                <span class="font_color">تاریخ انجام:</span> 1404/03/06  <span class="font_color1">با روغن</span>
+                            </p>
+                            <p class="card-text">
+                                <span class="font_color">سرویس بعدی:</span> 1404/03/07
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- کارت ماهانه -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card account" data-bs-toggle="modal" data-bs-target="#modalMonthly">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-calendar-month"></i> ماهانه
+                            </h5>
+                            <p class="card-text">
+                                <span class="font_color">تاریخ انجام:</span> 1404/03/06
+                            </p>
+                            <p class="card-text">
+                                <span class="font_color">سرویس بعدی:</span> 1404/04/06
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- کارت سه ماهه -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card account" data-bs-toggle="modal" data-bs-target="#modalQuarterly">
+                        <div class="card-body ">
+                            <h5 class="card-title">
+                                <i class="bi bi-calendar3"></i> سه ماهه
+                            </h5>
+                            <p class="card-text">
+                                <span class="font_color">تاریخ انجام:</span> 1404/03/06<span class="font_color1">با روغن</span>
+                            </p>
+                            <p class="card-text">
+                                <span class="font_color">سرویس بعدی:</span> 1404/06/06
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- کارت شش ماهه -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card account" data-bs-toggle="modal" data-bs-target="#modalSemiannual">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-calendar3-event"></i> شش ماهه
+                            </h5>
+                            <p class="card-text">
+                                <span class="font_color">تاریخ انجام:</span> 1404/03/06
+                            </p>
+                            <p class="card-text">
+                                <span class="font_color">سرویس بعدی:</span> 1404/09/06
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- کارت سالیانه -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card account" data-bs-toggle="modal" data-bs-target="#modalAnnual">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-calendar"></i> سالیانه
+                            </h5>
+                            <p class="card-text">
+                                <span class="font_color">تاریخ انجام:</span> 1404/03/06
+                            </p>
+                            <p class="card-text">
+                                <span class="font_color">سرویس بعدی:</span> 1405/03/06
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- کارت سه سالیانه -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card account" data-bs-toggle="modal" data-bs-target="#modalTriennial">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-calendar4"></i> سه سالیانه
+                            </h5>
+                            <p class="card-text">
+                                <span class="font_color">تاریخ انجام:</span> 1404/03/06
+                            </p>
+                            <p class="card-text">
+                                <span class="font_color">سرویس بعدی:</span> 1407/03/06
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- کارت بازدید چرخ دنده -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card account" data-bs-toggle="modal" data-bs-target="#modalGearInspection">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-gear"></i> بازدید چرخ دنده
+                            </h5>
+                            <p class="card-text">
+                                <span class="font_color">تاریخ انجام:</span> 1404/03/06<span class="font_color1">با روغن</span>
+                            </p>
+                            <p class="card-text">
+                                <span class="font_color">سرویس بعدی:</span> 1404/06/06
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- کارت سایر -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card account" data-bs-toggle="modal" data-bs-target="#modalOther">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-list-check"></i> سایر
+                            </h5>
+                            <p class="card-text">
+                                <span class="font_color">تاریخ انجام:</span> 1404/03/06
+                            </p>
+                            <p class="card-text">
+                                <span class="font_color">سرویس بعدی:</span> نامشخص
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- مودال‌های مربوط به هر کارت -->
+        <!-- مودال روزانه -->
+        <div class="modal fade" id="modalDaily" tabindex="-1" aria-labelledby="modalDailyLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalDailyLabel">نگهداری روزانه</h5>
+{#                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+                    </div>
+                    <div class="modal-body">
+                        <p><span class="font_color">کارهای انجام‌شده:</span> بررسی روزانه قطعات و عملکرد سیستم‌ها.</p>
+                        <p><span class="font_color">مامور انجام:</span> محمد حسینی</p>
+                        <p><span class="font_color">محل انجام:</span> کارگاه مرکزی</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- مودال ماهانه -->
+        <div class="modal fade" id="modalMonthly" tabindex="-1" aria-labelledby="modalMonthlyLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalMonthlyLabel">نگهداری ماهانه</h5>
+{#                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+                    </div>
+                    <div class="modal-body">
+                        <p><span class="font_color">کارهای انجام‌شده:</span> بازرسی ماهانه و تعویض فیلترها.</p>
+                        <p><span class="font_color">مامور انجام:</span> علی رضایی</p>
+                        <p><span class="font_color">محل انجام:</span> ایستگاه شماره ۱</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- مودال سه ماهه -->
+        <div class="modal fade" id="modalQuarterly" tabindex="-1" aria-labelledby="modalQuarterlyLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalQuarterlyLabel">نگهداری سه ماهه</h5>
+{#                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+                    </div>
+                    <div class="modal-body">
+                        <p><span class="font_color">کارهای انجام‌شده:</span> بررسی کامل سیستم‌های مکانیکی.</p>
+                        <p><span class="font_color">مامور انجام:</span> رضا محمدی</p>
+                        <p><span class="font_color">محل انجام:</span> کارگاه شرقی</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- مودال شش ماهه -->
+        <div class="modal fade" id="modalSemiannual" tabindex="-1" aria-labelledby="modalSemiannualLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalSemiannualLabel">نگهداری شش ماهه</h5>
+{#                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+                    </div>
+                    <div class="modal-body">
+                        <p><span class="font_color">کارهای انجام‌شده:</span> سرویس کامل و تست عملکرد کلی.</p>
+                        <p><span class="font_color">مامور انجام:</span> حسین احمدی</p>
+                        <p><span class="font_color">محل انجام:</span> کارگاه شمالی</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- مودال سالیانه -->
+        <div class="modal fade" id="modalAnnual" tabindex="-1" aria-labelledby="modalAnnualLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalAnnualLabel">نگهداری سالیانه</h5>
+{#                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+                    </div>
+                    <div class="modal-body">
+                        <p><span class="font_color">کارهای انجام‌شده:</span> بازرسی جامع و تعمیرات اساسی.</p>
+                        <p><span class="font_color">مامور انجام:</span> مهدی کریمی</p>
+                        <p><span class="font_color">محل انجام:</span> کارگاه اصلی</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- مودال سه سالیانه -->
+        <div class="modal fade" id="modalTriennial" tabindex="-1" aria-labelledby="modalTriennialLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTriennialLabel">نگهداری سه سالیانه</h5>
+{#                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+                    </div>
+                    <div class="modal-body">
+                        <p><span class="font_color">کارهای انجام‌شده:</span> بازسازی کامل قطعات و سیستم‌ها.</p>
+                        <p><span class="font_color">مامور انجام:</span> سعید جعفری</p>
+                        <p><span class="font_color">محل انجام:</span> کارگاه مرکزی</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- مودال بازدید چرخ دنده -->
+        <div class="modal fade" id="modalGearInspection" tabindex="-1" aria-labelledby="modalGearInspectionLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalGearInspectionLabel">بازدید چرخ دنده</h5>
+{#                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+                    </div>
+                    <div class="modal-body">
+                        <p><span class="font_color">کارهای انجام‌شده:</span> بازرسی و روغن‌کاری چرخ‌دنده‌ها.</p>
+                        <p><span class="font_color">مامور انجام:</span> احمد نوری</p>
+                        <p><span class="font_color">محل انجام:</span> ایستگاه شماره ۲</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- مودال سایر -->
+        <div class="modal fade" id="modalOther" tabindex="-1" aria-labelledby="modalOtherLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalOtherLabel">سایر</h5>
+{#                        <button type="button" class="btn-close" data-bs-dismiss="modal">بستن</button>#}
+                    </div>
+                    <div class="modal-body">
+                        <p><span class="font_color">کارهای انجام‌شده:</span> فعالیت‌های متفرقه نگهداری.</p>
+                        <p><span class="font_color">مامور انجام:</span> محمدرضا شریفی</p>
+                        <p><span class="font_color">محل انجام:</span> کارگاه متفرقه</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock javascripts %}

@@ -84,5 +84,19 @@ def dailyCheckForm(request):
 
     return render(request, 'maintenance/home/dailyCheckForm.html')
 
+@login_required
+def serviceList(request):
+
+    return render(request, 'maintenance/home/serviceList.html')
+
+
+@login_required
+def oilTest(request):
+
+    return render(request, 'maintenance/home/oilTest.html')
+
+
+
+
 
 

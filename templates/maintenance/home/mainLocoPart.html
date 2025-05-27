@@ -1,77 +1,161 @@
+
 {% extends "maintenance/layout/base.html" %}
 
 {% block title %} Page 404 {% endblock %}
 
-
 {% block stylesheets %}
-<link rel="stylesheet" href="/static/css/reportStyle.css?v0.1">
+    <link rel="stylesheet" href="/static/css/reportStyle.css?v0.1">
     <script type="text/javascript" src="/static/js/contract.js?v1.7"></script>
+    <style>
+        /* اضافه کردن رنگ پس‌زمینه برای کارت بزرگ */
+        .card-loco {
+            background-color: #e6f3fa;
+            border-radius: 10px;
+        }
+
+        /* استایل برای آیکون‌های کنار عنوان */
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap; /* جلوگیری از دوخطی شدن متن */
+        }
+
+        .card-title i {
+            font-size: 1.25rem;
+            color: #009dff;
+        }
+
+        /* استایل برای دسکتاپ‌های بزرگ‌تر (992px و بالاتر) */
+        @media (min-width: 992px) {
+            .bottom-card {
+                min-height: 160px; /* افزایش ارتفاع کارت‌ها */
+                transition: transform 0.2s; /* انلیمیشن برای بزرگ شدن */
+            }
+
+            .bottom-card:hover {
+                transform: scale(1.05); /* بزرگ شدن کارت هنگام هاور */
+            }
+
+            .bottom-card .card-body {
+                padding: 1.75rem; /* افزایش پدینگ */
+            }
+
+            .bottom-card .card-title {
+                font-size: 1.3rem; /* اندازه فونت بزرگ‌تر */
+            }
+
+            .bottom-card .card-title i {
+                font-size: 1.5rem; /* افزایش اندازه آیکون */
+            }
+        }
+
+        /* استایل برای دسکتاپ‌های کوچک‌تر (768px تا 991px) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .bottom-card {
+                min-height: 140px; /* ارتفاع کمی کوچک‌تر */
+                transition: transform 0.2s;
+            }
+
+            .bottom-card:hover {
+                transform: scale(1.05);
+            }
+
+            .bottom-card .card-body {
+                padding: 1.25rem; /* پدینگ کوچک‌تر */
+            }
+
+            .bottom-card .card-title {
+                font-size: 1rem; /* فونت کوچک‌تر برای جلوگیری از دوخطی شدن */
+            }
+
+            .bottom-card .card-title i {
+                font-size: 1.2rem; /* آیکون کوچک‌تر */
+            }
+        }
+
+        /* استایل برای تبلت و موبایل (بازگشت به حالت اولیه) */
+        @media (max-width: 767.98px) {
+            .bottom-card .card-body {
+                padding: 1rem; /* پدینگ اولیه بوت‌استرپ */
+            }
+
+            .bottom-card .card-title {
+                font-size: 1rem; /* اندازه فونت اولیه */
+            }
+
+            .bottom-card .card-title i {
+                font-size: 1.25rem; /* اندازه آیکون اولیه */
+            }
+
+            .bottom-card {
+                min-height: auto; /* حذف ارتفاع ثابت */
+            }
+        }
+    </style>
 {% endblock stylesheets %}
 
 {% block content %}
-
     <div class="container-fluid">
-    <div class="row justify-content-center">
-
-        <div class="col-12 ">
-            <div class="card my-4">
-                <div class="card-body">
-                    <h2 class="card-title account">{{ loco }}</h2>
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card my-4 card-loco">
+                    <div class="card-body">
+                        <h2 class="card-title account">{{ loco }}</h2>
+                    </div>
                 </div>
-            </div>
 
-
-                 <div class="row g-1 justify-content-center" >
-                    <div class="col-md-2 my-1">
-                        <a class="text-decoration-none" href="{% url 'maintenance:mainDieselDetails' loco=loco  %}">
-                            <div class="card"
-                                 onclick="selectCard(this);">
+                <div class="row g-1 justify-content-center">
+                    <div class="col-12 col-sm-6 col-md-3 my-1"> <!-- col-12 برای موبایل، col-sm-6 برای تبلت، col-md-3 برای دسکتاپ -->
+                        <a class="text-decoration-none" href="{% url 'maintenance:mainDieselDetails' loco=loco %}">
+                            <div class="card bottom-card account" onclick="selectCard(this);">
                                 <div class="card-body">
-                                    <h5 class="card-title ">سابقه تعمیرات</h5>
+                                    <h5 class="card-title">
+                                        <i class="bi bi-tools"></i> سابقه تعمیرات
+                                    </h5>
                                 </div>
                             </div>
                         </a>
                     </div>
-                    <div class="col-md-2   my-1">
-                         <a class="text-decoration-none" href="{% url 'maintenance:mainLocoPartChange' loco=loco  %}">
-                        <div class="card"
-                             onclick="selectCard(this)">
+                    <div class="col-12 col-sm-6 col-md-3 my-1"> <!-- col-12 برای موبایل، col-sm-6 برای تبلت، col-md-3 برای دسکتاپ -->
+                        <a class="text-decoration-none" href="{% url 'maintenance:mainLocoPartChange' loco=loco %}">
+                            <div class="card bottom-card account" onclick="selectCard(this)">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-gear"></i> تعویض قطعات
+                                    </h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3 my-1"> <!-- col-12 برای موبایل، col-sm-6 برای تبلت، col-md-3 برای دسکتاپ -->
+                        <a class="text-decoration-none" href="{% url 'maintenance:oilTest' %}">
+                            <div class="card bottom-card account" onclick="selectCard(this)">
                             <div class="card-body">
-                                <h5 class="card-title ">تعویض قطعات</h5>
+                                <h5 class="card-title">
+                                    <i class="bi bi-droplet"></i>آنالیز روغن
+                                </h5>
                             </div>
                         </div>
-                         </a>
-                    </div>
-                    <div class=" col-md-2   my-1">
-                        <div class="card"
-                             onclick="selectCard(this); showReportDetails('گزارش موجودی انبار', 'بررسی موجودی کالاها و نیازهای تدارکاتی انبار.')">
-                            <div class="card-body">
-                                <h5 class="card-title ">آزمایش روغن</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class=" col-md-2   my-1">
-                        <div class="card"
-                             onclick="selectCard(this); showReportDetails('گزارش رضایت مشتریان', 'تحلیل بازخورد مشتریان از خدمات و محصولات.')">
-                            <div class="card-body">
-                                <h5 class="card-title ">سرویس</h5>
-                            </div>
-                        </div>
-                    </div>
+                        </a>
 
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3 my-1"> <!-- col-12 برای موبایل، col-sm-6 برای تبلت، col-md-3 برای دسکتاپ -->
+                        <a href="{% url 'maintenance:serviceList' %}" class="text-decoration-none">
+                            <div class="card bottom-card account" onclick="selectCard(this)">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-wrench"></i> سرویس
+                                    </h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
-
-
-
-        </div>
-
+            </div>
         </div>
     </div>
-
-
 {% endblock content %}
 
-
 {% block javascripts %}
-
 {% endblock javascripts %}

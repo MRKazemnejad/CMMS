@@ -18,5 +18,8 @@ urlpatterns = [
     path('motorizedRepairForm/', views.motorizedRepairForm, name='motorizedRepairForm'),
     path('dailyCheckForm/', views.dailyCheckForm, name='dailyCheckForm'),
 
+    path('serviceList/', views.serviceList, name='serviceList'),
+    path('oilTest/', views.oilTest, name='oilTest'),
+
     path('mainDieselDetails/<str:loco>', views.mainDieselDetails, name='mainDieselDetails'),
 ]
