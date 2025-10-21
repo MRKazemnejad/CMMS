@@ -5,21 +5,8 @@ app_name = 'maintenance'
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
-    path('mainSelectLoco', views.mainSelectLoco, name='mainSelectLoco'),
-    path('mainLocoPart/<str:loco>', views.mainLocoPart, name='mainLocoPart'),
-    path('mainLocoPartChange/<str:loco>', views.mainLocoPartChange, name='mainLocoPartChange'),
+    path('mainSelectLoco/', views.mainSelectLoco, name='mainSelectLoco'),
+    path('mainRegisterFailure/', views.mainRegisterFailure, name='mainRegisterFailure'),
+    path('mainRegisterFailure_submit/', views.mainRegisterFailure_submit, name='mainRegisterFailure_submit'),
 
-    path('mainRecord/', views.mainRecord, name='mainRecord'),
-    path('registerFailure/', views.registerFailure, name='registerFailure'),
-    path('registerRepair/', views.registerRepair, name='registerRepair'),
-
-    path('electricalRepairForm/', views.electricalRepairForm, name='electricalRepairForm'),
-    path('motorizedRepairForm/', views.motorizedRepairForm, name='motorizedRepairForm'),
-    path('dailyCheckForm/', views.dailyCheckForm, name='dailyCheckForm'),
-
-    path('serviceList/', views.serviceList, name='serviceList'),
-    path('oilTest/', views.oilTest, name='oilTest'),
-
-    path('mainDieselDetails/<str:loco>', views.mainDieselDetails, name='mainDieselDetails'),
-    path('download_file/<int:id>', views.download_file, name='download_file'),
 ]

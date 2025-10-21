@@ -120,8 +120,8 @@ STATICFILES_DIRS = (
 )
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-MEDIA_ROOT = 'C:/CMMS/Files/media/'
-MEDIA_URL = 'C:/CMMS/Files/media/'
+MEDIA_ROOT = 'C:/CMMS/Files/Media/'
+MEDIA_URL = 'C:/CMMS/Files/Media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

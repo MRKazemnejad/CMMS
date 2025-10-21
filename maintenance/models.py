@@ -1,42 +1,150 @@
 from django.db import models
+from django.utils import timezone
 
-class Maintenance(models.Model):
-    diesel_name = models.CharField(max_length=100,null=True,verbose_name="اسم دیزل")
-    failure_title = models.CharField(max_length=200,null=True, verbose_name="عنوان خرابی")
-    failure_description = models.TextField(null=True,verbose_name="شرح خرابی")
-    start_date = models.CharField(max_length=10,null=True, verbose_name="تاریخ شروع خرابی")  # به‌صورت کاراکتر
-    end_date = models.CharField(max_length=10,null=True, verbose_name="تاریخ پایان خرابی")    # به‌صورت کاراکتر
-    location = models.CharField(max_length=200,null=True, verbose_name="مکان خرابی")
-    repair_description = models.TextField(null=True, verbose_name="رفع خرابی")
-    officer = models.CharField(null=True,max_length=100, verbose_name="مامور خرابی")
-    in_repair=models.BooleanField(default=False)
+# Locomotive model to store locomotive details
+class Locomotive(models.Model):
+    locomotive_id = models.CharField(max_length=50, unique=True, verbose_name="Locomotive ID")
+    model = models.CharField(max_length=100, verbose_name="Locomotive Model")
+    depot = models.CharField(max_length=100, verbose_name="Depot Location")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
     def __str__(self):
-        return f"{self.diesel_name} - {self.failure_title}"
+        return f"{self.locomotive_id} - {self.model}"
 
     class Meta:
-        verbose_name = "تعمیرات"
-        verbose_name_plural = "تعمیرات‌ها"
+        verbose_name = "Locomotive"
+        verbose_name_plural = "Locomotives"
 
-class MaintenanceImage(models.Model):
-    IMAGE_TYPE_CHOICES = [
-        ('before', 'قبل از تعمیر'),
-        ('after', 'بعد از تعمیر'),
-    ]
-    maintenance = models.ForeignKey(Maintenance, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='maintenance/', verbose_name="تصویر")
-    image_type = models.CharField(max_length=10, choices=IMAGE_TYPE_CHOICES, verbose_name="نوع تصویر")
+# Base model for images to support multiple image uploads
+class Image(models.Model):
+    image = models.ImageField(upload_to='images/%Y/%m/%d/', verbose_name="Image")
+    uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Uploaded At")
 
     class Meta:
-        verbose_name = "تصویر تعمیرات"
-        verbose_name_plural = "تصاویر تعمیرات"
+        abstract = True
 
+# Failure model to store locomotive failure details
+class Failure(models.Model):
+    DAMAGE_TYPES = (
+        ('MECHANICAL', 'Mechanical'),
+        ('ELECTRICAL', 'Electrical'),
+        ('BOGIE_CHASSIS', 'Bogie and Chassis'),
+        ('BRAKE', 'Brake'),
+        ('CABIN_AMENITIES', 'Cabin and Amenities'),
+    )
 
+    locomotive = models.ForeignKey(Locomotive, on_delete=models.CASCADE, related_name='failures', verbose_name="Locomotive")
+    damage_type = models.CharField(max_length=50, choices=DAMAGE_TYPES, verbose_name="Damage Type")
+    description = models.TextField(verbose_name="Failure Description")
+    location = models.CharField(max_length=100, verbose_name="Failure Location")
+    reported_date = models.DateField(default=timezone.now, verbose_name="Reported Date")
+    reported_time = models.TimeField(default=timezone.now, verbose_name="Reported Time")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
 
-class ChangeParts(models.Model):
-    part=models.CharField(max_length=200,null=True)
-    serial=models.CharField(max_length=200,null=True)
-    change_date=models.CharField(max_length=200,null=True)
-    part_number=models.IntegerField(default=0,null=True)
-    product_id=models.IntegerField(null=True)
-    diesel=models.CharField(null=True,max_length=100)
+    def __str__(self):
+        return f"Failure {self.id} - {self.locomotive.locomotive_id} ({self.damage_type})"
+
+    class Meta:
+        verbose_name = "Failure"
+        verbose_name_plural = "Failures"
+
+# FailureImage model to store multiple images for a failure
+class FailureImage(Image):
+    failure = models.ForeignKey(Failure, on_delete=models.CASCADE, related_name='images', verbose_name="Failure")
+
+    def __str__(self):
+        return f"Image for Failure {self.failure.id}"
+
+    class Meta:
+        verbose_name = "Failure Image"
+        verbose_name_plural = "Failure Images"
+
+# Repair model to store repair details with updated fields
+class Repair(models.Model):
+    REPAIR_STATUS = (
+        ('IN_PROGRESS', 'In Progress'),
+        ('COMPLETED', 'Completed'),
+    )
+
+    failure = models.ForeignKey(Failure, on_delete=models.CASCADE, related_name='repairs', verbose_name="Related Failure")
+    title = models.CharField(max_length=200, verbose_name="Repair Title")
+    start_date = models.DateField(default=timezone.now, verbose_name="Start Date")
+    start_time = models.TimeField(default=timezone.now, verbose_name="Start Time")
+    end_date = models.DateField(null=True, blank=True, verbose_name="End Date")
+    end_time = models.TimeField(null=True, blank=True, verbose_name="End Time")
+    location = models.CharField(max_length=100, verbose_name="Repair Location")
+    technician = models.CharField(max_length=100, verbose_name="Technician")
+    status = models.CharField(max_length=20, choices=REPAIR_STATUS, default='IN_PROGRESS', verbose_name="Repair Status")
+    description = models.TextField(verbose_name="Repair Description")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    def __str__(self):
+        return f"Repair {self.title} for Failure {self.failure.id}"
+
+    class Meta:
+        verbose_name = "Repair"
+        verbose_name_plural = "Repairs"
+
+# RepairImage model to store multiple images for a repair
+class RepairImage(Image):
+    repair = models.ForeignKey(Repair, on_delete=models.CASCADE, related_name='images', verbose_name="Repair")
+
+    def __str__(self):
+        return f"Image for Repair {self.repair.id}"
+
+    class Meta:
+        verbose_name = "Repair Image"
+        verbose_name_plural = "Repair Images"
+
+# Service model to store regular service details
+class Service(models.Model):
+    locomotive = models.ForeignKey(Locomotive, on_delete=models.CASCADE, related_name='services', verbose_name="Locomotive")
+    checklist = models.TextField(verbose_name="Checklist Details")
+    serviced_date = models.DateField(default=timezone.now, verbose_name="Serviced Date")
+    serviced_time = models.TimeField(default=timezone.now, verbose_name="Serviced Time")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    def __str__(self):
+        return f"Service {self.id} - {self.locomotive.locomotive_id}"
+
+    class Meta:
+        verbose_name = "Service"
+        verbose_name_plural = "Services"
+
+# ServiceImage model to store multiple images for a service
+class ServiceImage(Image):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='images', verbose_name="Service")
+
+    def __str__(self):
+        return f"Image for Service {self.service.id}"
+
+    class Meta:
+        verbose_name = "Service Image"
+        verbose_name_plural = "Service Images"
+
+# Incident model to store incident details
+class Incident(models.Model):
+    locomotive = models.ForeignKey(Locomotive, on_delete=models.CASCADE, related_name='incidents', verbose_name="Locomotive")
+    description = models.TextField(verbose_name="Incident Description")
+    incident_date = models.DateField(default=timezone.now, verbose_name="Incident Date")
+    incident_time = models.TimeField(default=timezone.now, verbose_name="Incident Time")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    def __str__(self):
+        return f"Incident {self.id} - {self.locomotive.locomotive_id}"
+
+    class Meta:
+        verbose_name = "Incident"
+        verbose_name_plural = "Incidents"
+
+# IncidentImage model to store multiple images for an incident
+class IncidentImage(Image):
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, related_name='images', verbose_name="Incident")
+
+    def __str__(self):
+        return f"Image for Incident {self.incident.id}"
+
+    class Meta:
+        verbose_name = "Incident Image"
+        verbose_name_plural = "Incident Images"
