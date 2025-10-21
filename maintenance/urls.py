@@ -9,7 +9,6 @@ urlpatterns = [
     path('mainLocoPart/<str:loco>', views.mainLocoPart, name='mainLocoPart'),
     path('mainLocoPartChange/<str:loco>', views.mainLocoPartChange, name='mainLocoPartChange'),
 
-
     path('mainRecord/', views.mainRecord, name='mainRecord'),
     path('registerFailure/', views.registerFailure, name='registerFailure'),
     path('registerRepair/', views.registerRepair, name='registerRepair'),
@@ -22,4 +21,5 @@ urlpatterns = [
     path('oilTest/', views.oilTest, name='oilTest'),
 
     path('mainDieselDetails/<str:loco>', views.mainDieselDetails, name='mainDieselDetails'),
+    path('download_file/<int:id>', views.download_file, name='download_file'),
 ]

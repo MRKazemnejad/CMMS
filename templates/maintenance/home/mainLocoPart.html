@@ -117,6 +117,7 @@
                             </div>
                         </a>
                     </div>
+
                     <div class="col-12 col-sm-6 col-md-3 my-1"> <!-- col-12 برای موبایل، col-sm-6 برای تبلت، col-md-3 برای دسکتاپ -->
                         <a class="text-decoration-none" href="{% url 'maintenance:mainLocoPartChange' loco=loco %}">
                             <div class="card bottom-card account" onclick="selectCard(this)">
@@ -152,6 +153,30 @@
                         </a>
                     </div>
                 </div>
+                 <div class="row g-1 justify-content-center">
+                      <div class="col-12 col-sm-6 col-md-3 my-1"> <!-- col-12 برای موبایل، col-sm-6 برای تبلت، col-md-3 برای دسکتاپ -->
+                        <a href="{% url 'maintenance:serviceList' %}" class="text-decoration-none">
+                            <div class="card bottom-card account" onclick="selectCard(this)">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-bar-chart-line"></i>گزارش عملکرد
+                                    </h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                     <div class="col-12 col-sm-6 col-md-3 my-1"> <!-- col-12 برای موبایل، col-sm-6 برای تبلت، col-md-3 برای دسکتاپ -->
+                        <a href="{% url 'maintenance:serviceList' %}" class="text-decoration-none">
+                            <div class="card bottom-card account" onclick="selectCard(this)">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-chat-right-text"></i>گزارشات
+                                    </h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                 </div>
             </div>
         </div>
     </div>

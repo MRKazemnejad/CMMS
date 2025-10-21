@@ -139,7 +139,9 @@
                                 </p>
                                 <p class="card-text">
                                     <span class="font_color">فایل پیوست:</span>
-                                    <a href="{{ attached_file|default:'/static/pdf/daily_report.pdf' }}" class="file-link" target="_blank">مشاهده</a>
+{#                                    <a href="/static/pdf/monthly_report.pdf" class="file-link" target="_blank">مشاهده</a>#}
+                                    <a href="{% url 'maintenance:download_file' id=1%}" class="btn btn-warning btn-sm ">مشاهده</a>
+
                                 </p>
                             </div>
                             <div class="chart-column">

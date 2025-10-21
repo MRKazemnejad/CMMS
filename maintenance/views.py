@@ -1,3 +1,4 @@
+from django.http import FileResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from maintenance.forms import MaintenanceForm
@@ -94,6 +95,13 @@ def serviceList(request):
 def oilTest(request):
 
     return render(request, 'maintenance/home/oilTest.html')
+
+def download_file(request,id):
+
+    response = FileResponse(open(f'maintenance/file/{id}.pdf', 'rb'))
+    file_name = f'{id}.pdf'
+    response['Content-Disposition'] = 'inline; filename=' + file_name
+    return response
 
 
 
