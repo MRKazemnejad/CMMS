@@ -41,6 +41,7 @@ class Failure(models.Model):
     reported_date = models.DateField(default=timezone.now, verbose_name="Reported Date")
     reported_time = models.TimeField(default=timezone.now, verbose_name="Reported Time")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    inRepair = models.BooleanField(default=False,null=True)
 
     def __str__(self):
         return f"Failure {self.id} - {self.locomotive.locomotive_id} ({self.damage_type})"
@@ -101,6 +102,7 @@ class RepairImage(Image):
 class Service(models.Model):
     locomotive = models.ForeignKey(Locomotive, on_delete=models.CASCADE, related_name='services', verbose_name="Locomotive")
     checklist = models.TextField(verbose_name="Checklist Details")
+    hasOil=models.BooleanField(default=False,null=True)
     serviced_date = models.DateField(default=timezone.now, verbose_name="Serviced Date")
     serviced_time = models.TimeField(default=timezone.now, verbose_name="Serviced Time")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")

@@ -1,3 +1,4 @@
+
 {% extends "maintenance/layout/base.html" %}
 
 {% block title %} ثبت خرابی لکوموتیو {% endblock %}
@@ -15,6 +16,7 @@
             background-color: #f8f9fa;
             font-family: 'Vazirmatn', sans-serif;
         }
+
         .container-fullwidth {
             width: 100%;
             padding: 20px;
@@ -23,70 +25,86 @@
             border-radius: 10px;
             margin-top: 20px;
         }
+
         .form-title {
             text-align: center;
             margin-bottom: 20px;
             font-size: 1.8rem;
             color: #333;
         }
+
         .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
         }
+
         .btn-primary:hover {
             background-color: #0056b3;
             border-color: #004085;
         }
+
         .form-label {
             font-weight: bold;
         }
+
         .form-group {
             margin-bottom: 1rem;
         }
+
         /* Adjust form width for fields */
         .form-container {
             max-width: 1080px; /* Approximate width for 3x col-md-3 */
             margin: 0 auto;
         }
-        /* Style for timepicker with clock icon */
-        .timepicker-container {
-            position: relative;
+
+        /* Validation styles */
+        .is-invalid {
+            border-color: #dc3545;
         }
-        .timepicker-container::after {
-            content: '\f017'; /* FontAwesome clock icon (Unicode) */
-            font-family: 'FontAwesome';
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            color: #666;
-            pointer-events: none;
-            font-size: 1rem; /* Smaller clock icon */
+
+        .invalid-feedback {
+            display: none;
+            color: #dc3545;
+            font-size: 0.875rem;
         }
-        .timepicker-container input {
-            padding-right: 30px; /* Space for icon */
+
+        .is-invalid ~ .invalid-feedback {
+            display: block;
         }
+
         /* Responsive adjustments for mobile */
         @media (max-width: 576px) {
             .container-fullwidth {
                 padding: 15px;
                 margin: 10px;
             }
+
             .form-title {
                 font-size: 1.5rem;
             }
+
             .form-container {
                 max-width: 100%;
                 padding: 0 10px;
             }
+
             .form-group {
                 margin-bottom: 0.75rem;
             }
         }
 
-        .time-picker-container {
-            max-width: 500px;
-            margin: 0 auto;
+        .timepicker-container {
+            position: relative;
+        }
+        .timepicker-container .form-control {
+            padding-left: 40px; /* فضای سمت چپ برای آیکون */
+        }
+        .timepicker-container .fa-clock {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #495057;
         }
     </style>
 {% endblock stylesheets %}
@@ -94,52 +112,62 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row justify-content-center">
-             <h2 class="form-title account">ثبت خرابی لکوموتیو</h2>
+            <h2 class="form-title account">ثبت خرابی لکوموتیو</h2>
             <div class="container-fullwidth">
                 <div class="form-container account">
-                    <!-- Row 1: Locomotive ID, Damage Type, Description -->
+                    <!-- Row 1: Locomotive ID, Damage Type, Location -->
                     <div class="row">
                         <div class="col-md-3 form-group">
                             <label for="locomotiveId" class="form-label">شناسه لکوموتیو</label>
                             <select id="locomotiveId" class="form-control" aria-label="انتخاب لکوموتیو">
-                                <option selected disabled>یک لکوموتیو انتخاب کنید</option>
+                                <option value="0" selected>یک لکوموتیو انتخاب کنید</option>
                                 <option value="7019">7019</option>
                                 <option value="7020">7020</option>
                                 <option value="7021">7021</option>
-                                <!-- Options will be populated dynamically -->
                             </select>
+                            <div class="invalid-feedback">لطفاً یک لکوموتیو انتخاب کنید.</div>
                         </div>
                         <div class="col-md-3 form-group">
                             <label for="damageType" class="form-label">نوع خرابی</label>
                             <select id="damageType" class="form-control" aria-label="انتخاب نوع خرابی">
-                                <option selected disabled>نوع خرابی را انتخاب کنید</option>
+                                <option value="0" selected>نوع خرابی را انتخاب کنید</option>
                                 <option value="MECHANICAL">مکانیکی</option>
                                 <option value="ELECTRICAL">برقی</option>
                                 <option value="BOGIE_CHASSIS">بوژی و شاسی</option>
                                 <option value="BRAKE">ترمز</option>
                                 <option value="CABIN_AMENITIES">کابین و رفاهی</option>
                             </select>
+                            <div class="invalid-feedback">لطفاً نوع خرابی را انتخاب کنید.</div>
                         </div>
                         <div class="col-md-3 form-group">
                             <label for="location" class="form-label">مکان خرابی</label>
                             <input type="text" id="location" class="form-control" placeholder="مکان خرابی را وارد کنید">
+                            <div class="invalid-feedback">لطفاً مکان خرابی را وارد کنید.</div>
                         </div>
                     </div>
-                    <!-- Row 2: Location, Reported Date, Reported Time -->
+                    <!-- Row 2: Reported Date, Reported Time -->
                     <div class="row">
                         <div class="col-md-3 form-group">
                             <label for="reportedDate" class="form-label">تاریخ گزارش</label>
-                            <input type="text" id="reportedDate" class="form-control" data-jdp placeholder="تاریخ را وارد کنید">
+                            <input type="text" id="reportedDate" class="form-control" data-jdp
+                                   placeholder="تاریخ را وارد کنید">
+                            <div class="invalid-feedback">لطفاً تاریخ گزارش را وارد کنید.</div>
                         </div>
                         <div class="col-md-3 form-group timepicker-container">
                             <label for="reportedTime" class="form-label">ساعت گزارش</label>
-                            <input type="text" id="reportedTime" class="form-control" placeholder="ساعت را انتخاب کنید">
+                            <div class="timepicker-container">
+                                <input type="time" class="form-control" id="reportedTime">
+                                <i class="fas fa-clock"></i> <!-- آیکون ساعت -->
+                            </div>
+                            <div class="invalid-feedback">لطفاً ساعت گزارش را وارد کنید.</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-9 form-group">
                             <label for="description" class="form-label">توضیحات خرابی</label>
-                            <textarea id="description" class="form-control" rows="4" placeholder="توضیحات خرابی را وارد کنید"></textarea>
+                            <textarea id="description" class="form-control" rows="4"
+                                      placeholder="توضیحات خرابی را وارد کنید"></textarea>
+                            <div class="invalid-feedback">لطفاً توضیحات خرابی را وارد کنید.</div>
                         </div>
                     </div>
                     <!-- Row 3: Image Upload, Submit Button -->
@@ -184,20 +212,45 @@
             maxDate: "attr"
         });
 
-        // Initialize Flatpickr for Timepicker with clock icon
-        flatpickr("#reportedTime", {
-            enableTime: true,
-            noCalendar: true,
-            dateFormat: "H:i",
-            time_24hr: true,
-            locale: "fa",
-            defaultDate: new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', hour12: false }),
-            minuteIncrement: 1,
-            enableSeconds: false
-        });
-
-        // Handle form submission with SweetAlert2 confirmation
+        // Handle form submission with validation
         document.getElementById('submitBtn').addEventListener('click', () => {
+            // Reset previous validation states
+            document.querySelectorAll('.form-control, .form-control-file').forEach(input => {
+                input.classList.remove('is-invalid');
+            });
+
+            // Check for empty required fields
+            const requiredFields = [
+                { id: 'locomotiveId', label: 'شناسه لکوموتیو' },
+                { id: 'damageType', label: 'نوع خرابی' },
+                { id: 'location', label: 'مکان خرابی' },
+                { id: 'reportedDate', label: 'تاریخ گزارش' },
+                { id: 'reportedTime', label: 'ساعت گزارش' },
+                { id: 'description', label: 'توضیحات خرابی' }
+            ];
+
+            let emptyFields = [];
+            requiredFields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const value = input.value.trim();
+                if (!value || (input.tagName === 'SELECT' && input.value === '0')) {
+                    input.classList.add('is-invalid');
+                    emptyFields.push(field.label);
+                }
+            });
+
+            // If there are empty fields, show SweetAlert2 error
+            if (emptyFields.length > 0) {
+                Swal.fire({
+                    title: 'خطا!',
+                    html: `لطفاً فیلدهای زیر را پر کنید:<br>${emptyFields.join('<br>')}`,
+                    icon: 'error',
+                    confirmButtonText: 'باشه'
+                });
+                return;
+            }
+
+            // Proceed with form submission if all fields are valid
             Swal.fire({
                 title: 'آیا مطمئن هستید؟',
                 text: 'آیا می‌خواهید اطلاعات خرابی را ثبت کنید؟',
@@ -216,7 +269,7 @@
                     formData.append('reportedDate', document.getElementById('reportedDate').value);
                     formData.append('reportedTime', document.getElementById('reportedTime').value);
 
-                    // Append multiple images
+                    // Append multiple images (optional)
                     const images = document.getElementById('images').files;
                     for (let i = 0; i < images.length; i++) {
                         formData.append('images', images[i]);
@@ -232,7 +285,7 @@
                         headers: {
                             'X-CSRFToken': '{{ csrf_token }}'
                         },
-                        success: function(response) {
+                        success: function (response) {
                             if (response.status === 'success') {
                                 Swal.fire({
                                     title: 'موفقیت!',
@@ -241,8 +294,8 @@
                                     confirmButtonText: 'باشه'
                                 }).then(() => {
                                     // Reset form
-                                    document.getElementById('locomotiveId').value = '';
-                                    document.getElementById('damageType').value = '';
+                                    document.getElementById('locomotiveId').value = '0';
+                                    document.getElementById('damageType').value = '0';
                                     document.getElementById('description').value = '';
                                     document.getElementById('location').value = '';
                                     document.getElementById('reportedDate').value = '';
@@ -258,7 +311,7 @@
                                 });
                             }
                         },
-                        error: function(xhr) {
+                        error: function (xhr) {
                             Swal.fire({
                                 title: 'خطا!',
                                 text: xhr.responseJSON ? xhr.responseJSON.message : 'خطا در ارسال اطلاعات',

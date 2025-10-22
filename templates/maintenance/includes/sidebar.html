@@ -25,49 +25,55 @@
             </li>
 
 
-            <li class="nav-item mb-2 ">
-                <a href="{% url 'maintenance:mainRegisterFailure' %}" class="nav-link {% if segment in 'failure' %}active{% endif %}" href="#">
-                    <i class="fe fe-layers fe-16"></i>
-                    <span class="ml-3 item-text">ثبت خرابی</span>
+{#            <li class="nav-item mb-2 ">#}
+{#                <a href="{% url 'maintenance:mainRegisterFailure' %}" class="nav-link {% if segment in 'failure' %}active{% endif %}" href="#">#}
+{#                    <i class="fe fe-layers fe-16"></i>#}
+{#                    <span class="ml-3 item-text">ثبت خرابی</span>#}
+{##}
+{#                </a>#}
+{#            </li>#}
 
-                </a>
-            </li>
 
+                        <ul class="navbar-nav flex-fill w-100 mb-2 account">
+                            <li class="nav-item dropdown">
+                                <a href="#failurpart" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link ">
+                                    <i class="fe fe-box fe-16"></i>
+                                    <span class="ml-3 item-text">ثبت اطلاعات</span><span class="sr-only"></span>
+                                </a>
+                                <ul class="collapse list-unstyled pl-4 w-100 {% if segment in 'failure repair service crash' %}show{% else %}{% endif %}"
+                                    id="failurpart">
+                                    <li class="nav-item ">
+                                        <a class="nav-link pl-3 {% if segment in 'failure' %}active{% else %}{% endif %}"
+                                           href="{% url 'maintenance:mainRegisterFailure' %}"><span
+                                                class="ml-1 item-text">ثبت خرابی</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link pl-3 {% if segment in 'repair' %}active{% else %}{% endif %}"
+                                           href="{% url 'maintenance:mainRegisterFailureRepair' %}"><span
+                                                class="ml-1 item-text">ثبت تعمیر</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link pl-3 {% if segment in 'service' %}active{% else %}{% endif %}"
+                                           href="{% url 'maintenance:mainRegisterService' %}"><span
+                                                class="ml-1 item-text">ثبت سرویس</span></a>
+                                    </li>
 
-            {#            <ul class="navbar-nav flex-fill w-100 mb-2 account">#}
-            {#                <li class="nav-item dropdown">#}
-            {#                    <a href="#demontage" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link ">#}
-            {#                        <i class="fe fe-box fe-16"></i>#}
-            {#                        <span class="ml-3 item-text">مونتاژ/ دمونتاژ</span><span class="sr-only"></span>#}
-            {#                    </a>#}
-            {#                    <ul class="collapse list-unstyled pl-4 w-100 {% if segment in 'entrdata montage fail' %}show{% else %}{% endif %}"#}
-            {#                        id="demontage">#}
-            {#                        <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'entrdata' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">ورود اطلاعات</span></a>#}
-            {#                        </li>#}
-            {#                        <li class="nav-item">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'montage' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">مونتاژ</span></a>#}
-            {#                        </li>#}
-            {#                        <li class="nav-item">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'fail' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">عدم تایید ناظر</span></a>#}
-            {#                        </li>#}
-            {#                    </ul>#}
-            {#                </li>#}
-            {#            </ul>#}
+                                 <li class="nav-item">
+                                        <a class="nav-link pl-3 {% if segment in 'crash' %}active{% else %}{% endif %}"
+                                           href="{% url 'maintenance:mainRegisterCrash' %}"><span
+                                                class="ml-1 item-text">ثبت سانحه</span></a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
 
-            {#            <li class="nav-item mb-2 ">#}
-            {#                <a class="nav-link {% if segment in 'chk' %}active{% endif %}" href="#">#}
-            {#                    <i class="fe fe-layers fe-16"></i>#}
-            {#                    <span class="ml-3 item-text">ناظر</span>#}
-            {##}
-            {#                </a>#}
-            {#            </li>#}
+{#                        <li class="nav-item mb-2 ">#}
+{#                            <a href="{% url 'maintenance:timepicker' %}" class="nav-link {% if segment in 'chk' %}active{% endif %}" href="#">#}
+{#                                <i class="fe fe-layers fe-16"></i>#}
+{#                                <span class="ml-3 item-text">ناظر</span>#}
+{##}
+{#                            </a>#}
+{#                        </li>#}
 
 
             {#            <ul class="navbar-nav flex-fill w-100 mb-2 account">#}
