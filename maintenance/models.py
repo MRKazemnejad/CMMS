@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 # Locomotive model to store locomotive details
 class Locomotive(models.Model):
     locomotive_id = models.CharField(max_length=50, unique=True, verbose_name="Locomotive ID")
@@ -25,6 +26,9 @@ class Image(models.Model):
         abstract = True
 
 # Failure model to store locomotive failure details
+from django.db import models
+from django.utils import timezone
+
 class Failure(models.Model):
     DAMAGE_TYPES = (
         ('MECHANICAL', 'Mechanical'),
@@ -34,6 +38,12 @@ class Failure(models.Model):
         ('CABIN_AMENITIES', 'Cabin and Amenities'),
     )
 
+    MOVE_STATUS = (
+        ('ACTIVE', 'گرم / ادامه سیر'),
+        ('DEACTIVE', 'سرد'),
+        ('REPAIR', 'متوقف / اعزام به تعمیرات'),
+    )
+
     locomotive = models.ForeignKey(Locomotive, on_delete=models.CASCADE, related_name='failures', verbose_name="Locomotive")
     damage_type = models.CharField(max_length=50, choices=DAMAGE_TYPES, verbose_name="Damage Type")
     description = models.TextField(verbose_name="Failure Description")
@@ -41,7 +51,9 @@ class Failure(models.Model):
     reported_date = models.DateField(default=timezone.now, verbose_name="Reported Date")
     reported_time = models.TimeField(default=timezone.now, verbose_name="Reported Time")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
-    inRepair = models.BooleanField(default=False,null=True)
+    inRepair = models.BooleanField(default=False, null=True)
+    dispatch_from = models.CharField(max_length=100, blank=True, null=True, verbose_name="اعزام نیرو از")
+    move_status = models.CharField(max_length=20, choices=MOVE_STATUS, default='ACTIVE', verbose_name="وضعیت حرکت")
 
     def __str__(self):
         return f"Failure {self.id} - {self.locomotive.locomotive_id} ({self.damage_type})"
@@ -49,6 +61,41 @@ class Failure(models.Model):
     class Meta:
         verbose_name = "Failure"
         verbose_name_plural = "Failures"
+
+
+
+
+
+# class Failure(models.Model):
+#     DAMAGE_TYPES = (
+#         ('MECHANICAL', 'Mechanical'),
+#         ('ELECTRICAL', 'Electrical'),
+#         ('BOGIE_CHASSIS', 'Bogie and Chassis'),
+#         ('BRAKE', 'Brake'),
+#         ('CABIN_AMENITIES', 'Cabin and Amenities'),
+#     )
+#
+#     MOVE_STATUS = {
+#         'َACTIVE': 'گرم / ادامه سیر',
+#         'DEACTIVE': 'سرد',
+#         'REPAIR': 'متوقف / اعزام به تعمیرات',
+#     }
+#
+#     locomotive = models.ForeignKey(Locomotive, on_delete=models.CASCADE, related_name='failures', verbose_name="Locomotive")
+#     damage_type = models.CharField(max_length=50, choices=DAMAGE_TYPES, verbose_name="Damage Type")
+#     description = models.TextField(verbose_name="Failure Description")
+#     location = models.CharField(max_length=100, verbose_name="Failure Location")
+#     reported_date = models.DateField(default=timezone.now, verbose_name="Reported Date")
+#     reported_time = models.TimeField(default=timezone.now, verbose_name="Reported Time")
+#     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+#     inRepair = models.BooleanField(default=False,null=True)
+#
+#     def __str__(self):
+#         return f"Failure {self.id} - {self.locomotive.locomotive_id} ({self.damage_type})"
+#
+#     class Meta:
+#         verbose_name = "Failure"
+#         verbose_name_plural = "Failures"
 
 # FailureImage model to store multiple images for a failure
 class FailureImage(Image):
@@ -67,6 +114,8 @@ class Repair(models.Model):
         ('IN_PROGRESS', 'In Progress'),
         ('COMPLETED', 'Completed'),
     )
+
+
 
     failure = models.ForeignKey(Failure, on_delete=models.CASCADE, related_name='repairs', verbose_name="Related Failure")
     title = models.CharField(max_length=200, verbose_name="Repair Title")
@@ -150,3 +199,5 @@ class IncidentImage(Image):
     class Meta:
         verbose_name = "Incident Image"
         verbose_name_plural = "Incident Images"
+
+

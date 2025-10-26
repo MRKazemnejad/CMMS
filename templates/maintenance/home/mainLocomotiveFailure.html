@@ -1,0 +1,765 @@
+{##}
+{#{% extends "maintenance/layout/base.html" %}#}
+{##}
+{#{% block title %} خرابی‌های لکوموتیو {{ locomotive.locomotive_id }} {% endblock %}#}
+{##}
+{#{% block stylesheets %}#}
+{#    <style>#}
+{#        body, .card, .modal-content {#}
+{#            direction: rtl;#}
+{#            text-align: right;#}
+{#        }#}
+{##}
+{#        .permission-card {#}
+{#            transition: background-color 0.2s, box-shadow 0.2s;#}
+{#        }#}
+{##}
+{#        .permission-card:hover {#}
+{#            background-color: #f8f9fa;#}
+{#            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);#}
+{#            cursor: pointer;#}
+{#        }#}
+{##}
+{#        .permission-card .card-text span {#}
+{#            margin-left: 1rem;#}
+{#        }#}
+{##}
+{#        .no-repairs-message {#}
+{#            text-align: center;#}
+{#            color: #6c757d;#}
+{#            font-size: 1rem;#}
+{#            margin-top: 1rem;#}
+{#        }#}
+{##}
+{#        .thumbnail {#}
+{#            width: 100px;#}
+{#            height: 100px;#}
+{#            object-fit: cover;#}
+{#            margin: 0.5rem;#}
+{#            cursor: pointer;#}
+{#            border: 1px solid #ddd;#}
+{#            border-radius: 4px;#}
+{#        }#}
+{##}
+{#        .fieldset-container {#}
+{#            border: 1px solid #ccc;#}
+{#            padding: 1rem;#}
+{#            margin-bottom: 1rem;#}
+{#            border-radius: 4px;#}
+{#        }#}
+{##}
+{#        .fieldset-container legend {#}
+{#            font-weight: bold;#}
+{#            font-size: 1.1rem;#}
+{#            padding: 0 0.5rem;#}
+{#        }#}
+{##}
+{#        .full-image-modal .modal-content {#}
+{#            background: none;#}
+{#            border: none;#}
+{#        }#}
+{##}
+{#        .full-image-modal .modal-body {#}
+{#            padding: 0;#}
+{#            display: flex;#}
+{#            justify-content: center;#}
+{#            align-items: center;#}
+{#        }#}
+{##}
+{#        .full-image {#}
+{#            max-width: 90vw;#}
+{#            max-height: 90vh;#}
+{#            object-fit: contain;#}
+{#        }#}
+{##}
+{#        /* Ensure failureModal is scrollable */#}
+{#        #failureModal .modal-body {#}
+{#            max-height: 80vh;#}
+{#            overflow-y: auto;#}
+{#        }#}
+{#    </style>#}
+{#{% endblock stylesheets %}#}
+{##}
+{#{% block content %}#}
+{#    <div class="container-fluid">#}
+{#        <div class="row justify-content-center">#}
+{#            <div class="col-12">#}
+{#                <div class="card shadow">#}
+{#                    <div class="card-body">#}
+{#                        <h5 class="page-title account mb-3">خرابی‌های لکوموتیو {{ locomotive.locomotive_id }}</h5>#}
+{#                        {% include 'maintenance/includes/searchForm.html' with tab='locomotive' template_name=template_name %}#}
+{#                        <div class="row my-2">#}
+{#                            {% for failure in failures %}#}
+{#                                <div class="col-12 mb-3 permission-item">#}
+{#                                    <div class="card shadow-sm permission-card w-100"#}
+{#                                         data-failure-id="{{ failure.id }}"#}
+{#                                         data-locomotive="{{ failure.locomotive.locomotive_id }}"#}
+{#                                         data-damage-type="{{ failure.damage_type }}"#}
+{#                                         data-location="{{ failure.location }}"#}
+{#                                         data-reported-date="{{ failure.reported_date }}"#}
+{#                                         data-reported-time="{{ failure.reported_time|default_if_none:'' }}"#}
+{#                                         data-description="{{ failure.description }}"#}
+{#                                         data-in-repair="{{ failure.inRepair }}"#}
+{#                                         data-created-at="{{ failure.created_at }}"#}
+{#                                         data-move-status="{{ failure.move_status }}"#}
+{#                                         data-dispatch-from="{{ failure.dispatch_from|default_if_none:'' }}"#}
+{#                                         data-images="{{ failure.images|join:',' }}"#}
+{#                                         data-repairs='{{ failure.repairs }}'>#}
+{#                                        <div class="card-body">#}
+{#                                            <p class="card-text account">#}
+{#                                                <span>کد خرابی: <strong class="mx-2">{{ failure.id }}</strong></span>#}
+{#                                                <span>نوع خرابی: <strong class="mx-2">{{ failure.damage_type }}</strong></span>#}
+{#                                                <span>محل خرابی: <strong class="mx-2">{{ failure.location }}</strong></span>#}
+{#                                                <span>تاریخ خرابی: <strong class="mx-2">{{ failure.reported_date }}</strong></span>#}
+{#                                                <span>توضیحات: <strong class="mx-2">{{ failure.description|truncatechars:50 }}</strong></span>#}
+{#                                                <span>وضعیت: <strong class="mx-2">{{ failure.inRepair|yesno:"جاری,پایان‌یافته" }}</strong></span>#}
+{#                                                <span>وضعیت حرکت: <strong class="mx-2">{{ failure.move_status }}</strong></span>#}
+{#                                            </p>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            {% empty %}#}
+{#                                <p class="no-repairs-message">هیچ خرابی‌ای برای این لکوموتیو ثبت نشده است.</p>#}
+{#                            {% endfor %}#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{##}
+{#    <!-- Modal for showing failure details -->#}
+{#    <div class="modal fade" id="failureModal" tabindex="-1" role="dialog" aria-labelledby="failureModalLabel" aria-hidden="true">#}
+{#        <div class="modal-dialog modal-lg" role="document">#}
+{#            <div class="modal-content">#}
+{#                <div class="modal-header">#}
+{#                    <h5 class="modal-title" id="failureModalLabel">جزئیات خرابی</h5>#}
+{#                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
+{#                        <span aria-hidden="true">&times;</span>#}
+{#                    </button>#}
+{#                </div>#}
+{#                <div class="modal-body">#}
+{#                    <!-- Failure Details -->#}
+{#                    <fieldset class="fieldset-container">#}
+{#                        <legend>جزئیات خرابی</legend>#}
+{#                        <div class="row mb-3">#}
+{#                            <div class="col-md-4"><strong>کد خرابی:</strong> <span id="failure-id"></span></div>#}
+{#                            <div class="col-md-4"><strong>شماره لکوموتیو:</strong> <span id="failure-locomotive"></span></div>#}
+{#                            <div class="col-md-4"><strong>نوع خرابی:</strong> <span id="failure-damage-type"></span></div>#}
+{#                        </div>#}
+{#                        <div class="row mb-3">#}
+{#                            <div class="col-md-4"><strong>محل خرابی:</strong> <span id="failure-location"></span></div>#}
+{#                            <div class="col-md-4"><strong>تاریخ خرابی:</strong> <span id="failure-reported-date"></span></div>#}
+{#                            <div class="col-md-4"><strong>ساعت خرابی:</strong> <span id="failure-reported-time"></span></div>#}
+{#                        </div>#}
+{#                        <div class="row mb-3">#}
+{#                            <div class="col-md-4"><strong>وضعیت:</strong> <span id="failure-in-repair"></span></div>#}
+{#                            <div class="col-md-4"><strong>تاریخ ایجاد:</strong> <span id="failure-created-at"></span></div>#}
+{#                            <div class="col-md-4"><strong>وضعیت حرکت:</strong> <span id="failure-move-status"></span></div>#}
+{#                        </div>#}
+{#                        <div class="row mb-3">#}
+{#                            <div class="col-md-4"><strong>اعزام نیرو از:</strong> <span id="failure-dispatch-from"></span></div>#}
+{#                            <div class="col-md-8"><strong>توضیحات:</strong> <span id="failure-description"></span></div>#}
+{#                        </div>#}
+{#                        <div class="row">#}
+{#                            <div class="col-12">#}
+{#                                <strong>عکس‌های خرابی:</strong>#}
+{#                                <div id="failure-images" class="d-flex flex-wrap"></div>#}
+{#                                <div id="no-failure-images-message" class="no-repairs-message" style="display: none;">#}
+{#                                    هیچ عکسی برای این خرابی ثبت نشده است.#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </fieldset>#}
+{##}
+{#                    <!-- Repairs -->#}
+{#                    <div id="repairs-container"></div>#}
+{#                    <div id="no-repairs-message" class="no-repairs-message" style="display: none;">#}
+{#                        هیچ تعمیری برای این خرابی ثبت نشده است.#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="modal-footer">#}
+{#                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{##}
+{#    <!-- Modal for full-size image -->#}
+{#    <div class="modal fade full-image-modal" id="fullImageModal" tabindex="-1" role="dialog" aria-labelledby="fullImageModalLabel" aria-hidden="true">#}
+{#        <div class="modal-dialog modal-xl" role="document">#}
+{#            <div class="modal-content">#}
+{#                <div class="modal-body">#}
+{#                    <img id="full-image" class="full-image" src="" alt="Full-size image">#}
+{#                </div>#}
+{#                <div class="modal-footer">#}
+{#                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#{% endblock content %}#}
+{##}
+{#{% block javascripts %}#}
+{#    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>#}
+{#    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>#}
+{#    <script src="https://kit.fontawesome.com/a076d05399.js"></script>#}
+{##}
+{#    <script>#}
+{#        $(document).ready(function () {#}
+{#            // Debug: Check if jQuery and Bootstrap are loaded#}
+{#            console.log("jQuery loaded:", typeof $ !== 'undefined');#}
+{#            console.log("Bootstrap modal available:", typeof $.fn.modal !== 'undefined');#}
+{##}
+{#            // Handle click on permission card#}
+{#            $('.permission-card').on('click', function (e) {#}
+{#                e.preventDefault();#}
+{#                console.log("Card clicked, failureId:", $(this).data('failure-id'));#}
+{##}
+{#                // Get data attributes#}
+{#                const failureId = $(this).data('failure-id');#}
+{#                const locomotive = $(this).data('locomotive');#}
+{#                const damageType = $(this).data('damage-type');#}
+{#                const location = $(this).data('location');#}
+{#                const reportedDate = $(this).data('reported-date');#}
+{#                const reportedTime = $(this).data('reported-time');#}
+{#                const description = $(this).data('description');#}
+{#                const inRepair = $(this).data('in-repair');#}
+{#                const createdAt = $(this).data('created-at');#}
+{#                const moveStatus = $(this).data('move-status');#}
+{#                const dispatchFrom = $(this).data('dispatch-from');#}
+{#                const images = $(this).data('images') ? $(this).data('images').split(',').filter(url => url) : [];#}
+{#                let repairs = [];#}
+{##}
+{#                // Debug: Log raw data-repairs before parsing#}
+{#                const rawRepairs = $(this).attr('data-repairs');#}
+{#                console.log("Raw data-repairs:", rawRepairs);#}
+{##}
+{#                try {#}
+{#                    repairs = rawRepairs ? JSON.parse(rawRepairs) : [];#}
+{#                } catch (e) {#}
+{#                    console.error("Error parsing repairs data:", e);#}
+{#                    repairs = []; // Fallback to empty array#}
+{#                }#}
+{##}
+{#                // Debug: Log all data#}
+{#                console.log("Data:", { failureId, locomotive, damageType, location, reportedDate, reportedTime, description, inRepair, createdAt, moveStatus, dispatchFrom, images, repairs });#}
+{##}
+{#                // Set failure details#}
+{#                $('#failure-id').text(failureId || '-');#}
+{#                $('#failure-locomotive').text(locomotive || '-');#}
+{#                $('#failure-damage-type').text(damageType || '-');#}
+{#                $('#failure-location').text(location || '-');#}
+{#                $('#failure-reported-date').text(reportedDate || '-');#}
+{#                $('#failure-reported-time').text(reportedTime || '-');#}
+{#                $('#failure-description').text(description || '-');#}
+{#                $('#failure-in-repair').text(inRepair ? 'جاری' : 'پایان‌یافته');#}
+{#                $('#failure-created-at').text(createdAt || '-');#}
+{#                $('#failure-move-status').text(moveStatus || '-');#}
+{#                $('#failure-dispatch-from').text(dispatchFrom || '-');#}
+{##}
+{#                // Populate failure images#}
+{#                const imageContainer = $('#failure-images');#}
+{#                imageContainer.empty();#}
+{#                console.log("Failure images:", images);#}
+{#                if (images.length > 0) {#}
+{#                    images.forEach(url => {#}
+{#                        const img = $('<img>').addClass('thumbnail').attr('src', url).attr('alt', 'Failure image');#}
+{#                        img.on('click', function () {#}
+{#                            $('#full-image').attr('src', url);#}
+{#                            $('#fullImageModal').modal('show');#}
+{#                        });#}
+{#                        imageContainer.append(img);#}
+{#                    });#}
+{#                    $('#no-failure-images-message').hide();#}
+{#                } else {#}
+{#                    $('#no-failure-images-message').show();#}
+{#                }#}
+{##}
+{#                // Populate repairs#}
+{#                const repairsContainer = $('#repairs-container');#}
+{#                repairsContainer.empty();#}
+{#                console.log("Parsed repairs:", repairs);#}
+{#                if (repairs && repairs.length > 0) {#}
+{#                    repairs.forEach((repair, index) => {#}
+{#                        console.log(`Processing repair ${index + 1}:`, repair);#}
+{#                        const repairFieldset = $('<fieldset>').addClass('fieldset-container');#}
+{#                        // Add start date and time to legend#}
+{#                        const startDateTime = (repair.start_date && repair.start_time) ? `${repair.start_date} ${repair.start_time}` : 'نامشخص';#}
+{#                        const legend = $('<legend>').text(`تعمیر ${index + 1} - ${startDateTime}`);#}
+{#                        repairFieldset.append(legend);#}
+{##}
+{#                        const repairDetails = `#}
+{#                            <div class="row mb-3">#}
+{#                                <div class="col-md-4"><strong>عنوان تعمیر:</strong> <span>${repair.title || '-'}</span></div>#}
+{#                                <div class="col-md-4"><strong>مکان تعمیر:</strong> <span>${repair.location || '-'}</span></div>#}
+{#                                <div class="col-md-4"><strong>تکنسین:</strong> <span>${repair.technician || '-'}</span></div>#}
+{#                            </div>#}
+{#                            <div class="row mb-3">#}
+{#                                <div class="col-md-4"><strong>تاریخ شروع:</strong> <span>${repair.start_date || '-'}</span></div>#}
+{#                                <div class="col-md-4"><strong>ساعت شروع:</strong> <span>${repair.start_time || '-'}</span></div>#}
+{#                                <div class="col-md-4"><strong>وضعیت:</strong> <span>${repair.status || '-'}</span></div>#}
+{#                            </div>#}
+{#                            <div class="row mb-3">#}
+{#                                <div class="col-md-4"><strong>تاریخ پایان:</strong> <span>${repair.end_date || '-'}</span></div>#}
+{#                                <div class="col-md-4"><strong>ساعت پایان:</strong> <span>${repair.end_time || '-'}</span></div>#}
+{#                            </div>#}
+{#                            <div class="row mb-3">#}
+{#                                <div class="col-12"><strong>توضیحات:</strong> <span>${repair.description || '-'}</span></div>#}
+{#                            </div>#}
+{#                            <div class="row">#}
+{#                                <div class="col-12">#}
+{#                                    <strong>عکس‌های تعمیر:</strong>#}
+{#                                    <div class="repair-images d-flex flex-wrap" data-repair-id="${repair.id || '-'}"></div>#}
+{#                                    <div class="no-repair-images-message no-repairs-message" style="display: none;">#}
+{#                                        هیچ عکسی برای این تعمیر ثبت نشده است.#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        `;#}
+{#                        repairFieldset.append(repairDetails);#}
+{#                        repairsContainer.append(repairFieldset);#}
+{##}
+{#                        // Populate repair images#}
+{#                        const repairImages = repair.images || [];#}
+{#                        console.log(`Repair ${repair.id} images:`, repairImages);#}
+{#                        const repairId = repair.id || '-';#}
+{#                        const repairImageContainer = $(`.repair-images[data-repair-id="${repairId}"]`);#}
+{#                        console.log(`Selector for repair ${repairId}:`, `.repair-images[data-repair-id="${repairId}"]`);#}
+{#                        console.log(`Found container:`, repairImageContainer.length > 0 ? 'Yes' : 'No');#}
+{#                        const noRepairImagesMessage = repairImageContainer.siblings('.no-repair-images-message');#}
+{#                        repairImageContainer.empty();#}
+{#                        if (repairImages.length > 0) {#}
+{#                            repairImages.forEach(image => {#}
+{#                                const img = $('<img>').addClass('thumbnail').attr('src', image).attr('alt', 'Repair image');#}
+{#                                img.on('click', function () {#}
+{#                                    $('#full-image').attr('src', image);#}
+{#                                    $('#fullImageModal').modal('show');#}
+{#                                });#}
+{#                                repairImageContainer.append(img);#}
+{#                            });#}
+{#                            noRepairImagesMessage.hide();#}
+{#                        } else {#}
+{#                            noRepairImagesMessage.show();#}
+{#                        }#}
+{#                    });#}
+{#                    $('#no-repairs-message').hide();#}
+{#                } else {#}
+{#                    console.log("No repairs to display");#}
+{#                    $('#no-repairs-message').show();#}
+{#                }#}
+{##}
+{#                // Show the modal#}
+{#                console.log("Showing modal");#}
+{#                $('#failureModal').modal('show');#}
+{#            });#}
+{##}
+{#            // Fix scroll issue when closing fullImageModal#}
+{#            $('#fullImageModal').on('hidden.bs.modal', function () {#}
+{#                console.log("fullImageModal closed");#}
+{#                // Remove modal-open class and overflow styles from body#}
+{#                $('body').removeClass('modal-open');#}
+{#                $('body').css('overflow', '');#}
+{#                // Ensure failureModal remains scrollable#}
+{#                $('#failureModal').css('overflow-y', 'auto');#}
+{#                $('.modal-backdrop').remove(); // Remove extra backdrops if any#}
+{#                console.log("Body classes:", $('body').attr('class'));#}
+{#                console.log("Body overflow:", $('body').css('overflow'));#}
+{#            });#}
+{#        });#}
+{#    </script>#}
+{#{% endblock javascripts %}#}
+
+
+{% extends "maintenance/layout/base.html" %}
+
+{% block title %} خرابی‌های لکوموتیو {{ locomotive.locomotive_id }} {% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body, .card, .modal-content {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .permission-card {
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .permission-card:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .permission-card .card-text span {
+            margin-left: 1rem;
+        }
+
+        .no-repairs-message {
+            text-align: center;
+            color: #6c757d;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
+        .thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin: 0.5rem;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .fieldset-container {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+
+        .fieldset-container legend {
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 0 0.5rem;
+        }
+
+        /* Styling for failure fieldset */
+        .failure-fieldset {
+            border-color: #4b8bf5; /* Blue border for failure */
+            background-color: #e6f0fa; /* Light blue background */
+        }
+
+        /* Styling for ongoing repair fieldset */
+        .ongoing-repair-fieldset {
+            border-color: #f1c40f; /* Yellow border for ongoing repairs */
+            background-color: #fef9e7; /* Light yellow background */
+        }
+
+        /* Styling for completed repair fieldset */
+        .completed-repair-fieldset {
+            border-color: #2ecc71; /* Green border for completed repairs */
+            background-color: #e8f5e9; /* Light green background */
+        }
+
+        .full-image-modal .modal-content {
+            background: none;
+            border: none;
+        }
+
+        .full-image-modal .modal-body {
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .full-image {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        /* Ensure failureModal is scrollable */
+        #failureModal .modal-body {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="page-title account mb-3">خرابی‌های لکوموتیو {{ locomotive.locomotive_id }}</h5>
+                        {% include 'maintenance/includes/searchForm.html' with tab='locomotive' template_name=template_name %}
+                        <div class="row my-2">
+                            {% for failure in failures %}
+                                <div class="col-12 mb-3 permission-item">
+                                    <div class="card shadow-sm permission-card w-100"
+                                         data-failure-id="{{ failure.id }}"
+                                         data-locomotive="{{ failure.locomotive.locomotive_id }}"
+                                         data-damage-type="{{ failure.damage_type }}"
+                                         data-location="{{ failure.location }}"
+                                         data-reported-date="{{ failure.reported_date }}"
+                                         data-reported-time="{{ failure.reported_time|default_if_none:'' }}"
+                                         data-description="{{ failure.description }}"
+                                         data-in-repair="{{ failure.inRepair }}"
+                                         data-created-at="{{ failure.created_at }}"
+                                         data-move-status="{{ failure.move_status }}"
+                                         data-dispatch-from="{{ failure.dispatch_from|default_if_none:'' }}"
+                                         data-images="{{ failure.images|join:',' }}"
+                                         data-repairs='{{ failure.repairs }}'>
+                                        <div class="card-body">
+                                            <p class="card-text account">
+                                                <span>کد خرابی: <strong class="mx-2">{{ failure.id }}</strong></span>
+                                                <span>نوع خرابی: <strong class="mx-2">{{ failure.damage_type }}</strong></span>
+                                                <span>محل خرابی: <strong class="mx-2">{{ failure.location }}</strong></span>
+                                                <span>تاریخ خرابی: <strong class="mx-2">{{ failure.reported_date }}</strong></span>
+                                                <span>توضیحات: <strong class="mx-2">{{ failure.description|truncatechars:50 }}</strong></span>
+                                                <span>وضعیت: <strong class="mx-2">{{ failure.inRepair|yesno:"جاری,پایان‌یافته" }}</strong></span>
+{#                                                <span>وضعیت حرکت: <strong class="mx-2">{{ failure.move_status }}</strong></span>#}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p class="no-repairs-message">هیچ خرابی‌ای برای این لکوموتیو ثبت نشده است.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for showing failure details -->
+    <div class="modal fade" id="failureModal" tabindex="-1" role="dialog" aria-labelledby="failureModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="failureModalLabel">جزئیات خرابی</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Failure Details -->
+                    <fieldset class="fieldset-container failure-fieldset">
+                        <legend>جزئیات خرابی</legend>
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>کد خرابی:</strong> <span id="failure-id"></span></div>
+                            <div class="col-md-4"><strong>شماره لکوموتیو:</strong> <span id="failure-locomotive"></span></div>
+                            <div class="col-md-4"><strong>نوع خرابی:</strong> <span id="failure-damage-type"></span></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>محل خرابی:</strong> <span id="failure-location"></span></div>
+                            <div class="col-md-4"><strong>تاریخ خرابی:</strong> <span id="failure-reported-date"></span></div>
+                            <div class="col-md-4"><strong>ساعت خرابی:</strong> <span id="failure-reported-time"></span></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>وضعیت:</strong> <span id="failure-in-repair"></span></div>
+                            <div class="col-md-4"><strong>تاریخ ایجاد:</strong> <span id="failure-created-at"></span></div>
+                            <div class="col-md-4"><strong>وضعیت حرکت:</strong> <span id="failure-move-status"></span></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>اعزام نیرو از:</strong> <span id="failure-dispatch-from"></span></div>
+                            <div class="col-md-8"><strong>توضیحات:</strong> <span id="failure-description"></span></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <strong>عکس‌های خرابی:</strong>
+                                <div id="failure-images" class="d-flex flex-wrap"></div>
+                                <div id="no-failure-images-message" class="no-repairs-message" style="display: none;">
+                                    هیچ عکسی برای این خرابی ثبت نشده است.
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Repairs -->
+                    <div id="repairs-container"></div>
+                    <div id="no-repairs-message" class="no-repairs-message" style="display: none;">
+                        هیچ تعمیری برای این خرابی ثبت نشده است.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for full-size image -->
+    <div class="modal fade full-image-modal" id="fullImageModal" tabindex="-1" role="dialog" aria-labelledby="fullImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img id="full-image" class="full-image" src="" alt="Full-size image">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascripts %}
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Debug: Check if jQuery and Bootstrap are loaded
+            console.log("jQuery loaded:", typeof $ !== 'undefined');
+            console.log("Bootstrap modal available:", typeof $.fn.modal !== 'undefined');
+
+            // Handle click on permission card
+            $('.permission-card').on('click', function (e) {
+                e.preventDefault();
+                console.log("Card clicked, failureId:", $(this).data('failure-id'));
+
+                // Get data attributes
+                const failureId = $(this).data('failure-id');
+                const locomotive = $(this).data('locomotive');
+                const damageType = $(this).data('damage-type');
+                const location = $(this).data('location');
+                const reportedDate = $(this).data('reported-date');
+                const reportedTime = $(this).data('reported-time');
+                const description = $(this).data('description');
+                const inRepair = $(this).data('in-repair');
+                const createdAt = $(this).data('created-at');
+                const moveStatus = $(this).data('move-status');
+                const dispatchFrom = $(this).data('dispatch-from');
+                const images = $(this).data('images') ? $(this).data('images').split(',').filter(url => url) : [];
+                let repairs = [];
+
+                // Debug: Log raw data-repairs before parsing
+                const rawRepairs = $(this).attr('data-repairs');
+                console.log("Raw data-repairs:", rawRepairs);
+
+                try {
+                    repairs = rawRepairs ? JSON.parse(rawRepairs) : [];
+                } catch (e) {
+                    console.error("Error parsing repairs data:", e);
+                    repairs = []; // Fallback to empty array
+                }
+
+                // Debug: Log all data
+                console.log("Data:", { failureId, locomotive, damageType, location, reportedDate, reportedTime, description, inRepair, createdAt, moveStatus, dispatchFrom, images, repairs });
+
+                // Set failure details
+                $('#failure-id').text(failureId || '-');
+                $('#failure-locomotive').text(locomotive || '-');
+                $('#failure-damage-type').text(damageType || '-');
+                $('#failure-location').text(location || '-');
+                $('#failure-reported-date').text(reportedDate || '-');
+                $('#failure-reported-time').text(reportedTime || '-');
+                $('#failure-description').text(description || '-');
+                $('#failure-in-repair').text(inRepair ? 'جاری' : 'پایان‌یافته');
+                $('#failure-created-at').text(createdAt || '-');
+                $('#failure-move-status').text(moveStatus || '-');
+                $('#failure-dispatch-from').text(dispatchFrom || '-');
+
+                // Populate failure images
+                const imageContainer = $('#failure-images');
+                imageContainer.empty();
+                console.log("Failure images:", images);
+                if (images.length > 0) {
+                    images.forEach(url => {
+                        const img = $('<img>').addClass('thumbnail').attr('src', url).attr('alt', 'Failure image');
+                        img.on('click', function () {
+                            $('#full-image').attr('src', url);
+                            $('#fullImageModal').modal('show');
+                        });
+                        imageContainer.append(img);
+                    });
+                    $('#no-failure-images-message').hide();
+                } else {
+                    $('#no-failure-images-message').show();
+                }
+
+                // Populate repairs
+                const repairsContainer = $('#repairs-container');
+                repairsContainer.empty();
+                console.log("Parsed repairs:", repairs);
+                if (repairs && repairs.length > 0) {
+                    repairs.forEach((repair, index) => {
+                        console.log(`Processing repair ${index + 1}:`, repair);
+                        // Determine fieldset class based on repair status
+                        const fieldsetClass = repair.status === 'در حال انجام' ? 'ongoing-repair-fieldset' : 'completed-repair-fieldset';
+                        const repairFieldset = $('<fieldset>').addClass(`fieldset-container ${fieldsetClass}`);
+                        // Add start date and time to legend
+                        const startDateTime = (repair.start_date && repair.start_time) ? `${repair.start_date} ${repair.start_time}` : 'نامشخص';
+                        const legend = $('<legend>').text(`تعمیر ${index + 1} - ${startDateTime}`);
+                        repairFieldset.append(legend);
+
+                        const repairDetails = `
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>عنوان تعمیر:</strong> <span>${repair.title || '-'}</span></div>
+                                <div class="col-md-4"><strong>مکان تعمیر:</strong> <span>${repair.location || '-'}</span></div>
+                                <div class="col-md-4"><strong>تکنسین:</strong> <span>${repair.technician || '-'}</span></div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>تاریخ شروع:</strong> <span>${repair.start_date || '-'}</span></div>
+                                <div class="col-md-4"><strong>ساعت شروع:</strong> <span>${repair.start_time || '-'}</span></div>
+                                <div class="col-md-4"><strong>وضعیت:</strong> <span>${repair.status || '-'}</span></div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>تاریخ پایان:</strong> <span>${repair.end_date || '-'}</span></div>
+                                <div class="col-md-4"><strong>ساعت پایان:</strong> <span>${repair.end_time || '-'}</span></div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-12"><strong>توضیحات:</strong> <span>${repair.description || '-'}</span></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <strong>عکس‌های تعمیر:</strong>
+                                    <div class="repair-images d-flex flex-wrap" data-repair-id="${repair.id || '-'}"></div>
+                                    <div class="no-repair-images-message no-repairs-message" style="display: none;">
+                                        هیچ عکسی برای این تعمیر ثبت نشده است.
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        repairFieldset.append(repairDetails);
+                        repairsContainer.append(repairFieldset);
+
+                        // Populate repair images
+                        const repairImages = repair.images || [];
+                        console.log(`Repair ${repair.id} images:`, repairImages);
+                        const repairId = repair.id || '-';
+                        const repairImageContainer = $(`.repair-images[data-repair-id="${repairId}"]`);
+                        console.log(`Selector for repair ${repairId}:`, `.repair-images[data-repair-id="${repairId}"]`);
+                        console.log(`Found container:`, repairImageContainer.length > 0 ? 'Yes' : 'No');
+                        const noRepairImagesMessage = repairImageContainer.siblings('.no-repair-images-message');
+                        repairImageContainer.empty();
+                        if (repairImages.length > 0) {
+                            repairImages.forEach(image => {
+                                const img = $('<img>').addClass('thumbnail').attr('src', image).attr('alt', 'Repair image');
+                                img.on('click', function () {
+                                    $('#full-image').attr('src', image);
+                                    $('#fullImageModal').modal('show');
+                                });
+                                repairImageContainer.append(img);
+                            });
+                            noRepairImagesMessage.hide();
+                        } else {
+                            noRepairImagesMessage.show();
+                        }
+                    });
+                    $('#no-repairs-message').hide();
+                } else {
+                    console.log("No repairs to display");
+                    $('#no-repairs-message').show();
+                }
+
+                // Show the modal
+                console.log("Showing modal");
+                $('#failureModal').modal('show');
+            });
+
+            // Fix scroll issue when closing fullImageModal
+            $('#fullImageModal').on('hidden.bs.modal', function () {
+                console.log("fullImageModal closed");
+                // Remove modal-open class and overflow styles from body
+                $('body').removeClass('modal-open');
+                $('body').css('overflow', '');
+                // Ensure failureModal remains scrollable
+                $('#failureModal').css('overflow-y', 'auto');
+                $('.modal-backdrop').remove(); // Remove extra backdrops if any
+                console.log("Body classes:", $('body').attr('class'));
+                console.log("Body overflow:", $('body').css('overflow'));
+            });
+        });
+    </script>
+{% endblock javascripts %}

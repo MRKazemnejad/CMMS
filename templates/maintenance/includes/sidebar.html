@@ -1,5 +1,4 @@
 <!--sidebar with scroll -->
-{#<aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>#}
 <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar">
     <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
         <i class="fe fe-x"><span class="sr-only"></span></i>
@@ -25,186 +24,72 @@
             </li>
 
 
-{#            <li class="nav-item mb-2 ">#}
-{#                <a href="{% url 'maintenance:mainRegisterFailure' %}" class="nav-link {% if segment in 'failure' %}active{% endif %}" href="#">#}
+
+
+
+
+{#         <li class="nav-item mb-2 ">#}
+{#                <a href="{% url 'maintenance:mainAllHistory' %}"#}
+{#                   class="nav-link {% if segment in 'history' %}active{% endif %}">#}
 {#                    <i class="fe fe-layers fe-16"></i>#}
-{#                    <span class="ml-3 item-text">ثبت خرابی</span>#}
+{#                    <span class="ml-3 item-text">سابقه لکوموتیوها</span>#}
 {##}
 {#                </a>#}
 {#            </li>#}
 
 
-                        <ul class="navbar-nav flex-fill w-100 mb-2 account">
-                            <li class="nav-item dropdown">
-                                <a href="#failurpart" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link ">
-                                    <i class="fe fe-box fe-16"></i>
-                                    <span class="ml-3 item-text">ثبت اطلاعات</span><span class="sr-only"></span>
-                                </a>
-                                <ul class="collapse list-unstyled pl-4 w-100 {% if segment in 'failure repair service crash' %}show{% else %}{% endif %}"
-                                    id="failurpart">
-                                    <li class="nav-item ">
-                                        <a class="nav-link pl-3 {% if segment in 'failure' %}active{% else %}{% endif %}"
-                                           href="{% url 'maintenance:mainRegisterFailure' %}"><span
-                                                class="ml-1 item-text">ثبت خرابی</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link pl-3 {% if segment in 'repair' %}active{% else %}{% endif %}"
-                                           href="{% url 'maintenance:mainRegisterFailureRepair' %}"><span
-                                                class="ml-1 item-text">ثبت تعمیر</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link pl-3 {% if segment in 'service' %}active{% else %}{% endif %}"
-                                           href="{% url 'maintenance:mainRegisterService' %}"><span
-                                                class="ml-1 item-text">ثبت سرویس</span></a>
-                                    </li>
 
-                                 <li class="nav-item">
-                                        <a class="nav-link pl-3 {% if segment in 'crash' %}active{% else %}{% endif %}"
-                                           href="{% url 'maintenance:mainRegisterCrash' %}"><span
-                                                class="ml-1 item-text">ثبت سانحه</span></a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2 account">
+                <li class="nav-item dropdown">
+                    <a href="#failurpart" data-toggle="collapse" aria-expanded="false"
+                       class="dropdown-toggle nav-link ">
+                        <i class="fe fe-box fe-16"></i>
+                        <span class="ml-3 item-text">ثبت اطلاعات</span><span class="sr-only"></span>
+                    </a>
+                    <ul class="collapse list-unstyled pl-4 w-100 {% if segment in 'failure repair service crash' %}show{% else %}{% endif %}"
+                        id="failurpart">
+                        <li class="nav-item ">
+                            <a class="nav-link pl-3 {% if segment in 'failure' %}active{% else %}{% endif %}"
+                               href="{% url 'maintenance:mainRegisterFailure' %}"><span
+                                    class="ml-1 item-text">ثبت خرابی</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-3 {% if segment in 'repair' %}active{% else %}{% endif %}"
+                               href="{% url 'maintenance:mainRegisterFailureRepair' %}"><span
+                                    class="ml-1 item-text">ثبت تعمیر</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-3 {% if segment in 'service' %}active{% else %}{% endif %}"
+                               href="{% url 'maintenance:mainRegisterService' %}"><span
+                                    class="ml-1 item-text">ثبت سرویس</span></a>
+                        </li>
 
-{#                        <li class="nav-item mb-2 ">#}
-{#                            <a href="{% url 'maintenance:timepicker' %}" class="nav-link {% if segment in 'chk' %}active{% endif %}" href="#">#}
-{#                                <i class="fe fe-layers fe-16"></i>#}
-{#                                <span class="ml-3 item-text">ناظر</span>#}
-{##}
-{#                            </a>#}
-{#                        </li>#}
+                        <li class="nav-item">
+                            <a class="nav-link pl-3 {% if segment in 'crash' %}active{% else %}{% endif %}"
+                               href="{% url 'maintenance:mainRegisterCrash' %}"><span
+                                    class="ml-1 item-text">ثبت سانحه</span></a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
 
 
-            {#            <ul class="navbar-nav flex-fill w-100 mb-2 account">#}
-            {#                <li class="nav-item dropdown">#}
-            {#                    <a href="#logistic" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">#}
-            {#                        <i class="fe fe-tool fe-16"></i>#}
-            {#                        <span class="ml-3 item-text">تعمیر و بازسازی</span><span class="sr-only"></span>#}
-            {#                    </a>#}
-            {#                    <ul class="collapse list-unstyled pl-4 w-100 {% if segment in 'maintenance underrepair qcwait sendtow invoice' %}show{% else %}{% endif %}"#}
-            {#                        id="logistic">#}
-            {#                        <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'maintenance' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">معیوب در انبار</span>#}
-            {##}
-            {#                            </a>#}
-            {#                        </li>#}
-            {#                        <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'underrepair' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">در حال تعمیر</span></a>#}
-            {#                        </li>#}
-            {#                        <li class="nav-item">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'qcwait' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">درانتظار QC</span></a>#}
-            {#                        </li>#}
-            {#                        <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'sendtow' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">ارسال به انبار</span>#}
-            {#                            <span class="badge badge-pill badge-primary">New</span>#}
-            {#                            </a>#}
-            {#                        </li>#}
-            {#                    </ul>#}
-            {#                </li>#}
-            {#            </ul>#}
+         <li class="nav-item mb-2">
+                <a class="nav-link {% if segment in 'history' %}active{% else %}{% endif %}"
+                   href="{% url 'maintenance:mainAllHistory' %}" aria-expanded="false">
+                    <i class="fe fe-layers fe-16"></i>
+                    <span class="ml-3 item-text">سابقه لکوموتیوها</span><span class="sr-only">(current)</span>
+                </a>
+            </li>
 
+            <li class="nav-item mb-2">
+                <a class=" nav-link {% if segment in 'shop' %}active{% else %}{% endif %}"
+                   href="#">
+                    <i class="fe fe-settings fe-16"></i>
+                    <span class="ml-3 item-text">تنظیمات</span>
+                </a>
+            </li>
 
-            {#            <li class="nav-item mb-2">#}
-            {#                <a class=" nav-link {% if segment in 'shop' %}active{% else %}{% endif %}"#}
-            {#                   href="#">#}
-            {#                    <i class="fe fe-pie-chart fe-16"></i>#}
-            {#                    <span class="ml-3 item-text">انبار</span>#}
-            {#                </a>#}
-            {#            </li>#}
-
-            {##}
-            {#            <ul class="navbar-nav flex-fill w-100 mb-2 account">#}
-            {#                <li class="nav-item dropdown">#}
-            {#                    <a href="#qc" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">#}
-            {#                        <i class="fe fe-box fe-16"></i>#}
-            {#                        <span class="ml-3 item-text">کنترل کیفیت</span><span class="sr-only"></span>#}
-            {#                    </a>#}
-            {#                    <ul class="collapse list-unstyled pl-4 w-100 {% if segment in 'pass notif' %}show{% else %}{% endif %}"#}
-            {#                        id="qc">#}
-            {#                        <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'pass' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">در انتظار QC</span></a>#}
-            {#                        </li>#}
-            {#                        <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'notif' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">ارسال به انبار</span></a>#}
-            {#                        </li>#}
-            {#                    </ul>#}
-            {#                </li>#}
-            {#            </ul>#}
-
-            {#            <li class="nav-item mb-2">#}
-            {#                <a class="nav-link {% if segment in 'report' %}active{% else %}{% endif %}" href="#">#}
-            {#                    <i class="fe fe-calendar fe-16"></i>#}
-            {#                    <span class="ml-3 item-text">گزارشات</span>#}
-            {#                </a>#}
-            {#            </li>#}
-            {#            <li class="nav-item mb-2">#}
-            {#                <a class="nav-link {% if segment in 'find' %}active{% else %}{% endif %}"#}
-            {#                   href="#">#}
-            {#                    <i class="fe fe-grid fe-16"></i>#}
-            {#                    <span class="ml-3 item-text">جستجو</span>#}
-            {#                </a>#}
-            {#            </li>#}
-            {#            <li class="nav-item mb-2">#}
-            {#                <a href="{% url 'pms:pmsSettings' %}"#}
-            {#                   class=" nav-link {% if segment in 'settings' %}active{% else %}{% endif %}">#}
-            {#                    <i class="fe fe-settings fe-16"></i>#}
-            {#                    <span class="ml-3 item-text">تنظیمات</span>#}
-            {#                </a>#}
-            {#            </li>#}
-
-
-            {#            <ul class="navbar-nav flex-fill w-100 mb-2 account">#}
-            {#                <li class="nav-item dropdown">#}
-            {#                    <a href="#settings" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">#}
-            {#                        <i class="fe fe-settings fe-16"></i>#}
-            {#                        <span class="ml-3 item-text">تنظیمات</span><span class="sr-only"></span>#}
-            {#                    </a>#}
-            {#                    <ul class="collapse list-unstyled pl-4 w-100 {% if segment in 'company part contractor edit' %}show{% else %}{% endif %}"#}
-            {#                        id="settings">#}
-            {#                        <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'company' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">شرکت</span></a>#}
-            {#                        </li>#}
-            {#                        <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'part' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">قطعه</span></a>#}
-            {#                        </li>#}
-            {##}
-            {#                     <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'contractor' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">پیمانکار</span></a>#}
-            {#                        </li>#}
-            {#                     <li class="nav-item ">#}
-            {#                            <a class="nav-link pl-3 {% if segment in 'edit' %}active{% else %}{% endif %}"#}
-            {#                               href="#"><span#}
-            {#                                    class="ml-1 item-text">ویرایش اطلاعات</span></a>#}
-            {#                        </li>#}
-            {#                    </ul>#}
-            {#                </li>#}
-            {#            </ul>#}
-
-            {#            <li class="nav-item mb-2">#}
-            {#                <a class="nav-link" href="#">#}
-            {#                    <i class="fe fe-grid fe-16"></i>#}
-            {#                    <span class="ml-3 item-text">تست</span>#}
-            {#                </a>#}
-            {#            </li>#}
         </ul>
     </nav>
 </aside>

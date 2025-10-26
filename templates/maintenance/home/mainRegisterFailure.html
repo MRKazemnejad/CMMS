@@ -1,15 +1,390 @@
+{##}
+{#{% extends "maintenance/layout/base.html" %}#}
+{##}
+{#{% block title %} ثبت خرابی لکوموتیو {% endblock %}#}
+{##}
+{#<!-- Specific Page CSS goes HERE -->#}
+{#{% block stylesheets %}#}
+{#    <link rel="stylesheet" href="/static/css/reportStyle.css?v0.1">#}
+{##}
+{#    <!-- Flatpickr CSS -->#}
+{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">#}
+{#    <!-- SweetAlert2 CSS -->#}
+{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">#}
+{#    <style>#}
+{#        body {#}
+{#            background-color: #f8f9fa;#}
+{#            font-family: 'Vazirmatn', sans-serif;#}
+{#        }#}
+{##}
+{#        .container-fullwidth {#}
+{#            width: 100%;#}
+{#            padding: 20px;#}
+{#            background-color: #fff;#}
+{#            border: 1px solid #ddd;#}
+{#            border-radius: 10px;#}
+{#            margin-top: 20px;#}
+{#        }#}
+{##}
+{#        .form-title {#}
+{#            text-align: center;#}
+{#            margin-bottom: 20px;#}
+{#            font-size: 1.8rem;#}
+{#            color: #333;#}
+{#        }#}
+{##}
+{#        .btn-primary {#}
+{#            background-color: #007bff;#}
+{#            border-color: #007bff;#}
+{#        }#}
+{##}
+{#        .btn-primary:hover {#}
+{#            background-color: #0056b3;#}
+{#            border-color: #004085;#}
+{#        }#}
+{##}
+{#        .form-label {#}
+{#            font-weight: bold;#}
+{#        }#}
+{##}
+{#        .form-group {#}
+{#            margin-bottom: 1rem;#}
+{#        }#}
+{##}
+{#        /* Adjust form width for fields */#}
+{#        .form-container {#}
+{#            max-width: 1080px; /* Approximate width for 3x col-md-3 */#}
+{#            margin: 0 auto;#}
+{#        }#}
+{##}
+{#        /* Validation styles */#}
+{#        .is-invalid {#}
+{#            border-color: #dc3545;#}
+{#        }#}
+{##}
+{#        .invalid-feedback {#}
+{#            display: none;#}
+{#            color: #dc3545;#}
+{#            font-size: 0.875rem;#}
+{#        }#}
+{##}
+{#        .is-invalid ~ .invalid-feedback {#}
+{#            display: block;#}
+{#        }#}
+{##}
+{#        /* Responsive adjustments for mobile */#}
+{#        @media (max-width: 576px) {#}
+{#            .container-fullwidth {#}
+{#                padding: 15px;#}
+{#                margin: 10px;#}
+{#            }#}
+{##}
+{#            .form-title {#}
+{#                font-size: 1.5rem;#}
+{#            }#}
+{##}
+{#            .form-container {#}
+{#                max-width: 100%;#}
+{#                padding: 0 10px;#}
+{#            }#}
+{##}
+{#            .form-group {#}
+{#                margin-bottom: 0.75rem;#}
+{#            }#}
+{#        }#}
+{##}
+{#        .timepicker-container {#}
+{#            position: relative;#}
+{#        }#}
+{#        .timepicker-container .form-control {#}
+{#            padding-left: 40px; /* فضای سمت چپ برای آیکون */#}
+{#        }#}
+{#        .timepicker-container .fa-clock {#}
+{#            position: absolute;#}
+{#            left: 10px;#}
+{#            top: 50%;#}
+{#            transform: translateY(-50%);#}
+{#            color: #495057;#}
+{#        }#}
+{#    </style>#}
+{#{% endblock stylesheets %}#}
+{##}
+{#{% block content %}#}
+{#    <div class="container-fluid">#}
+{#    {% csrf_token %}#}
+{#        <div class="row justify-content-center">#}
+{#            <h2 class="form-title account">ثبت خرابی لکوموتیو</h2>#}
+{#            <div class="container-fullwidth">#}
+{#                <div class="form-container account">#}
+{#                    <!-- Row 1: Locomotive ID, Damage Type, Location -->#}
+{#                    <div class="row">#}
+{#                        <div class="col-md-3 form-group">#}
+{#                            <label for="locomotiveId" class="form-label">لکوموتیو</label>#}
+{#                            <select id="locomotiveId" class="form-control" aria-label="انتخاب لکوموتیو">#}
+{#                                <option value="0" selected>یک لکوموتیو انتخاب کنید</option>#}
+{#                            </select>#}
+{#                            <div class="invalid-feedback">لطفاً یک لکوموتیو انتخاب کنید.</div>#}
+{#                        </div>#}
+{#                        <div class="col-md-3 form-group">#}
+{#                            <label for="damageType" class="form-label">نوع خرابی</label>#}
+{#                            <select id="damageType" class="form-control" aria-label="انتخاب نوع خرابی">#}
+{#                                <option value="0" selected>نوع خرابی را انتخاب کنید</option>#}
+{#                                <option value="MECHANICAL">مکانیکی</option>#}
+{#                                <option value="ELECTRICAL">برقی</option>#}
+{#                                <option value="BOGIE_CHASSIS">بوژی و شاسی</option>#}
+{#                                <option value="BRAKE">ترمز</option>#}
+{#                                <option value="CABIN_AMENITIES">کابین و رفاهی</option>#}
+{#                            </select>#}
+{#                            <div class="invalid-feedback">لطفاً نوع خرابی را انتخاب کنید.</div>#}
+{#                        </div>#}
+{#                        <div class="col-md-3 form-group">#}
+{#                            <label for="location" class="form-label">مکان خرابی</label>#}
+{#                            <input type="text" id="location" class="form-control" placeholder="مکان خرابی را وارد کنید">#}
+{#                            <div class="invalid-feedback">لطفاً مکان خرابی را وارد کنید.</div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <!-- Row 2: Reported Date, Reported Time -->#}
+{#                    <div class="row">#}
+{#                        <div class="col-md-3 form-group">#}
+{#                            <label for="reportedDate" class="form-label">تاریخ گزارش</label>#}
+{#                            <input type="text" id="reportedDate" class="form-control" data-jdp#}
+{#                                   placeholder="تاریخ را وارد کنید">#}
+{#                            <div class="invalid-feedback">لطفاً تاریخ گزارش را وارد کنید.</div>#}
+{#                        </div>#}
+{#                        <div class="col-md-3 form-group timepicker-container">#}
+{#                            <label for="reportedTime" class="form-label">ساعت گزارش</label>#}
+{#                            <div class="timepicker-container">#}
+{#                                <input type="time" class="form-control" id="reportedTime">#}
+{#                                <i class="fas fa-clock"></i> <!-- آیکون ساعت -->#}
+{#                            </div>#}
+{#                            <div class="invalid-feedback">لطفاً ساعت گزارش را وارد کنید.</div>#}
+{#                        </div>#}
+{##}
+{#                        <div class="col-md-3 form-group">#}
+{#                            <label for="moveStatus" class="form-label">وضعیت</label>#}
+{#                            <select id="moveStatus" name="moveStatus" class="form-control" aria-label="انتخاب نوع خرابی">#}
+{#                                <option value="0" selected>نوع وضعیت را انتخاب کنید</option>#}
+{#                                <option value="ACTIVE">گرم /ادامه سیر</option>#}
+{#                                <option value="DEACTIVE">سرد</option>#}
+{#                                <option value="REPAIR">متوقف/اعزام به تعمیرات</option>#}
+{#                            </select>#}
+{#                            <div class="invalid-feedback">لطفاً نوع خرابی را انتخاب کنید.</div>#}
+{#                        </div>#}
+{##}
+{##}
+{#                    </div>#}
+{#                    <div class="row">#}
+{#                        <div class="col-md-3 form-group">#}
+{#                            <label for="location" class="form-label">اعزام نیرو از</label>#}
+{#                            <input type="text" id="dispatchFrom" name="dispatchFrom" class="form-control" placeholder="اعزام نیرو ...">#}
+{#                            <div class="invalid-feedback">محل اعزامنیرو را وارد کنید.</div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="row">#}
+{#                        <div class="col-md-9 form-group">#}
+{#                            <label for="description" class="form-label">توضیحات خرابی</label>#}
+{#                            <textarea id="description" class="form-control" rows="4"#}
+{#                                      placeholder="توضیحات خرابی را وارد کنید"></textarea>#}
+{#                            <div class="invalid-feedback">لطفاً توضیحات خرابی را وارد کنید.</div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <!-- Row 3: Image Upload, Submit Button -->#}
+{#                    <div class="row">#}
+{#                        <div class="col-md-3 form-group">#}
+{#                            <label for="images" class="form-label">آپلود تصاویر</label>#}
+{#                            <input type="file" id="images" class="form-control-file" accept="image/*" multiple>#}
+{#                            <small class="form-text text-muted">می‌توانید چندین تصویر انتخاب کنید</small>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="row">#}
+{#                        <div class="col-md-3 form-group d-flex align-items-end">#}
+{#                            <button id="submitBtn" class="btn btn-primary w-100">ثبت خرابی</button>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#{% endblock content %}#}
+{##}
+{#{% block javascripts %}#}
+{#    <!-- Bootstrap 4 JS and dependencies -->#}
+{#    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>#}
+{##}
+{#    <!-- FontAwesome for clock icon -->#}
+{#    <script src="https://kit.fontawesome.com/a076d05399.js"></script>#}
+{#    <!-- Jalali Datepicker JS -->#}
+{#    <script src="/static/js/jalaliDatepicker.min.js"></script>#}
+{#    <!-- Flatpickr JS -->#}
+{#    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>#}
+{#    <!-- Persian locale for Flatpickr -->#}
+{#    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/fa.js"></script>#}
+{#    <!-- SweetAlert2 JS -->#}
+{#    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>#}
+{##}
+{#    <script>#}
+{#        // Initialize Jalali Datepicker#}
+{#        jalaliDatepicker.startWatch({#}
+{#            minDate: "attr",#}
+{#            maxDate: "attr"#}
+{#        });#}
+{##}
+{#        // Handle form submission with validation#}
+{#        document.getElementById('submitBtn').addEventListener('click', () => {#}
+{#            // Reset previous validation states#}
+{#            document.querySelectorAll('.form-control, .form-control-file').forEach(input => {#}
+{#                input.classList.remove('is-invalid');#}
+{#            });#}
+{##}
+{#            // Check for empty required fields#}
+{#            const requiredFields = [#}
+{#                { id: 'locomotiveId', label: 'شناسه لکوموتیو' },#}
+{#                { id: 'damageType', label: 'نوع خرابی' },#}
+{#                { id: 'location', label: 'مکان خرابی' },#}
+{#                { id: 'reportedDate', label: 'تاریخ گزارش' },#}
+{#                { id: 'reportedTime', label: 'ساعت گزارش' },#}
+{#                { id: 'moveStatus', label: 'وضعیت' },#}
+{#                { id: 'description', label: 'توضیحات خرابی' }#}
+{#            ];#}
+{##}
+{#            let emptyFields = [];#}
+{#            requiredFields.forEach(field => {#}
+{#                const input = document.getElementById(field.id);#}
+{#                const value = input.value.trim();#}
+{#                if (!value || (input.tagName === 'SELECT' && input.value === '0')) {#}
+{#                    input.classList.add('is-invalid');#}
+{#                    emptyFields.push(field.label);#}
+{#                }#}
+{#            });#}
+{##}
+{#            // If there are empty fields, show SweetAlert2 error#}
+{#            if (emptyFields.length > 0) {#}
+{#                Swal.fire({#}
+{#                    title: 'خطا!',#}
+{#                    html: `لطفاً فیلدهای زیر را پر کنید:<br>${emptyFields.join('<br>')}`,#}
+{#                    icon: 'error',#}
+{#                    confirmButtonText: 'باشه'#}
+{#                });#}
+{#                return;#}
+{#            }#}
+{##}
+{#            // Proceed with form submission if all fields are valid#}
+{#            Swal.fire({#}
+{#                title: 'آیا مطمئن هستید؟',#}
+{#                text: 'آیا می‌خواهید اطلاعات خرابی را ثبت کنید؟',#}
+{#                icon: 'question',#}
+{#                showCancelButton: true,#}
+{#                confirmButtonText: 'بله، ثبت کن',#}
+{#                cancelButtonText: 'خیر',#}
+{#                reverseButtons: true#}
+{#            }).then((result) => {#}
+{#                if (result.isConfirmed) {#}
+{#                    const formData = new FormData();#}
+{#                    formData.append('locomotiveId', document.getElementById('locomotiveId').value);#}
+{#                    formData.append('moveStatus', document.getElementById('moveStatus').value);#}
+{#                    formData.append('damageType', document.getElementById('damageType').value);#}
+{#                    formData.append('description', document.getElementById('description').value);#}
+{#                    formData.append('location', document.getElementById('location').value);#}
+{#                    formData.append('reportedDate', document.getElementById('reportedDate').value);#}
+{#                    formData.append('reportedTime', document.getElementById('reportedTime').value);#}
+{#                    formData.append('dispatchFrom', document.getElementById('dispatchFrom').value);#}
+{##}
+{#                    // Append multiple images (optional)#}
+{#                    const images = document.getElementById('images').files;#}
+{#                    for (let i = 0; i < images.length; i++) {#}
+{#                        formData.append('images', images[i]);#}
+{#                    }#}
+{##}
+{#                    // Send AJAX request#}
+{#                    $.ajax({#}
+{#                        url: '{% url "maintenance:mainRegisterFailure_submit" %}',#}
+{#                        type: 'POST',#}
+{#                        data: formData,#}
+{#                        processData: false,#}
+{#                        contentType: false,#}
+{#                        headers: {#}
+{#                            'X-CSRFToken': '{{ csrf_token }}'#}
+{#                        },#}
+{#                        success: function (response) {#}
+{#                            if (response.status === 'success') {#}
+{#                                Swal.fire({#}
+{#                                    title: 'موفقیت!',#}
+{#                                    text: 'اطلاعات خرابی با موفقیت ثبت شد.',#}
+{#                                    icon: 'success',#}
+{#                                    confirmButtonText: 'باشه'#}
+{#                                }).then(() => {#}
+{#                                    // Reset form#}
+{#                                    document.getElementById('locomotiveId').value = '0';#}
+{#                                    document.getElementById('damageType').value = '0';#}
+{#                                    document.getElementById('description').value = '';#}
+{#                                    document.getElementById('location').value = '';#}
+{#                                    document.getElementById('reportedDate').value = '';#}
+{#                                    document.getElementById('reportedTime').value = '';#}
+{#                                    document.getElementById('images').value = '';#}
+{#                                });#}
+{#                            } else {#}
+{#                                Swal.fire({#}
+{#                                    title: 'خطا!',#}
+{#                                    text: response.message,#}
+{#                                    icon: 'error',#}
+{#                                    confirmButtonText: 'باشه'#}
+{#                                });#}
+{#                            }#}
+{#                        },#}
+{#                        error: function (xhr) {#}
+{#                            Swal.fire({#}
+{#                                title: 'خطا!',#}
+{#                                text: xhr.responseJSON ? xhr.responseJSON.message : 'خطا در ارسال اطلاعات',#}
+{#                                icon: 'error',#}
+{#                                confirmButtonText: 'باشه'#}
+{#                            });#}
+{#                        }#}
+{#                    });#}
+{#                }#}
+{#            });#}
+{#        });#}
+{#    </script>#}
+{##}
+{#    <script>#}
+{#    $(document).ready(function () {#}
+{#        // AJAX request to load locomotives#}
+{#        $.ajax({#}
+{#            url: '{% url "maintenance:mainGetLocomotives" %}',#}
+{#            type: 'GET',#}
+{#            dataType: 'json',#}
+{#            success: function (response) {#}
+{#                const select = $('#locomotiveId');#}
+{#                // Clear existing options except the default#}
+{#                select.find('option:not(:first)').remove();#}
+{#                // Add locomotives to select#}
+{#                response.locomotives.forEach(loco => {#}
+{#                    select.append(`<option value="${loco.id}">${loco.name}</option>`);#}
+{#                });#}
+{#            },#}
+{#            error: function (xhr) {#}
+{#                console.error('Error loading locomotives:', xhr);#}
+{#                Swal.fire({#}
+{#                    title: 'خطا!',#}
+{#                    text: 'خطا در بارگذاری لیست لکوموتیوها',#}
+{#                    icon: 'error',#}
+{#                    confirmButtonText: 'باشه'#}
+{#                });#}
+{#            }#}
+{#        });#}
+{#    });#}
+{#</script>#}
+{#{% endblock javascripts %}#}
+
+
 
 {% extends "maintenance/layout/base.html" %}
 
 {% block title %} ثبت خرابی لکوموتیو {% endblock %}
 
-<!-- Specific Page CSS goes HERE -->
 {% block stylesheets %}
     <link rel="stylesheet" href="/static/css/reportStyle.css?v0.1">
-
-    <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         body {
@@ -51,13 +426,11 @@
             margin-bottom: 1rem;
         }
 
-        /* Adjust form width for fields */
         .form-container {
-            max-width: 1080px; /* Approximate width for 3x col-md-3 */
+            max-width: 1080px;
             margin: 0 auto;
         }
 
-        /* Validation styles */
         .is-invalid {
             border-color: #dc3545;
         }
@@ -72,7 +445,6 @@
             display: block;
         }
 
-        /* Responsive adjustments for mobile */
         @media (max-width: 576px) {
             .container-fullwidth {
                 padding: 15px;
@@ -97,7 +469,7 @@
             position: relative;
         }
         .timepicker-container .form-control {
-            padding-left: 40px; /* فضای سمت چپ برای آیکون */
+            padding-left: 40px;
         }
         .timepicker-container .fa-clock {
             position: absolute;
@@ -111,6 +483,7 @@
 
 {% block content %}
     <div class="container-fluid">
+
         <div class="row justify-content-center">
             <h2 class="form-title account">ثبت خرابی لکوموتیو</h2>
             <div class="container-fullwidth">
@@ -118,18 +491,15 @@
                     <!-- Row 1: Locomotive ID, Damage Type, Location -->
                     <div class="row">
                         <div class="col-md-3 form-group">
-                            <label for="locomotiveId" class="form-label">شناسه لکوموتیو</label>
+                            <label for="locomotiveId" class="form-label">لکوموتیو</label>
                             <select id="locomotiveId" class="form-control" aria-label="انتخاب لکوموتیو">
-                                <option value="0" selected>یک لکوموتیو انتخاب کنید</option>
-                                <option value="7019">7019</option>
-                                <option value="7020">7020</option>
-                                <option value="7021">7021</option>
+                                <option value="" selected>یک لکوموتیو انتخاب کنید</option>
                             </select>
                             <div class="invalid-feedback">لطفاً یک لکوموتیو انتخاب کنید.</div>
                         </div>
                         <div class="col-md-3 form-group">
                             <label for="damageType" class="form-label">نوع خرابی</label>
-                            <select id="damageType" class="form-control" aria-label="انتخاب نوع خرابی">
+                                 <select id="damageType" class="form-control" aria-label="انتخاب نوع خرابی">
                                 <option value="0" selected>نوع خرابی را انتخاب کنید</option>
                                 <option value="MECHANICAL">مکانیکی</option>
                                 <option value="ELECTRICAL">برقی</option>
@@ -145,7 +515,7 @@
                             <div class="invalid-feedback">لطفاً مکان خرابی را وارد کنید.</div>
                         </div>
                     </div>
-                    <!-- Row 2: Reported Date, Reported Time -->
+                    <!-- Row 2: Reported Date, Reported Time, Move Status -->
                     <div class="row">
                         <div class="col-md-3 form-group">
                             <label for="reportedDate" class="form-label">تاریخ گزارش</label>
@@ -157,11 +527,30 @@
                             <label for="reportedTime" class="form-label">ساعت گزارش</label>
                             <div class="timepicker-container">
                                 <input type="time" class="form-control" id="reportedTime">
-                                <i class="fas fa-clock"></i> <!-- آیکون ساعت -->
+                                <i class="fas fa-clock"></i>
                             </div>
                             <div class="invalid-feedback">لطفاً ساعت گزارش را وارد کنید.</div>
                         </div>
+                        <div class="col-md-3 form-group">
+                            <label for="moveStatus" class="form-label">وضعیت</label>
+                            <select id="moveStatus" name="moveStatus" class="form-control" aria-label="انتخاب نوع خرابی">
+                                <option value="0" selected>نوع وضعیت را انتخاب کنید</option>
+                                <option value="ACTIVE">گرم /ادامه سیر</option>
+                                <option value="DEACTIVE">سرد</option>
+                                <option value="REPAIR">متوقف/اعزام به تعمیرات</option>
+                            </select>
+                            <div class="invalid-feedback">لطفاً وضعیت را انتخاب کنید.</div>
+                        </div>
                     </div>
+                    <!-- Row 3: Dispatch From -->
+                    <div class="row">
+                        <div class="col-md-3 form-group">
+                            <label for="dispatchFrom" class="form-label">اعزام نیرو از</label>
+                            <input type="text" id="dispatchFrom" name="dispatchFrom" class="form-control" placeholder="اعزام نیرو ...">
+                            <div class="invalid-feedback">لطفاً محل اعزام نیرو را وارد کنید.</div>
+                        </div>
+                    </div>
+                    <!-- Row 4: Description -->
                     <div class="row">
                         <div class="col-md-9 form-group">
                             <label for="description" class="form-label">توضیحات خرابی</label>
@@ -170,7 +559,7 @@
                             <div class="invalid-feedback">لطفاً توضیحات خرابی را وارد کنید.</div>
                         </div>
                     </div>
-                    <!-- Row 3: Image Upload, Submit Button -->
+                    <!-- Row 5: Image Upload, Submit Button -->
                     <div class="row">
                         <div class="col-md-3 form-group">
                             <label for="images" class="form-label">آپلود تصاویر</label>
@@ -190,19 +579,13 @@
 {% endblock content %}
 
 {% block javascripts %}
-    <!-- Bootstrap 4 JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-
-    <!-- FontAwesome for clock icon -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <!-- Jalali Datepicker JS -->
     <script src="/static/js/jalaliDatepicker.min.js"></script>
-    <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Persian locale for Flatpickr -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/fa.js"></script>
-    <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -210,6 +593,35 @@
         jalaliDatepicker.startWatch({
             minDate: "attr",
             maxDate: "attr"
+        });
+
+        // Load locomotives via AJAX
+        $(document).ready(function () {
+            $.ajax({
+                url: '{% url "maintenance:mainGetLocomotives" %}',
+                type: 'GET',
+                dataType: 'json',
+                beforeSend: function () {
+                    console.log('Loading locomotives from:', '{% url "maintenance:mainGetLocomotives" %}');
+                },
+                success: function (response) {
+                    console.log('Locomotives response:', response);
+                    const select = $('#locomotiveId');
+                    select.find('option:not(:first)').remove();
+                    response.locomotives.forEach(loco => {
+                        select.append(`<option value="${loco.id}">${loco.name}</option>`);
+                    });
+                },
+                error: function (xhr) {
+                    console.error('Error loading locomotives:', xhr.status, xhr.responseText);
+                    Swal.fire({
+                        title: 'خطا!',
+                        text: 'خطا در بارگذاری لیست لکوموتیوها',
+                        icon: 'error',
+                        confirmButtonText: 'باشه'
+                    });
+                }
+            });
         });
 
         // Handle form submission with validation
@@ -226,6 +638,7 @@
                 { id: 'location', label: 'مکان خرابی' },
                 { id: 'reportedDate', label: 'تاریخ گزارش' },
                 { id: 'reportedTime', label: 'ساعت گزارش' },
+                { id: 'moveStatus', label: 'وضعیت' },
                 { id: 'description', label: 'توضیحات خرابی' }
             ];
 
@@ -233,7 +646,8 @@
             requiredFields.forEach(field => {
                 const input = document.getElementById(field.id);
                 const value = input.value.trim();
-                if (!value || (input.tagName === 'SELECT' && input.value === '0')) {
+                console.log(`${field.label}: ${value}`); // Debug log
+                if (!value || (input.tagName === 'SELECT' && input.value === '')) {
                     input.classList.add('is-invalid');
                     emptyFields.push(field.label);
                 }
@@ -241,6 +655,7 @@
 
             // If there are empty fields, show SweetAlert2 error
             if (emptyFields.length > 0) {
+                console.log('Validation failed, empty fields:', emptyFields);
                 Swal.fire({
                     title: 'خطا!',
                     html: `لطفاً فیلدهای زیر را پر کنید:<br>${emptyFields.join('<br>')}`,
@@ -266,6 +681,8 @@
                     formData.append('damageType', document.getElementById('damageType').value);
                     formData.append('description', document.getElementById('description').value);
                     formData.append('location', document.getElementById('location').value);
+                    formData.append('moveStatus', document.getElementById('moveStatus').value);
+                    formData.append('dispatchFrom', document.getElementById('dispatchFrom').value || '');
                     formData.append('reportedDate', document.getElementById('reportedDate').value);
                     formData.append('reportedTime', document.getElementById('reportedTime').value);
 
@@ -273,6 +690,11 @@
                     const images = document.getElementById('images').files;
                     for (let i = 0; i < images.length; i++) {
                         formData.append('images', images[i]);
+                    }
+
+                    // Log form data for debugging
+                    for (let pair of formData.entries()) {
+                        console.log(`${pair[0]}: ${pair[1]}`);
                     }
 
                     // Send AJAX request
@@ -285,7 +707,11 @@
                         headers: {
                             'X-CSRFToken': '{{ csrf_token }}'
                         },
+                        beforeSend: function () {
+                            console.log('Sending AJAX request to:', '{% url "maintenance:mainRegisterFailure_submit" %}');
+                        },
                         success: function (response) {
+                            console.log('Response:', response);
                             if (response.status === 'success') {
                                 Swal.fire({
                                     title: 'موفقیت!',
@@ -294,15 +720,18 @@
                                     confirmButtonText: 'باشه'
                                 }).then(() => {
                                     // Reset form
-                                    document.getElementById('locomotiveId').value = '0';
-                                    document.getElementById('damageType').value = '0';
+                                    document.getElementById('locomotiveId').value = '';
+                                    document.getElementById('damageType').value = '';
+                                    document.getElementById('moveStatus').value = '';
                                     document.getElementById('description').value = '';
                                     document.getElementById('location').value = '';
+                                    document.getElementById('dispatchFrom').value = '';
                                     document.getElementById('reportedDate').value = '';
                                     document.getElementById('reportedTime').value = '';
                                     document.getElementById('images').value = '';
                                 });
                             } else {
+                                console.log('Error response:', response.message);
                                 Swal.fire({
                                     title: 'خطا!',
                                     text: response.message,
@@ -312,6 +741,7 @@
                             }
                         },
                         error: function (xhr) {
+                            console.error('AJAX error:', xhr.status, xhr.responseText);
                             Swal.fire({
                                 title: 'خطا!',
                                 text: xhr.responseJSON ? xhr.responseJSON.message : 'خطا در ارسال اطلاعات',

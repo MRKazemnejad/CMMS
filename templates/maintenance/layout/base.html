@@ -1,4 +1,6 @@
+
 {% load static %}
+
 <!doctype html>
 <html lang="fa">
 <head>
@@ -8,7 +10,8 @@
     <meta name="author" content="">
     <link rel="icon" href="favicon.ico">
     {#    <title>شرکت کاوان ریل صنعت نیرو</title>#}
-
+    <!-- Simple bar CSS -->
+    <link rel="stylesheet" href="/static/css/simplebar.css">
     <!-- Fonts CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap"
           rel="stylesheet">
@@ -24,14 +27,13 @@
     <link rel="stylesheet" href="/static/css/daterangepicker.css">
     <!-- App CSS -->
     <link rel="stylesheet" href="/static/css/app-light.css" id="lightTheme">
-    <link rel="stylesheet" href="/static/css/app-dark.css?v1.1" id="darkTheme" disabled>
+    <link rel="stylesheet" href="/static/css/app-dark.css" id="darkTheme" disabled>
 
     <!-- Persian font -->
     <link rel="stylesheet" href="/static/css/account.css">
 
     <!-- Style -->
-    <link rel="stylesheet" href="/static/css/style.css?v1.1">
-    {#    <link rel="stylesheet" href="/static/css/custom.css?v1.0">#}
+    <link rel="stylesheet" href="/static/css/style.css?v1.4">
 
     <!-- date picker -->
     <link type="text/css" rel="stylesheet" href="/static/jalaliDatePicker/jalalidatepicker.min.css"/>
@@ -40,52 +42,67 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!--print icon-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-
-  <!-- Font Awesome for Icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"  crossorigin="anonymous">
+    {#    <link type="text/css" href="/static/css/test.css?v1.0">#}
+    {#    <script type="text/javascript" src="/static/js/test.js?v1.0"></script>#}
 
     <!--sidebar hilight-->
     <style>
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        footer {
+            {#background-color: #f8f8f8;#}
+            {#text-align: center;#}
+            padding: 10px 10px;
+        }
 
         .nav-link.active, .dropdown-item.active {
             background-color: #e1f3f8;
             color: white;
         }
     </style>
+
+
     {% block stylesheets %}{% endblock stylesheets %}
 </head>
 <body class="vertical  light rtl ">
 <div class="wrapper">
     {% include 'maintenance/includes/navbar.html' %}
     {% include 'maintenance/includes/sidebar.html' %}
-    {#    {% include 'maintenance/includes/shortcut.html' %}#}
+
+
 
 
     <main role="main" class="main-content">
         {% block content %}{% endblock content %}
-
     </main> <!-- main -->
-    {% include 'maintenance/includes/footer.html' %}
+
 </div> <!-- .wrapper -->
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/popper.min.js"></script>
 <script src="/static/js/moment.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
-{#<script src="/static/js/simplebar.min.js"></script>#}
+<script src="/static/js/simplebar.min.js"></script>
 <script src='/static/js/daterangepicker.js'></script>
 <script src='/static/js/jquery.stickOnScroll.js'></script>
 <script src="/static/js/tinycolor-min.js"></script>
-{#<script src="/static/js/config.js"></script>#}
+<script src="/static/js/config.js"></script>
 <script src="/static/js/d3.min.js"></script>
 <script src="/static/js/topojson.min.js"></script>
 <script src="/static/js/datamaps.all.min.js"></script>
 <script src="/static/js/datamaps-zoomto.js"></script>
 <script src="/static/js/datamaps.custom.js"></script>
 <script src="/static/js/Chart.min.js"></script>
+<script>
+    /* defind global options */
+    Chart.defaults.global.defaultFontFamily = base.defaultFontFamily;
+    Chart.defaults.global.defaultFontColor = colors.mutedColor;
+</script>
 <script src="/static/js/gauge.min.js"></script>
 <script src="/static/js/jquery.sparkline.min.js"></script>
 <script src="/static/js/apexcharts.min.js"></script>
@@ -99,6 +116,10 @@
 <script src='/static/js/uppy.min.js'></script>
 <script src='/static/js/quill.min.js'></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.6.5/sweetalert2.all.min.js"></script>
+
+
+<script src="/static/js/apps.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
 
 
 

@@ -1,24 +1,27 @@
-
 {% load static %}
 <style>
-.card-raised {
-    background: linear-gradient(180deg, rgba(225, 225, 245, 0.8) 0%, rgba(255, 255, 255, 1) 50%, rgba(225, 225, 245, 0.8) 100%);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.5);
-    border: 1px solid #dee2e6;
-}
-.dropdown-menu {
-    min-width: 200px;
-}
-.dropdown-item {
-    padding: 0.25rem 1.5rem;
-}
-.checkbox-option {
-    display: flex;
-    align-items: center;
-}
-.checkbox-option input {
-    margin-right: 0.5rem;
-}
+    .card-raised {
+        background: linear-gradient(180deg, rgba(225, 225, 245, 0.8) 0%, rgba(255, 255, 255, 1) 50%, rgba(225, 225, 245, 0.8) 100%);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.5);
+        border: 1px solid #dee2e6;
+    }
+
+    .dropdown-menu {
+        min-width: 200px;
+    }
+
+    .dropdown-item {
+        padding: 0.25rem 1.5rem;
+    }
+
+    .checkbox-option {
+        display: flex;
+        align-items: center;
+    }
+
+    .checkbox-option input {
+        margin-right: 0.5rem;
+    }
 </style>
 
 <div class="card card-raised shadow">
@@ -30,23 +33,27 @@
             <div class="row">
                 <div class="col-md-2 col-6">
                     <div class="form-group mb-2" id="ordercompany">
-                        <input type="text" id="part" name="part" class="form-control form-control-sm" placeholder="موضوع" value="{{ part|default:'' }}">
+                        <input type="text" id="part" name="part" class="form-control form-control-sm"
+                               placeholder="موضوع" value="{{ part|default:'' }}">
                     </div>
                 </div>
                 <div class="col-md-2 col-6">
                     <div class="form-group mb-2">
-                        <input type="text" id="fromDate" name="from_date" class="form-control form-control-sm" placeholder="از تاریخ" data-jdp value="{{ from_date|default:'' }}">
+                        <input type="text" id="fromDate" name="from_date" class="form-control form-control-sm"
+                               placeholder="از تاریخ" data-jdp value="{{ from_date|default:'' }}">
                     </div>
                 </div>
                 <div class="col-md-2 col-6">
                     <div class="form-group mb-2">
-                        <input type="text" id="toDate" name="to_date" class="form-control form-control-sm" placeholder="تا تاریخ" data-jdp value="{{ to_date|default:'' }}">
+                        <input type="text" id="toDate" name="to_date" class="form-control form-control-sm"
+                               placeholder="تا تاریخ" data-jdp value="{{ to_date|default:'' }}">
                     </div>
                 </div>
                 <div class="col-md-2 col-6">
                     <div class="form-group mb-2">
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100" type="button" id="guarantyDropdown" data-toggle="dropdown" aria-expanded="false">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100" type="button"
+                                    id="guarantyDropdown" data-toggle="dropdown" aria-expanded="false">
                                 وضعیت
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="guarantyDropdown">
@@ -56,76 +63,90 @@
                                         <label for="select_all">انتخاب همه</label>
                                     </div>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICCMPLT" id="status_liccmplt" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICCMPLT" id="status_liccmplt"
+                                               class="status-checkbox">
                                         <label for="status_liccmplt">مجوز تأیید شده</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICREJCT" id="status_licrejct" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICREJCT" id="status_licrejct"
+                                               class="status-checkbox">
                                         <label for="status_licrejct">رد شده</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICRTURNE" id="status_licrtune" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICRTURNE" id="status_licrtune"
+                                               class="status-checkbox">
                                         <label for="status_licrtune">بازگشت به کارشناس خرید</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICRTURNC" id="status_licrturnc" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICRTURNC" id="status_licrturnc"
+                                               class="status-checkbox">
                                         <label for="status_licrturnc">بازگشت به امور قرارداد</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICRTURNM" id="status_licrturnm" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICRTURNM" id="status_licrturnm"
+                                               class="status-checkbox">
                                         <label for="status_licrturnm">بازگشت به مدیر بازرگانی</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICRTURND" id="status_licrturnd" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICRTURND" id="status_licrturnd"
+                                               class="status-checkbox">
                                         <label for="status_licrturnd">بازگشت به قایم مقام</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICPURCH" id="status_licpurch" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICPURCH" id="status_licpurch"
+                                               class="status-checkbox">
                                         <label for="status_licpurch">در انتظار امضای کارشناس خرید</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICCNTRC" id="status_liccntrc" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICCNTRC" id="status_liccntrc"
+                                               class="status-checkbox">
                                         <label for="status_liccntrc">در انتظار امضای امور قراردادها</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICMNGCM" id="status_licmngcm" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICMNGCM" id="status_licmngcm"
+                                               class="status-checkbox">
                                         <label for="status_licmngcm">در انتظار امضای مدیر بازرگانی</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICDPUTY" id="status_licdputy" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICDPUTY" id="status_licdputy"
+                                               class="status-checkbox">
                                         <label for="status_licdputy">در انتظار امضای قائم مقام</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICCEOAP" id="status_licceoap" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICCEOAP" id="status_licceoap"
+                                               class="status-checkbox">
                                         <label for="status_licceoap">در انتظار امضای مدیر عامل</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item checkbox-option">
-                                        <input type="checkbox" name="guaranty" value="LICBOARD" id="status_licboard" class="status-checkbox">
+                                        <input type="checkbox" name="guaranty" value="LICBOARD" id="status_licboard"
+                                               class="status-checkbox">
                                         <label for="status_licboard">در انتظار امضای هیئت مدیره</label>
                                     </div>
                                 </li>
@@ -145,10 +166,13 @@
 </div>
 
 <script>
-function toggleSelectAll(selectAllCheckbox) {
-    const checkboxes = document.querySelectorAll('.status-checkbox');
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = selectAllCheckbox.checked;
-    });
-}
+
+
+
+    function toggleSelectAll(selectAllCheckbox) {
+        const checkboxes = document.querySelectorAll('.status-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+    }
 </script>
