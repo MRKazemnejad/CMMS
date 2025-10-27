@@ -11,6 +11,9 @@ from django.http import JsonResponse
 from django.db.models import Count
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
+from django.utils import timezone
+from django.forms.models import model_to_dict
+from maintenance.utility import dateToGrgorian
 
 
 
@@ -62,56 +65,313 @@ PROVINCE_IDS = {
 
 @login_required
 def dashboard(request):
-    # Get total counts
+
+
+    # total_locomotives = Locomotive.objects.count()
+    # total_failures = Failure.objects.count()
+    # recent_failures = Failure.objects.select_related('locomotive').prefetch_related('images').order_by('-reported_date',
+    #                                                                                                    '-reported_time')[
+    #                   :10]
+    #
+    # for failure in recent_failures:
+    #     failure.image_urls = json.dumps([image.image.url for image in failure.images.all()])
+    #     # تبدیل reported_date به شمسی
+    #     if failure.reported_date:
+    #         reported_date_shamsi = jdatetime.datetime.fromgregorian(date=failure.reported_date).strftime('%Y/%m/%d')
+    #         failure.reported_date_shamsi = reported_date_shamsi
+    #     else:
+    #         failure.reported_date_shamsi = 'N/A'
+    #
+    # locomotives = Locomotive.objects.order_by('created_at')[:25]
+    # matrix_data = []
+    # for loco in locomotives:
+    #     latest_failure = Failure.objects.filter(locomotive=loco).order_by('-reported_date', '-reported_time').first()
+    #     status = 'COLD' if latest_failure and latest_failure.inRepair else 'HOT'
+    #     matrix_data.append({
+    #         'locomotive_id': loco.locomotive_id,
+    #         'status': status
+    #     })
+    #
+    # today = timezone.now()
+    # today_shamsi = jdatetime.datetime.fromgregorian(datetime=today).strftime(
+    #     '%Y/%m/%d')
+    # failure_types = Failure.objects.values('damage_type').annotate(count=Count('id')).order_by('-count')
+    # failure_type_labels = [item['damage_type'] for item in failure_types]
+    # failure_type_counts = [item['count'] for item in failure_types]
+    #
+    # failures_by_loco = Failure.objects.values('locomotive__locomotive_id').annotate(count=Count('id')).order_by(
+    #     '-count')
+    # locomotive_ids = [item['locomotive__locomotive_id'] for item in failures_by_loco]
+    # locomotive_counts = [item['count'] for item in failures_by_loco]
+    #
+    # stoppage_locomotive_ids = []
+    # stoppage_durations = []
+    # repairs = Repair.objects.select_related('failure__locomotive').filter(status='COMPLETED')
+    # for repair in repairs:
+    #     if repair.start_date and repair.start_time and repair.end_date and repair.end_time:
+    #         start = datetime.combine(repair.start_date, repair.start_time)
+    #         end = datetime.combine(repair.end_date, repair.end_time)
+    #         duration = (end - start).total_seconds() / 3600
+    #         stoppage_locomotive_ids.append(repair.failure.locomotive.locomotive_id)
+    #         stoppage_durations.append(round(duration, 2))
+    #
+    # top_locations = Failure.objects.values('location').annotate(count=Count('id')).order_by('-count')[:20]
+    # location_labels = [item['location'] for item in top_locations]
+    # location_counts = [item['count'] for item in top_locations]
+    #
+    # context = {
+    #     'total_locomotives': total_locomotives,
+    #     'total_failures': total_failures,
+    #     'recent_failures': recent_failures,
+    #     'matrix_data': matrix_data[:5] if len(matrix_data) > 5 else matrix_data,
+    #     'failure_type_labels': json.dumps(failure_type_labels, ensure_ascii=False),
+    #     'failure_type_counts': json.dumps(failure_type_counts),
+    #     'locomotive_ids': json.dumps(locomotive_ids, ensure_ascii=False),
+    #     'locomotive_counts': json.dumps(locomotive_counts),
+    #     'stoppage_locomotive_ids': json.dumps(stoppage_locomotive_ids, ensure_ascii=False),
+    #     'stoppage_durations': json.dumps(stoppage_durations),
+    #     'location_labels': json.dumps(location_labels, ensure_ascii=False),
+    #     'location_counts': json.dumps(location_counts),
+    #     'today_shamsi': today_shamsi,
+    # }
+    # return render(request, 'maintenance/home/dashboard.html', context)
     total_locomotives = Locomotive.objects.count()
     total_failures = Failure.objects.count()
+    recent_failures = Failure.objects.select_related('locomotive').prefetch_related('images').order_by('-reported_date',
+                                                                                                       '-reported_time')[
+                      :10]
 
-    # Get failure counts by damage type
-    failure_by_type = Failure.objects.values('damage_type').annotate(count=Count('damage_type')).order_by('damage_type')
-    failure_types = [item['damage_type'] for item in failure_by_type]
-    failure_type_counts = [item['count'] for item in failure_by_type]
-    failure_type_labels = [DAMAGE_TYPE_LABELS.get(item['damage_type'], item['damage_type']) for item in failure_by_type]
+    # مپینگ نوع خرابی به متن فارسی (اختیاری، می‌تونی تو جاوااسکریپت هم بسازی)
+    damage_type_map = {
+        "MECHANICAL": "مکانیکی",
+        "CABIN_AMENITIES": "امکانات کابین",
+        "BOGIE_CHASSIS": "شاسی بوژی"
+    }
 
-    # Get failure counts by locomotive
-    failure_by_locomotive = Failure.objects.values('locomotive__locomotive_id').annotate(
-        count=Count('locomotive')).order_by('locomotive__locomotive_id')
-    locomotive_ids = [item['locomotive__locomotive_id'] for item in failure_by_locomotive]
-    locomotive_counts = [item['count'] for item in failure_by_locomotive]
-
-    # Get recent failures (last 5) and convert dates to Jalali
-    recent_failures = Failure.objects.select_related('locomotive').order_by('-reported_date', '-reported_time')[:5]
-    recent_failures_data = []
     for failure in recent_failures:
-        # Convert Gregorian date to Jalali
-        jalali_date = jdatetime.date.fromgregorian(date=failure.reported_date)
-        # Get images
-        images = [img.image.url for img in failure.images.all()]
-        recent_failures_data.append({
-            'locomotive_model': failure.locomotive.locomotive_id,  # Use model instead of locomotive_id
-            'damage_type': DAMAGE_TYPE_LABELS.get(failure.damage_type, failure.damage_type),  # Ensure translation
-            'location': failure.location,
-            'reported_date': jalali_date.strftime("%Y/%m/%d"),
-            'reported_time': failure.reported_time.strftime("%H:%M"),
-            'images': json.dumps(images),  # JSON-encode images list
+        failure.image_urls = json.dumps([image.image.url for image in failure.images.all()])
+        # تبدیل reported_date به شمسی
+        if failure.reported_date:
+            reported_date_shamsi = jdatetime.datetime.fromgregorian(date=failure.reported_date).strftime('%Y/%m/%d')
+            failure.reported_date_shamsi = reported_date_shamsi
+        else:
+            failure.reported_date_shamsi = 'N/A'
+        # تبدیل reported_time به فرمت 24 ساعته (HH:MM:SS)
+        if failure.reported_time:
+            failure.reported_time_24h = failure.reported_time.strftime('%H:%M:%S')
+        else:
+            failure.reported_time_24h = 'N/A'
+        # اعمال مپینگ damage_type (اختیاری)
+        failure.damage_type_display = damage_type_map.get(failure.damage_type, failure.damage_type)
 
+    locomotives = Locomotive.objects.order_by('created_at')[:25]
+    matrix_data = []
+    for loco in locomotives:
+        latest_failure = Failure.objects.filter(locomotive=loco).order_by('-reported_date', '-reported_time').first()
+        status = 'COLD' if latest_failure and latest_failure.inRepair else 'HOT'
+        matrix_data.append({
+            'locomotive_id': loco.locomotive_id,
+            'status': status
         })
+
+    today = timezone.now()
+    today_shamsi = jdatetime.datetime.fromgregorian(datetime=today).strftime(
+        '%Y/%m/%d')
+    failure_types = Failure.objects.values('damage_type').annotate(count=Count('id')).order_by('-count')
+    failure_type_labels = [item['damage_type'] for item in failure_types]
+    failure_type_counts = [item['count'] for item in failure_types]
+
+    failures_by_loco = Failure.objects.values('locomotive__locomotive_id').annotate(count=Count('id')).order_by(
+        '-count')
+    locomotive_ids = [item['locomotive__locomotive_id'] for item in failures_by_loco]
+    locomotive_counts = [item['count'] for item in failures_by_loco]
+
+    stoppage_locomotive_ids = []
+    stoppage_durations = []
+    repairs = Repair.objects.select_related('failure__locomotive').filter(status='COMPLETED')
+    for repair in repairs:
+        if repair.start_date and repair.start_time and repair.end_date and repair.end_time:
+            start = datetime.combine(repair.start_date, repair.start_time)
+            end = datetime.combine(repair.end_date, repair.end_time)
+            duration = (end - start).total_seconds() / 3600
+            stoppage_locomotive_ids.append(repair.failure.locomotive.locomotive_id)
+            stoppage_durations.append(round(duration, 2))
+
+    top_locations = Failure.objects.values('location').annotate(count=Count('id')).order_by('-count')[:20]
+    location_labels = [item['location'] for item in top_locations]
+    location_counts = [item['count'] for item in top_locations]
 
     context = {
         'total_locomotives': total_locomotives,
         'total_failures': total_failures,
-        'failure_types': json.dumps(failure_types),
+        'recent_failures': recent_failures,
+        'matrix_data': matrix_data[:5] if len(matrix_data) > 5 else matrix_data,
+        'failure_type_labels': json.dumps(failure_type_labels, ensure_ascii=False),
         'failure_type_counts': json.dumps(failure_type_counts),
-        'failure_type_labels': json.dumps(failure_type_labels),
-        'locomotive_ids': json.dumps(locomotive_ids),
+        'locomotive_ids': json.dumps(locomotive_ids, ensure_ascii=False),
         'locomotive_counts': json.dumps(locomotive_counts),
-        'recent_failures': recent_failures_data,
-        'segment':'dashboard'
+        'stoppage_locomotive_ids': json.dumps(stoppage_locomotive_ids, ensure_ascii=False),
+        'stoppage_durations': json.dumps(stoppage_durations),
+        'location_labels': json.dumps(location_labels, ensure_ascii=False),
+        'location_counts': json.dumps(location_counts),
+        'today_shamsi': today_shamsi,
     }
     return render(request, 'maintenance/home/dashboard.html', context)
 
-    # return render(request,'maintenance/home/mainAllHistory.html',context)
 
 
+
+
+def mainDashboardFilter(request):
+
+    # start_date1 = request.GET.get('start_date')
+    # end_date1 = request.GET.get('end_date')
+    #
+    # start_date = dateToGrgorian(start_date1) if start_date1 else None
+    # end_date = dateToGrgorian(end_date1) if end_date1 else None
+    #
+    # failures = Failure.objects.all()
+    # if start_date and end_date:
+    #     start = start_date
+    #     end = end_date
+    #     failures = failures.filter(reported_date__range=[start, end])
+    # elif start_date:
+    #     start = start_date
+    #     failures = failures.filter(reported_date__gte=start)
+    # elif end_date:
+    #     end = end_date
+    #     failures = failures.filter(reported_date__lte=end)
+    #
+    # recent_failures = failures.select_related('locomotive').prefetch_related('images').order_by('-reported_date',
+    #                                                                                             '-reported_time')[:10]
+    # for failure in recent_failures:
+    #     failure.image_urls = json.dumps([image.image.url for image in failure.images.all()])
+    #     # تبدیل reported_date به شمسی
+    #     if failure.reported_date:
+    #         reported_date_shamsi = jdatetime.datetime.fromgregorian(date=failure.reported_date).strftime('%Y/%m/%d')
+    #         failure.reported_date_shamsi = reported_date_shamsi
+    #     else:
+    #         failure.reported_date_shamsi = 'N/A'
+    #
+    # # آماده‌سازی داده‌ها برای نمودارها
+    # failure_types = failures.values('damage_type').annotate(count=Count('id')).order_by('-count')
+    # failure_type_labels = [item['damage_type'] for item in failure_types]
+    # failure_type_counts = [item['count'] for item in failure_types]
+    #
+    # failures_by_loco = failures.values('locomotive__locomotive_id').annotate(count=Count('id')).order_by('-count')
+    # locomotive_ids = [item['locomotive__locomotive_id'] for item in failures_by_loco]
+    # locomotive_counts = [item['count'] for item in failures_by_loco]
+    #
+    # stoppage_locomotive_ids = []
+    # stoppage_durations = []
+    # repairs = Repair.objects.select_related('failure__locomotive').filter(status='COMPLETED', failure__in=failures)
+    # for repair in repairs:
+    #     if repair.start_date and repair.start_time and repair.end_date and repair.end_time:
+    #         start = datetime.combine(repair.start_date, repair.start_time)
+    #         end = datetime.combine(repair.end_date, repair.end_time)
+    #         duration = (end - start).total_seconds() / 3600
+    #         stoppage_locomotive_ids.append(repair.failure.locomotive.locomotive_id)
+    #         stoppage_durations.append(round(duration, 2))
+    #
+    # top_locations = failures.values('location').annotate(count=Count('id')).order_by('-count')[:20]
+    # location_labels = [item['location'] for item in top_locations]
+    # location_counts = [item['count'] for item in top_locations]
+    #
+    # # تبدیل recent_failures به دیکشنری با اضافه کردن reported_date_shamsi
+    # recent_failures_dicts = []
+    # for failure in recent_failures:
+    #     failure_dict = model_to_dict(failure)
+    #     failure_dict['image_urls'] = failure.image_urls  # اضافه کردن image_urls
+    #     failure_dict['reported_date_shamsi'] = failure.reported_date_shamsi  # اضافه کردن تاریخ شمسی
+    #     recent_failures_dicts.append(failure_dict)
+    #
+    # data = {
+    #     'recent_failures': recent_failures_dicts,
+    #     'failure_type_labels': failure_type_labels,
+    #     'failure_type_counts': failure_type_counts,
+    #     'locomotive_ids': locomotive_ids,
+    #     'locomotive_counts': locomotive_counts,
+    #     'stoppage_locomotive_ids': stoppage_locomotive_ids,
+    #     'stoppage_durations': stoppage_durations,
+    #     'location_labels': location_labels,
+    #     'location_counts': location_counts,
+    # }
+    # return JsonResponse(data)
+
+    start_date1 = request.GET.get('start_date')
+    end_date1 = request.GET.get('end_date')
+
+    start_date = dateToGrgorian(start_date1) if start_date1 else None
+    end_date = dateToGrgorian(end_date1) if end_date1 else None
+
+    failures = Failure.objects.all()
+    if start_date and end_date:
+        start = start_date
+        end = end_date
+        failures = failures.filter(reported_date__range=[start, end])
+    elif start_date:
+        start = start_date
+        failures = failures.filter(reported_date__gte=start)
+    elif end_date:
+        end = end_date
+        failures = failures.filter(reported_date__lte=end)
+
+    recent_failures = failures.select_related('locomotive').prefetch_related('images').order_by('-reported_date',
+                                                                                                '-reported_time')[:10]
+    for failure in recent_failures:
+        failure.image_urls = json.dumps([image.image.url for image in failure.images.all()])
+        # تبدیل reported_date به شمسی
+        if failure.reported_date:
+            reported_date_shamsi = jdatetime.datetime.fromgregorian(date=failure.reported_date).strftime('%Y/%m/%d')
+            failure.reported_date_shamsi = reported_date_shamsi
+        else:
+            failure.reported_date_shamsi = 'N/A'
+
+    # آماده‌سازی داده‌ها برای نمودارها
+    failure_types = failures.values('damage_type').annotate(count=Count('id')).order_by('-count')
+    failure_type_labels = [item['damage_type'] for item in failure_types]
+    failure_type_counts = [item['count'] for item in failure_types]
+
+    failures_by_loco = failures.values('locomotive__locomotive_id').annotate(count=Count('id')).order_by('-count')
+    locomotive_ids = [item['locomotive__locomotive_id'] for item in failures_by_loco]
+    locomotive_counts = [item['count'] for item in failures_by_loco]
+
+    stoppage_locomotive_ids = []
+    stoppage_durations = []
+    repairs = Repair.objects.select_related('failure__locomotive').filter(status='COMPLETED', failure__in=failures)
+    for repair in repairs:
+        if repair.start_date and repair.start_time and repair.end_date and repair.end_time:
+            start = datetime.combine(repair.start_date, repair.start_time)
+            end = datetime.combine(repair.end_date, repair.end_time)
+            duration = (end - start).total_seconds() / 3600
+            stoppage_locomotive_ids.append(repair.failure.locomotive.locomotive_id)
+            stoppage_durations.append(round(duration, 2))
+
+    top_locations = failures.values('location').annotate(count=Count('id')).order_by('-count')[:20]
+    location_labels = [item['location'] for item in top_locations]
+    location_counts = [item['count'] for item in top_locations]
+
+    # تبدیل recent_failures به دیکشنری با اضافه کردن locomotive_id
+    recent_failures_dicts = []
+    for failure in recent_failures:
+        failure_dict = model_to_dict(failure)
+        failure_dict['image_urls'] = failure.image_urls  # اضافه کردن image_urls
+        failure_dict['reported_date_shamsi'] = failure.reported_date_shamsi  # اضافه کردن تاریخ شمسی
+        failure_dict['locomotive_id'] = failure.locomotive.locomotive_id  # اضافه کردن locomotive_id
+        recent_failures_dicts.append(failure_dict)
+
+    data = {
+        'recent_failures': recent_failures_dicts,
+        'failure_type_labels': failure_type_labels,
+        'failure_type_counts': failure_type_counts,
+        'locomotive_ids': locomotive_ids,
+        'locomotive_counts': locomotive_counts,
+        'stoppage_locomotive_ids': stoppage_locomotive_ids,
+        'stoppage_durations': stoppage_durations,
+        'location_labels': location_labels,
+        'location_counts': location_counts,
+    }
+    return JsonResponse(data)
 @login_required
 def mainRegisterFailure(request):
 
@@ -197,85 +457,9 @@ def mainRegisterFailure_submit(request):
 
     return JsonResponse({'status': 'error', 'message': 'متد درخواست نامعتبر است'}, status=405)
 
-
-    # if request.method == 'POST':
-    #     try:
-    #         # Get form data from request.POST
-    #         locomotive_id = request.POST.get('locomotiveId')
-    #         damage_type = request.POST.get('damageType')
-    #         description = request.POST.get('description')
-    #         location = request.POST.get('location')
-    #         moveStatus = request.POST.get('moveStatus')
-    #         reported_date = request.POST.get('reportedDate')  # Expected format: YYYY/MM/DD (Jalali)
-    #         reported_time = request.POST.get('reportedTime')  # Expected format: HH:MM
-    #
-    #         # Validate required fields
-    #         if not all([locomotive_id, damage_type, description, location, reported_date, reported_time]):
-    #             return JsonResponse({'status': 'error', 'message': 'همه فیلدها الزامی هستند'}, status=400)
-    #
-    #         # Get locomotive instance
-    #         try:
-    #             locomotive = Locomotive.objects.get(locomotive_id=locomotive_id)
-    #         except Locomotive.DoesNotExist:
-    #             return JsonResponse({'status': 'error', 'message': 'شناسه لکوموتیو نامعتبر است'}, status=400)
-    #
-    #         # Validate damage type
-    #         if damage_type not in dict(Failure.DAMAGE_TYPES).keys():
-    #             return JsonResponse({'status': 'error', 'message': 'نوع خرابی نامعتبر است'}, status=400)
-    #
-    #         # Convert Jalali date and time to Gregorian
-    #         try:
-    #             # Parse Jalali date (e.g., "1404/01/01") and time (e.g., "14:30")
-    #             jalali_datetime = jdatetime.datetime.strptime(
-    #                 f"{reported_date} {reported_time}",
-    #                 "%Y/%m/%d %H:%M"
-    #             )
-    #             # Convert to Gregorian
-    #             gregorian_datetime = jalali_datetime.togregorian()
-    #             gregorian_date = gregorian_datetime.date()
-    #             gregorian_time = gregorian_datetime.time()
-    #         except ValueError as e:
-    #             return JsonResponse({'status': 'error', 'message': f'فرمت تاریخ یا ساعت نامعتبر است: {str(e)}'},
-    #                                 status=400)
-    #
-    #         # Create Failure instance
-    #         failure = Failure.objects.create(
-    #             locomotive=locomotive,
-    #             damage_type=damage_type,
-    #             description=description,
-    #             location=location,
-    #             reported_date=gregorian_date,  # Store Gregorian date
-    #             reported_time=gregorian_time,  # Store Gregorian time
-    #             inRepair=True
-    #         )
-    #
-    #         # Handle image uploads
-    #         if request.FILES.getlist('images'):
-    #             for image in request.FILES.getlist('images'):
-    #                 FailureImage.objects.create(failure=failure, image=image)
-    #
-    #         return JsonResponse({'status': 'success', 'message': 'خرابی با موفقیت ثبت شد'}, status=201)
-    #
-    #     except Exception as e:
-    #         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-    #
-    # return JsonResponse({'status': 'error', 'message': 'متد درخواست نامعتبر است'}, status=405)
-
-
 @login_required
 def mainRegisterFailureRepair(request):
 
-    # # Get failure counts by damage type
-    # failure_by_type = Failure.objects.values('damage_type').annotate(count=Count('damage_type')).order_by('damage_type')
-    # failure_types = [item['damage_type'] for item in failure_by_type]
-    # failure_type_counts = [item['count'] for item in failure_by_type]
-    # failure_type_labels = [DAMAGE_TYPE_LABELS.get(item['damage_type'], item['damage_type']) for item in failure_by_type]
-
-    # # Get failure counts by locomotive
-    # failure_by_locomotive = Failure.objects.values('locomotive__locomotive_id').annotate(
-    #     count=Count('locomotive')).order_by('locomotive__locomotive_id')
-    # locomotive_ids = [item['locomotive__locomotive_id'] for item in failure_by_locomotive]
-    # locomotive_counts = [item['count'] for item in failure_by_locomotive]
 
     # Get recent failures (last 5) and convert dates to Jalali
     recent_failures = Failure.objects.filter(inRepair=True).order_by('-reported_date', '-reported_time')
@@ -297,11 +481,6 @@ def mainRegisterFailureRepair(request):
         })
 
     context = {
-        # 'failure_types': json.dumps(failure_types),
-        # 'failure_type_counts': json.dumps(failure_type_counts),
-        # 'failure_type_labels': json.dumps(failure_type_labels),
-        # 'locomotive_ids': json.dumps(locomotive_ids),
-        # 'locomotive_counts': json.dumps(locomotive_counts),
         'recent_failures': recent_failures_data,
         'segment': 'repair',
     }
@@ -528,75 +707,6 @@ def mainLocomotiveFailure(request, locomotive_id):
         })
     except Locomotive.DoesNotExist:
         return render(request, 'maintenance/home/mainAllHistory.html', status=404)
-    # try:
-    #     # Get the specific locomotive
-    #     locomotive = get_object_or_404(Locomotive, id=locomotive_id)
-    #     # Get failures with related repairs and images
-    #     failures = Failure.objects.filter(locomotive=locomotive).prefetch_related('images', 'repairs__images').order_by(
-    #         '-reported_date')
-    #
-    #     # Convert data to a list of dictionaries for the template
-    #     failures_data = []
-    #     for failure in failures:
-    #         jalali_reported_date = jdatetime.date.fromgregorian(date=failure.reported_date).strftime('%Y/%m/%d')
-    #         jalali_created_at = jdatetime.datetime.fromgregorian(datetime=failure.created_at).strftime(
-    #             '%Y/%m/%d %H:%M:%S')
-    #         # Get image URLs for failure
-    #         image_urls = [image.image.url for image in failure.images.all()]
-    #         # Get repairs for this failure
-    #         repairs_data = []
-    #         for repair in failure.repairs.all():
-    #             repairs_data.append({
-    #                 'id': repair.id,
-    #                 'title': repair.title,
-    #                 'location': repair.location,
-    #                 'technician': repair.technician,
-    #                 'start_date': jdatetime.date.fromgregorian(date=repair.start_date).strftime(
-    #                     '%Y/%m/%d') if repair.start_date else '',
-    #                 'start_time': repair.start_time.strftime('%H:%M:%S') if repair.start_time else '',
-    #                 'end_date': jdatetime.date.fromgregorian(date=repair.end_date).strftime(
-    #                     '%Y/%m/%d') if repair.end_date else '',
-    #                 'end_time': repair.end_time.strftime('%H:%M:%S') if repair.end_time else '',
-    #                 'status': repair.get_status_display() if hasattr(repair, 'get_status_display') else repair.status,
-    #                 'description': repair.description,
-    #                 'images': [image.image.url for image in repair.images.all()]
-    #             })
-    #         # Debug: Print repairs for this failure
-    #         print(f"Failure {failure.id} Repairs:", repairs_data)
-    #         failures_data.append({
-    #             'id': failure.id,
-    #             'locomotive': failure.locomotive,
-    #             'damage_type': DAMAGE_TYPE_LABELS.get(failure.damage_type,
-    #                                                   failure.get_damage_type_display() if hasattr(failure,
-    #                                                                                                'get_damage_type_display') else failure.damage_type),
-    #             'description': failure.description,
-    #             'location': failure.location,
-    #             'reported_date': jalali_reported_date,
-    #             'reported_time': failure.reported_time.strftime('%H:%M:%S') if failure.reported_time else '',
-    #             'created_at': jalali_created_at,
-    #             'inRepair': failure.inRepair,
-    #             'move_status': failure.get_move_status_display() if hasattr(failure,
-    #                                                                         'get_move_status_display') else failure.move_status,
-    #             'dispatch_from': failure.dispatch_from or '',
-    #             'images': image_urls,
-    #             'repairs': json.dumps(repairs_data, cls=DjangoJSONEncoder, ensure_ascii=False)  # Serialize to JSON
-    #         })
-    #
-    #     # Debug: Print failures_data to check content
-    #     print("Failures Data:", failures_data)
-    #
-    #     return render(request, 'maintenance/home/mainLocomotiveFailure.html', {
-    #         'locomotive': locomotive,
-    #         'failures': failures_data,
-    #         'template_name': 'locomotive_failures',
-    #         'segment': 'history'
-    #     })
-    # except Locomotive.DoesNotExist:
-    #     return render(request, 'maintenance/home/mainAllHistory.html', status=404)
-
-
-
-
 
 
 @login_required
@@ -604,3 +714,42 @@ def mainGetLocomotives(request):
     locomotives = Locomotive.objects.all().values('locomotive_id')
     locomotive_list = [{'id': loco['locomotive_id'], 'name': loco['locomotive_id']} for loco in locomotives]
     return JsonResponse({'locomotives': locomotive_list})
+
+
+def searchRepairs(request):
+    part = request.GET.get('part', '').strip()
+    from_date_str = request.GET.get('from_date', '')
+    to_date_str = request.GET.get('to_date', '')
+
+    # تبدیل تاریخ شمسی به میلادی
+    from_date = dateToGrgorian(from_date_str) if from_date_str else None
+    to_date = dateToGrgorian(to_date_str) if to_date_str else None
+
+    repairs = Repair.objects.all()
+
+    # فیلتر بر اساس موضوع (description)
+    if part:
+        repairs = repairs.filter(description__icontains=part)
+
+    # فیلتر بر اساس بازه زمانی
+    if from_date and to_date:
+        repairs = repairs.filter(start_date__range=[from_date, to_date])
+    elif from_date:
+        repairs = repairs.filter(start_date__gte=from_date)
+    elif to_date:
+        repairs = repairs.filter(start_date__lte=to_date)
+
+    # آماده‌سازی داده‌ها برای نمایش
+    repair_data = []
+    for repair in repairs:
+        repair_data.append({
+            'id': repair.id,
+            'locomotive_model': repair.failure.locomotive.locomotive_id if repair.failure and repair.failure.locomotive else 'N/A',
+            'damage_type': repair.failure.damage_type if repair.failure else 'N/A',
+            'location': repair.location or 'N/A',
+            'reported_date': repair.start_date.strftime('%Y-%m-%d') if repair.start_date else 'N/A',
+            'reported_time': repair.start_time.strftime('%H:%M:%S') if repair.start_time else 'N/A',
+            'desc': repair.description or 'N/A'
+        })
+
+    return JsonResponse({'repairs': repair_data})

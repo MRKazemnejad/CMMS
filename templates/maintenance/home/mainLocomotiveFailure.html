@@ -599,6 +599,14 @@
 
     <script>
         $(document).ready(function () {
+
+
+     jalaliDatepicker.startWatch({
+                minDate: "attr",
+                maxDate: "attr"
+            });
+
+
             // Debug: Check if jQuery and Bootstrap are loaded
             console.log("jQuery loaded:", typeof $ !== 'undefined');
             console.log("Bootstrap modal available:", typeof $.fn.modal !== 'undefined');

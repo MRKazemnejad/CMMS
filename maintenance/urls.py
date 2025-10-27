@@ -15,6 +15,8 @@ urlpatterns = [
     path('mainAllHistory/', views.mainAllHistory, name='mainAllHistory'),
     path('mainLocomotiveFailure/<int:locomotive_id>/', views.mainLocomotiveFailure, name='mainLocomotiveFailure'),
     path('mainGetLocomotives/', views.mainGetLocomotives, name='mainGetLocomotives'),
+    path('mainDashboardFilter/', views.mainDashboardFilter, name='mainDashboardFilter'),
 
+    path('search-repairs/', views.searchRepairs, name='searchRepairs'),
 
 ]
