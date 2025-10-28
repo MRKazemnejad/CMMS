@@ -28,11 +28,11 @@ class Image(models.Model):
 # Failure model to store locomotive failure details
 class Failure(models.Model):
     DAMAGE_TYPES = (
-        ('MECHANICAL', 'Mechanical'),
-        ('ELECTRICAL', 'Electrical'),
-        ('BOGIE_CHASSIS', 'Bogie and Chassis'),
-        ('BRAKE', 'Brake'),
-        ('CABIN_AMENITIES', 'Cabin and Amenities'),
+        ('MECHANICAL', 'مکانیکی'),
+        ('ELECTRICAL', 'الکتریکی'),
+        ('BOGIE_CHASSIS', 'شاسی و بوژی'),
+        ('BRAKE', 'ترمز'),
+        ('CABIN_AMENITIES', 'کابین'),
     )
 
     MOVE_STATUS = (
@@ -73,8 +73,9 @@ class FailureImage(Image):
 # Repair model to store repair details with updated fields
 class Repair(models.Model):
     REPAIR_STATUS = (
-        ('IN_PROGRESS', 'In Progress'),
-        ('COMPLETED', 'Completed'),
+        ('IN_PROGRESS', 'جاری'),
+        ('Repair', 'اقدام تعمیراتی'),
+        ('COMPLETED', 'پایان تعمیرات'),
     )
 
 

@@ -17,6 +17,6 @@ urlpatterns = [
     path('mainGetLocomotives/', views.mainGetLocomotives, name='mainGetLocomotives'),
     path('mainDashboardFilter/', views.mainDashboardFilter, name='mainDashboardFilter'),
 
-    path('search-repairs/', views.searchRepairs, name='searchRepairs'),
+    path('filter/', views.smart_filter_view, name='smart_filter'),
 
 ]

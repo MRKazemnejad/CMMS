@@ -3,7 +3,7 @@ from django.http import FileResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import json
-from maintenance.models import Locomotive, Failure, FailureImage, Repair, RepairImage
+from maintenance.models import Locomotive, Failure, FailureImage, Repair, RepairImage,Service,Incident
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render,get_object_or_404
@@ -13,7 +13,8 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 from django.forms.models import model_to_dict
-from maintenance.utility import dateToGrgorian
+from maintenance.utility import dateToGrgorian,jalali_to_gregorian
+from django.db.models import Q
 
 
 
@@ -21,10 +22,10 @@ from maintenance.utility import dateToGrgorian
 # Dictionary for damage type translations
 DAMAGE_TYPE_LABELS = {
     'MECHANICAL': 'مکانیکی',
-    'ELECTRICAL': 'برقی',
+    'ELECTRICAL': 'الکتریکی',
     'BOGIE_CHASSIS': 'بوژی و شاسی',
     'BRAKE': 'ترمز',
-    'CABIN_AMENITIES': 'کابین و رفاهی'
+    'CABIN_AMENITIES': 'کابین'
 }
 
 # Dictionary for province IDs (for amCharts)
@@ -641,9 +642,82 @@ def mainAllHistory(request):
 
 @login_required
 def mainLocomotiveFailure(request, locomotive_id):
+    # try:
+    #     # Get the specific locomotive
+    #     locomotive = get_object_or_404(Locomotive, id=locomotive_id)
+    #     # Get failures with related repairs and images
+    #     failures = Failure.objects.filter(locomotive=locomotive).prefetch_related('images', 'repairs__images').order_by(
+    #         '-reported_date')
+    #
+    #     # Convert data to a list of dictionaries for the template
+    #     failures_data = []
+    #     for failure in failures:
+    #         jalali_reported_date = jdatetime.date.fromgregorian(date=failure.reported_date).strftime('%Y/%m/%d')
+    #         jalali_created_at = jdatetime.datetime.fromgregorian(datetime=failure.created_at).strftime(
+    #             '%Y/%m/%d %H:%M:%S')
+    #         # Get image URLs for failure
+    #         image_urls = [image.image.url for image in failure.images.all()]
+    #         # Get repairs for this failure, ordered by start_date and start_time descending
+    #         repairs = failure.repairs.all().order_by('-start_date', '-start_time')
+    #         repairs_data = []
+    #         for repair in repairs:
+    #             repairs_data.append({
+    #                 'id': repair.id,
+    #                 'title': repair.title,
+    #                 'location': repair.location,
+    #                 'technician': repair.technician,
+    #                 'start_date': jdatetime.date.fromgregorian(date=repair.start_date).strftime(
+    #                     '%Y/%m/%d') if repair.start_date else '',
+    #                 'start_time': repair.start_time.strftime('%H:%M:%S') if repair.start_time else '',
+    #                 'end_date': jdatetime.date.fromgregorian(date=repair.end_date).strftime(
+    #                     '%Y/%m/%d') if repair.end_date else '',
+    #                 'end_time': repair.end_time.strftime('%H:%M:%S') if repair.end_time else '',
+    #                 'status': repair.get_status_display() if hasattr(repair, 'get_status_display') else repair.status,
+    #                 'description': repair.description,
+    #                 'images': [image.image.url for image in repair.images.all()]
+    #             })
+    #         # Debug: Print repairs for this failure
+    #         print(f"Failure {failure.id} Repairs:", repairs_data)
+    #         failures_data.append({
+    #             'id': failure.id,
+    #             'locomotive': failure.locomotive,
+    #             'damage_type': DAMAGE_TYPE_LABELS.get(failure.damage_type,
+    #                                                   failure.get_damage_type_display() if hasattr(failure,
+    #                                                                                                'get_damage_type_display') else failure.damage_type),
+    #             'description': failure.description,
+    #             'location': failure.location,
+    #             'reported_date': jalali_reported_date,
+    #             'reported_time': failure.reported_time.strftime('%H:%M:%S') if failure.reported_time else '',
+    #             'created_at': jalali_created_at,
+    #             'inRepair': failure.inRepair,
+    #             'move_status': failure.get_move_status_display() if hasattr(failure,
+    #                                                                         'get_move_status_display') else failure.move_status,
+    #             'dispatch_from': failure.dispatch_from or '',
+    #             'images': image_urls,
+    #             'repairs': json.dumps(repairs_data, cls=DjangoJSONEncoder, ensure_ascii=False)  # Serialize to JSON
+    #         })
+    #
+    #     # Debug: Print failures_data to check content
+    #     print("Failures Data:", failures_data)
+    #
+    #     return render(request, 'maintenance/home/mainLocomotiveFailure.html', {
+    #         'locomotive': locomotive,
+    #         'failures': failures_data,
+    #         'template_name': 'locomotive_failures',
+    #         'segment': 'history'
+    #     })
+    # except Locomotive.DoesNotExist:
+    #     return render(request, 'maintenance/home/mainAllHistory.html', status=404)
+
     try:
         # Get the specific locomotive
         locomotive = get_object_or_404(Locomotive, id=locomotive_id)
+
+        # --- اگر پارامترهای GET وجود داشت → فیلتر فعال → برو به ویو مرکزی ---
+        if request.GET:
+            return smart_filter_view(request)
+
+        # --- اگر GET خالی بود → همون کد اصلی تو (بدون تغییر) ---
         # Get failures with related repairs and images
         failures = Failure.objects.filter(locomotive=locomotive).prefetch_related('images', 'repairs__images').order_by(
             '-reported_date')
@@ -715,41 +789,159 @@ def mainGetLocomotives(request):
     locomotive_list = [{'id': loco['locomotive_id'], 'name': loco['locomotive_id']} for loco in locomotives]
     return JsonResponse({'locomotives': locomotive_list})
 
+MODEL_MAP = {
+    'failure': Failure,
+    'repair': Repair,
+    'service': Service,
+    'incident': Incident,
+    'locomotive': Locomotive,
+}
 
-def searchRepairs(request):
+SEARCH_FIELDS = {
+    'failure': ['description', 'location', 'locomotive__locomotive_id','damage_type'],
+    'repair': ['title', 'description', 'failure__locomotive__locomotive_id'],
+    'service': ['checklist', 'locomotive__locomotive_id'],
+    'incident': ['description', 'locomotive__locomotive_id'],
+    'locomotive': ['locomotive_id', 'model', 'depot'],
+
+}
+
+
+
+
+def smart_filter_view(request):
+    """
+    Central filter view.
+    - No external jdatetime import required
+    - All date conversions happen inside
+    """
+    # --- Lazy import jdatetime inside function ---
+    try:
+        import jdatetime
+    except ImportError:
+        return render(request, 'error.html', {'msg': 'ماژول jdatetime نصب نیست.'})
+
+    model_name = request.GET.get('model', '').strip()
+    if not model_name:
+        return render(request, 'error.html', {'msg': 'مدل مشخص نشده'})
+
+    template_name = request.GET.get('template', 'base_list.html')
+    view_name = request.GET.get('view', 'dashboard')
+    locomotive_id = request.GET.get('locomotive_id')
+
+    model_key = model_name.lower()
+    model = MODEL_MAP.get(model_key)
+    if not model:
+        return render(request, 'error.html', {'msg': f'مدل {model_name} معتبر نیست'})
+
+    # --- Initial queryset ---
+    queryset = model.objects.all()
+
+    # --- Filter by locomotive ---
+    if locomotive_id and model == Failure:
+        try:
+            loco = Locomotive.objects.get(id=locomotive_id)
+            queryset = queryset.filter(locomotive=loco)
+        except (Locomotive.DoesNotExist, ValueError):
+            return render(request, 'error.html', {'msg': 'لکوموتیو یافت نشد'})
+
+    # --- Prefetch ---
+    if model == Failure:
+        queryset = queryset.prefetch_related('images', 'repairs__images')
+    elif model == Repair:
+        queryset = queryset.select_related('failure__locomotive')
+
+    # --- Text search ---
     part = request.GET.get('part', '').strip()
-    from_date_str = request.GET.get('from_date', '')
-    to_date_str = request.GET.get('to_date', '')
-
-    # تبدیل تاریخ شمسی به میلادی
-    from_date = dateToGrgorian(from_date_str) if from_date_str else None
-    to_date = dateToGrgorian(to_date_str) if to_date_str else None
-
-    repairs = Repair.objects.all()
-
-    # فیلتر بر اساس موضوع (description)
     if part:
-        repairs = repairs.filter(description__icontains=part)
+        q_objects = Q()
+        for field in SEARCH_FIELDS.get(model_key, []):
+            q_objects |= Q(**{f"{field}__icontains": part})
+        queryset = queryset.filter(q_objects)
 
-    # فیلتر بر اساس بازه زمانی
-    if from_date and to_date:
-        repairs = repairs.filter(start_date__range=[from_date, to_date])
-    elif from_date:
-        repairs = repairs.filter(start_date__gte=from_date)
-    elif to_date:
-        repairs = repairs.filter(start_date__lte=to_date)
+    # --- Date field ---
+    date_field = {
+        'failure': 'reported_date',
+        'repair': 'start_date',
+    }.get(model_key, 'created_at')
 
-    # آماده‌سازی داده‌ها برای نمایش
-    repair_data = []
-    for repair in repairs:
-        repair_data.append({
-            'id': repair.id,
-            'locomotive_model': repair.failure.locomotive.locomotive_id if repair.failure and repair.failure.locomotive else 'N/A',
-            'damage_type': repair.failure.damage_type if repair.failure else 'N/A',
-            'location': repair.location or 'N/A',
-            'reported_date': repair.start_date.strftime('%Y-%m-%d') if repair.start_date else 'N/A',
-            'reported_time': repair.start_time.strftime('%H:%M:%S') if repair.start_time else 'N/A',
-            'desc': repair.description or 'N/A'
-        })
+    # --- Date range filter ---
+    from_date = request.GET.get('from_date', '').strip()
+    if from_date:
+        gd = jalali_to_gregorian(from_date)
+        if gd:
+            queryset = queryset.filter(**{f"{date_field}__gte": gd.date()})
 
-    return JsonResponse({'repairs': repair_data})
+    to_date = request.GET.get('to_date', '').strip()
+    if to_date:
+        gd = jalali_to_gregorian(to_date)
+        if gd:
+            queryset = queryset.filter(**{f"{date_field}__lte": gd.date()})
+
+    # --- Order ---
+    queryset = queryset.order_by(f'-{date_field}')
+
+    # --- Prepare Failure data ---
+    if model == Failure and locomotive_id:
+        failures_data = []
+        for failure in queryset:
+            # --- Convert dates to Jalali (inside function) ---
+            jalali_reported_date = jdatetime.date.fromgregorian(date=failure.reported_date).strftime('%Y/%m/%d')
+            jalali_created_at = jdatetime.datetime.fromgregorian(datetime=failure.created_at).strftime('%Y/%m/%d %H:%M:%S')
+
+            # --- Images ---
+            image_urls = [img.image.url for img in failure.images.all()]
+
+            # --- Repairs ---
+            repairs_data = []
+            for repair in failure.repairs.all().order_by('-start_date', '-start_time'):
+                repairs_data.append({
+                    'id': repair.id,
+                    'title': repair.title,
+                    'location': repair.location,
+                    'technician': repair.technician,
+                    'start_date': jdatetime.date.fromgregorian(date=repair.start_date).strftime('%Y/%m/%d') if repair.start_date else '',
+                    'start_time': repair.start_time.strftime('%H:%M:%S') if repair.start_time else '',
+                    'end_date': jdatetime.date.fromgregorian(date=repair.end_date).strftime('%Y/%m/%d') if repair.end_date else '',
+                    'end_time': repair.end_time.strftime('%H:%M:%S') if repair.end_time else '',
+                    'status': repair.get_status_display() if hasattr(repair, 'get_status_display') else repair.status,
+                    'description': repair.description,
+                    'images': [img.image.url for img in repair.images.all()]
+                })
+
+            # --- Persian damage type ---
+            damage_type_display = DAMAGE_TYPE_LABELS.get(failure.damage_type, failure.damage_type)
+
+            failures_data.append({
+                'id': failure.id,
+                'locomotive': failure.locomotive,
+                'damage_type': damage_type_display,
+                'description': failure.description,
+                'location': failure.location,
+                'reported_date': jalali_reported_date,
+                'reported_time': failure.reported_time.strftime('%H:%M:%S') if failure.reported_time else '',
+                'created_at': jalali_created_at,
+                'inRepair': failure.inRepair,
+                'move_status': failure.get_move_status_display() if hasattr(failure, 'get_move_status_display') else failure.move_status,
+                'dispatch_from': failure.dispatch_from or '',
+                'images': image_urls,
+                'repairs': json.dumps(repairs_data, ensure_ascii=False, cls=DjangoJSONEncoder)
+            })
+
+        context = {
+            'locomotive': loco,
+            'failures': failures_data,
+            'view_name': view_name,
+            'model_name': model_name,
+            'template_name': template_name,
+            'segment': 'history'
+        }
+    else:
+        context = {
+            'objects': queryset,
+            'view_name': view_name,
+            'model_name': model_name,
+            'template_name': template_name,
+        }
+
+    return render(request, template_name, context)

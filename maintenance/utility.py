@@ -23,3 +23,13 @@ def dateTimeToJalali(edate):
     dt = timezone.localtime(edate, timezone.get_fixed_timezone(210))  # IRST: UTC+3:30
     jalali_dt = jdatetime.fromgregorian(datetime=dt)
     return jalali_dt.strftime('%Y/%m/%d %H:%M')
+
+
+def jalali_to_gregorian(jalali_str):
+    if not jalali_str:
+        return None
+    try:
+        jdate = jdatetime.strptime(jalali_str, '%Y/%m/%d')
+        return jdate.togregorian()
+    except:
+        return None
