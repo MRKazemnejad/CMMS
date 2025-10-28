@@ -167,7 +167,10 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <h5 class="page-title account mb-3">خرابی های جاری</h5>
-                        {% include 'maintenance/includes/searchForm.html' with tab='repair' template_name=template_name %}
+                         {% url 'maintenance:mainRegisterFailureRepair' locomotive_id=locomotive.id as original_url %}
+                          {% with view_name='mainRegisterFailureRepair' model_name='repair' template_name='maintenance/home/mainRegisterFailureRepair.html'  locomotive_id=locomotive.id original_url=original_url%}
+                          {% include 'maintenance/includes/filter.html' %}
+                          {% endwith %}
                         <div class="row my-2">
                             {% for item in recent_failures %}
                                 <div class="col-12 mb-3 permission-item">
@@ -340,20 +343,6 @@
 
 
 {% block javascripts %}
-    <!-- Bootstrap 4 JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- FontAwesome for clock icon -->
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <!-- Flatpickr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Persian locale for Flatpickr -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/fa.js"></script>
-    <!-- Jalali Datepicker JS -->
-    <script src="/static/js/jalaliDatepicker.min.js"></script>
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // Initialize Jalali Datepicker
@@ -484,68 +473,6 @@
                 });
             });
 
-            // Search functionality
-            $('#searchBtn').on('click', function () {
-                const part = $('#part').val().trim();
-                const fromDate = $('#fromDate').val();
-                const toDate = $('#toDate').val();
-
-                $.ajax({
-                    url: '{% url "maintenance:searchRepairs" %}', // URL ویو جدید
-                    type: 'GET',
-                    data: {
-                        part: part,
-                        from_date: fromDate,
-                        to_date: toDate
-                    },
-                    success: function (response) {
-                        const repairs = response.repairs;
-                        const row = $('.row.my-2');
-                        row.empty();
-
-                        if (repairs.length > 0) {
-                            repairs.forEach(item => {
-                                row.append(`
-                                    <div class="col-12 mb-3 permission-item">
-                                        <div class="card shadow-sm permission-card w-100"
-                                             data-failure-id="${item.id}"
-                                             data-locomotive="${item.locomotive_model}"
-                                             data-damage-type="${item.damage_type}"
-                                             data-location="${item.location}"
-                                             data-reported-date="${item.reported_date}"
-                                             data-reported-time="${item.reported_time}"
-                                             data-description="${item.desc}"
-                                             data-toggle="modal"
-                                             data-target="#repairModal">
-                                            <div class="card-body">
-                                                <p class="card-text account">
-                                                    <span>کد خرابی: <strong class="mx-2">${item.id}</strong></span>
-                                                    <span>شماره لکوموتیو: <strong class="mx-2">${item.locomotive_model}</strong></span>
-                                                    <span>نوع خرابی: <strong class="mx-2 persian-number">${item.damage_type}</strong></span>
-                                                    <span>محل خرابی: <strong class="mx-2 persian-number">${item.location}</strong></span>
-                                                    <span>تاریخ خرابی: <strong class="mx-2 persian-number">${item.reported_date}</strong></span>
-                                                    <span>ساعت خرابی: <strong class="mx-2 persian-number">${item.reported_time}</strong></span>
-                                                    <span>توضیحات: <strong class="mx-2 persian-number">${item.desc}</strong></span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `);
-                            });
-                        } else {
-                            row.append('<div class="no-repairs-message">هیچ نتیجه‌ای یافت نشد.</div>');
-                        }
-                    },
-                    error: function (xhr) {
-                        Swal.fire({
-                            title: 'خطا!',
-                            text: 'خطا در بارگذاری نتایج جستجو',
-                            icon: 'error',
-                            confirmButtonText: 'باشه'
-                        });
-                    }
-                });
-            });
 
             // Reset functionality
             $('#resetBtn').on('click', function () {
@@ -599,159 +526,3 @@
         });
     </script>
 {% endblock javascripts %}
-{##}
-{#{% block javascripts %}#}
-{#    <!-- Bootstrap 4 JS and dependencies -->#}
-{#    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>#}
-{#    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>#}
-{#    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>#}
-{#    <!-- FontAwesome for clock icon -->#}
-{#    <script src="https://kit.fontawesome.com/a076d05399.js"></script>#}
-{#    <!-- Flatpickr JS -->#}
-{#    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>#}
-{#    <!-- Persian locale for Flatpickr -->#}
-{#    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/fa.js"></script>#}
-{#    <!-- Jalali Datepicker JS -->#}
-{#    <script src="/static/js/jalaliDatepicker.min.js"></script>#}
-{#    <!-- SweetAlert2 JS -->#}
-{#    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>#}
-{##}
-{##}
-{##}
-{#    <script>#}
-{#     // Initialize Jalali Datepicker#}
-{#            jalaliDatepicker.startWatch({#}
-{#                minDate: "attr",#}
-{#                maxDate: "attr"#}
-{#            });#}
-{#    </script>#}
-{##}
-{#    <script>#}
-{#        document.addEventListener('DOMContentLoaded', function () {#}
-{#            jalaliDatepicker.startWatch({#}
-{#                container: '#repairModal',#}
-{#                time: false,#}
-{#                separator: '-'#}
-{#            });#}
-{#        });#}
-{#    </script>#}
-{##}
-{#    <script>#}
-{#        $(document).ready(function () {#}
-{##}
-{##}
-{#            // Populate failure details in modal#}
-{#            $('.permission-card').on('click', function () {#}
-{#                const failureId = $(this).data('failure-id');#}
-{#                const locomotive = $(this).data('locomotive');#}
-{#                const damageType = $(this).data('damage-type');#}
-{#                const location = $(this).data('location');#}
-{#                const reportedDate = $(this).data('reported-date');#}
-{#                const reportedTime = $(this).data('reported-time');#}
-{#                const description = $(this).data('description');#}
-{##}
-{#                // Set failure details#}
-{#                $('#failureId').val(failureId);#}
-{#                $('#failure-locomotive').text(locomotive);#}
-{#                $('#failure-damage-type').text(damageType);#}
-{#                $('#failure-location').text(location);#}
-{#                $('#failure-reported-date').text(reportedDate);#}
-{#                $('#failure-reported-time').text(reportedTime);#}
-{#                $('#failure-description').text(description);#}
-{#                $('#repairTitle').val(damageType);#}
-{#                $('#repairStartDate').val(reportedDate);#}
-{##}
-{#                // Reset form#}
-{#                $('#repairForm')[0].reset();#}
-{#                $('#repairForm .form-control').removeClass('is-invalid');#}
-{#                $('#repairTitle').val(damageType);#}
-{#                $('#repairStartDate').val(reportedDate);#}
-{#            });#}
-{##}
-{#            // Handle form submission with validation#}
-{#            $('#submitRepairBtn').on('click', function () {#}
-{#                // Reset previous validation states#}
-{#                $('#repairForm .form-control').removeClass('is-invalid');#}
-{##}
-{#                // Check for empty required fields#}
-{#                const requiredFields = [#}
-{#                    { id: 'repairTitle', label: 'عنوان تعمیر' },#}
-{#                    { id: 'repairLocation', label: 'مکان تعمیر' },#}
-{#                    { id: 'repairStartDate', label: 'تاریخ شروع' },#}
-{#                    { id: 'repairStartTime', label: 'ساعت شروع' },#}
-{#                    { id: 'repairTechnician', label: 'تکنسین' },#}
-{#                    { id: 'repairDescription', label: 'توضیحات تعمیر' },#}
-{#                    { id: 'actionType', label: 'نوع اقدام' }#}
-{#                ];#}
-{##}
-{#                let emptyFields = [];#}
-{#                requiredFields.forEach(field => {#}
-{#                    const input = document.getElementById(field.id);#}
-{#                    const value = input.value.trim();#}
-{#                    if (!value || (input.tagName === 'SELECT' && input.value === '')) {#}
-{#                        input.classList.add('is-invalid');#}
-{#                        emptyFields.push(field.label);#}
-{#                    }#}
-{#                });#}
-{##}
-{#                // If there are empty fields, show SweetAlert2 error#}
-{#                if (emptyFields.length > 0) {#}
-{#                    Swal.fire({#}
-{#                        title: 'خطا!',#}
-{#                        html: `لطفاً فیلدهای زیر را پر کنید:<br>${emptyFields.join('<br>')}`,#}
-{#                        icon: 'error',#}
-{#                        confirmButtonText: 'تایید'#}
-{#                    });#}
-{#                    return;#}
-{#                }#}
-{##}
-{#                // Prepare form data#}
-{#                const formData = new FormData($('#repairForm')[0]);#}
-{#                const images = document.getElementById('repairImages').files;#}
-{#                for (let i = 0; i < images.length; i++) {#}
-{#                    formData.append('images', images[i]);#}
-{#                }#}
-{##}
-{#                // Send AJAX request#}
-{#                $.ajax({#}
-{#                    url: '{% url "maintenance:mainRegisterFailureRepair_submit" %}',#}
-{#                    type: 'POST',#}
-{#                    data: formData,#}
-{#                    processData: false,#}
-{#                    contentType: false,#}
-{#                    headers: {#}
-{#                        'X-CSRFToken': '{{ csrf_token }}'#}
-{#                    },#}
-{#                    success: function (response) {#}
-{#                        if (response.status === 'success') {#}
-{#                            Swal.fire({#}
-{#                                title: 'موفقیت!',#}
-{#                                text: 'تعمیر با موفقیت ثبت شد.',#}
-{#                                icon: 'success',#}
-{#                                confirmButtonText: 'باشه'#}
-{#                            }).then(() => {#}
-{#                                $('#repairModal').modal('hide');#}
-{#                                window.location.reload();#}
-{#                            });#}
-{#                        } else {#}
-{#                            Swal.fire({#}
-{#                                title: 'خطا!',#}
-{#                                text: response.message,#}
-{#                                icon: 'error',#}
-{#                                confirmButtonText: 'باشه'#}
-{#                            });#}
-{#                        }#}
-{#                    },#}
-{#                    error: function (xhr) {#}
-{#                        Swal.fire({#}
-{#                            title: 'خطا!',#}
-{#                            text: xhr.responseJSON ? xhr.responseJSON.message : 'خطا در ثبت تعمیر',#}
-{#                            icon: 'error',#}
-{#                            confirmButtonText: 'باشه'#}
-{#                        });#}
-{#                    }#}
-{#                });#}
-{#            });#}
-{#        });#}
-{#    </script>#}
-{#{% endblock javascripts %}#}
