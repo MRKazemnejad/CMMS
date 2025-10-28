@@ -68,6 +68,15 @@
             </li>
 
 
+         <li class="nav-item mb-2">
+                <a class="nav-link {% if segment in 'edit' %}active{% else %}{% endif %}"
+                   href="{% url 'maintenance:edit_page' %}" aria-expanded="false">
+                    <i class="fe fe-edit fe-16"></i>
+                    <span class="ml-3 item-text">ویرایش اطلاعات</span><span class="sr-only">(current)</span>
+                </a>
+            </li>
+
+
 
          <li class="nav-item mb-2 ">
                 <a href="#"

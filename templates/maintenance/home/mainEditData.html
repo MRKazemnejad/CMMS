@@ -1,0 +1,277 @@
+<!-- templates/maintenance/edit/edit_page.html -->
+{% extends "maintenance/layout/base.html" %}
+{% load static %}
+
+{% block title %}صفحه ویرایش{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'css/jalalidatepicker.min.css' %}">
+<style>
+    .tab-content { padding: 20px; border: 1px solid #ddd; border-top: none; }
+    .image-thumb { width: 90px; height: 90px; object-fit: cover; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+    .nav-tabs .nav-link.active { background-color: #007bff; color: white; border-color: #dee2e6 #dee2e6 #fff; }
+    .load-btn { font-size: 0.85rem; padding: 0.25rem 0.75rem; }
+    .form-group label { font-weight: 600; font-size: 0.9rem; }
+    .form-control, .form-check-input { font-size: 0.9rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white rounded-top">
+            <h5 class="mb-0 font-weight-bold">صفحه ویرایش</h5>
+        </div>
+        <div class="card-body p-0">
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="editTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="failure-tab" data-toggle="tab" href="#failure" role="tab">
+                        ویرایش خرابی
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="repair-tab" data-toggle="tab" href="#repair" role="tab">
+                        ویرایش تعمیر
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="editTabsContent">
+
+                <!-- Tab 1: ویرایش خرابی -->
+                <div class="tab-pane fade show active" id="failure" role="tabpanel">
+                    <div class="p-4">
+
+                        <!-- بارگذاری خرابی -->
+                        <form method="post" class="mb-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="load_failure" value="1">
+                            <div class="col-md-3">
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="failure_id" class="form-control" placeholder="کد خرابی را وارد کنید..." required>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-info btn-sm load-btn">بارگذاری</button>
+                                </div>
+                            </div>
+                                </div>
+                        </form>
+
+                        {% if failure %}
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="update_failure" value="1">
+                            <input type="hidden" name="failure_id" value="{{ failure.id }}">
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>نوع خرابی</label>
+                                        <select name="damage_type" class="form-control form-control-sm" required>
+                                            {% for code, label in damage_types %}
+                                            <option value="{{ code }}" {% if failure.damage_type == code %}selected{% endif %}>{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>محل خرابی</label>
+                                        <input type="text" name="location" class="form-control form-control-sm" value="{{ failure.location }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>وضعیت حرکت</label>
+                                        <select name="move_status" class="form-control form-control-sm">
+                                            {% for code, label in move_statuses %}
+                                            <option value="{{ code }}" {% if failure.move_status == code %}selected{% endif %}>{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>اعزام نیرو از</label>
+                                        <input type="text" name="dispatch_from" class="form-control form-control-sm" value="{{ failure.dispatch_from }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>تاریخ گزارش</label>
+                                        <input type="text" name="reported_date" class="form-control form-control-sm" data-jdp
+                                               value="{{ failure.reported_date|date:'Y/m/d' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>ساعت گزارش</label>
+                                        <input type="text" name="reported_time" class="form-control form-control-sm"
+                                               value="{{ failure.reported_time|time:'H:i' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check mt-4">
+                                        <input type="checkbox" name="inRepair" class="form-check-input" {% if failure.inRepair %}checked{% endif %}>
+                                        <label class="form-check-label">در حال تعمیر</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>توضیحات</label>
+                                <textarea name="description" class="form-control form-control-sm" rows="2">{{ failure.description }}</textarea>
+                            </div>
+
+                            <hr class="my-4">
+                            <h6 class="font-weight-bold">تصاویر خرابی</h6>
+                            <div class="d-flex flex-wrap mb-3">
+                                {% for img in failure_images %}
+                                <div class="position-relative">
+                                    <img src="{{ img.image.url }}" class="image-thumb">
+                                    <input type="checkbox" name="delete_failure_image" value="{{ img.id }}"
+                                           class="position-absolute" style="top:5px;left:5px; transform: scale(0.8);">
+                                </div>
+                                {% empty %}
+                                <p class="text-muted small">هیچ عکسی نیست.</p>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <label>آپلود تصاویر جدید</label>
+                                <input type="file" name="new_failure_images" class="form-control form-control-sm" multiple accept="image/*">
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-sm">ذخیره تغییرات</button>
+                        </form>
+                        {% else %}
+                        <p class="text-center text-muted mt-5">کد خرابی را وارد کنید و دکمه بارگذاری را بزنید.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Tab 2: ویرایش تعمیر -->
+                <div class="tab-pane fade" id="repair" role="tabpanel">
+                    <div class="p-4">
+
+                        <!-- بارگذاری تعمیر -->
+                        <form method="post" class="mb-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="load_repair" value="1">
+                            <div class="col-md-3">
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="repair_id" class="form-control" placeholder="کد تعمیر را وارد کنید..." required>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-info btn-sm load-btn">بارگذاری</button>
+                                </div>
+                            </div>
+                            </div>
+                        </form>
+
+                        {% if repair %}
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="update_repair" value="1">
+                            <input type="hidden" name="repair_id" value="{{ repair.id }}">
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>عنوان</label>
+                                        <input type="text" name="title" class="form-control form-control-sm" value="{{ repair.title }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>مکان تعمیر</label>
+                                        <input type="text" name="location" class="form-control form-control-sm" value="{{ repair.location }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>تکنسین</label>
+                                        <input type="text" name="technician" class="form-control form-control-sm" value="{{ repair.technician }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>وضعیت</label>
+                                        <select name="status" class="form-control form-control-sm">
+                                            {% for code, label in repair_statuses %}
+                                            <option value="{{ code }}" {% if repair.status == code %}selected{% endif %}>{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>تاریخ شروع</label>
+                                        <input type="text" name="start_date" class="form-control form-control-sm" data-jdp
+                                               value="{% if repair.start_date %}{{ repair.start_date|date:'Y/m/d' }}{% endif %}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>ساعت شروع</label>
+                                        <input type="text" name="start_time" class="form-control form-control-sm"
+                                               value="{% if repair.start_time %}{{ repair.start_time|time:'H:i' }}{% endif %}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>توضیحات</label>
+                                <textarea name="description" class="form-control form-control-sm" rows="2">{{ repair.description }}</textarea>
+                            </div>
+
+                            <hr class="my-4">
+                            <h6 class="font-weight-bold">تصاویر تعمیر</h6>
+                            <div class="d-flex flex-wrap mb-3">
+                                {% for img in repair_images %}
+                                <div class="position-relative">
+                                    <img src="{{ img.image.url }}" class="image-thumb">
+                                    <input type="checkbox" name="delete_repair_image" value="{{ img.id }}"
+                                           class="position-absolute" style="top:5px;left:5px; transform: scale(0.8);">
+                                </div>
+                                {% empty %}
+                                <p class="text-muted small">هیچ عکسی نیست.</p>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <label>آپلود تصاویر جدید</label>
+                                <input type="file" name="new_repair_images" class="form-control form-control-sm" multiple accept="image/*">
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-sm">ذخیره تغییرات</button>
+                        </form>
+                        {% else %}
+                        <p class="text-center text-muted mt-5">کد تعمیر را وارد کنید و دکمه بارگذاری را بزنید.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'js/jalalidatepicker.min.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        jalaliDatepicker.startWatch({
+            format: 'YYYY/MM/DD',
+            autoClose: true
+        });
+    });
+</script>
+{% endblock %}

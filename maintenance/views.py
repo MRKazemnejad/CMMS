@@ -15,6 +15,7 @@ from django.utils import timezone
 from django.forms.models import model_to_dict
 from maintenance.utility import dateToGrgorian,jalali_to_gregorian
 from django.db.models import Q
+from django.contrib import messages
 
 
 
@@ -736,3 +737,110 @@ def smart_filter_view(request):
         }
 
     return render(request, template_name, context)
+
+
+# --- Model mapping ---
+EDIT_MODELS = {
+    'failure': {
+        'model': Failure,
+        'image_model': FailureImage,
+        'related_name': 'images',
+        'title': 'ویرایش خرابی',
+        'template': 'maintenance/edit/edit_failure.html',
+    },
+    'repair': {
+        'model': Repair,
+        'image_model': RepairImage,
+        'related_name': 'images',
+        'title': 'ویرایش تعمیر',
+        'template': 'maintenance/edit/edit_repair.html',
+    },
+}
+
+def edit_page(request):
+    context = {
+        'damage_types': Failure.DAMAGE_TYPES,
+        'move_statuses': Failure.MOVE_STATUS,
+        'repair_statuses': Repair.REPAIR_STATUS,
+    }
+
+    # --- Load Failure by ID ---
+    if request.method == 'POST' and 'load_failure' in request.POST:
+        failure_id = request.POST.get('failure_id')
+        try:
+            failure = Failure.objects.get(id=failure_id)
+            context['failure'] = failure
+            context['failure_images'] = failure.images.all()
+        except Failure.DoesNotExist:
+            messages.error(request, 'خرابی یافت نشد.')
+
+    # --- Update Failure ---
+    if request.method == 'POST' and 'update_failure' in request.POST:
+        failure_id = request.POST.get('failure_id')
+        try:
+            failure = Failure.objects.get(id=failure_id)
+            for field in ['damage_type', 'location', 'description', 'dispatch_from', 'move_status']:
+                if field in request.POST:
+                    setattr(failure, field, request.POST[field])
+            if 'reported_date' in request.POST and request.POST['reported_date']:
+                gd = jalali_to_gregorian(request.POST['reported_date'])
+                if gd:
+                    failure.reported_date = gd.date()
+            if 'reported_time' in request.POST:
+                failure.reported_time = request.POST['reported_time']
+            failure.inRepair = 'inRepair' in request.POST
+
+            # Images
+            if 'new_failure_images' in request.FILES:
+                for f in request.FILES.getlist('new_failure_images'):
+                    FailureImage.objects.create(failure=failure, image=f)
+            delete_ids = request.POST.getlist('delete_failure_image')
+            FailureImage.objects.filter(id__in=delete_ids).delete()
+
+            failure.save()
+            messages.success(request, 'خرابی بروزرسانی شد.')
+            context['failure'] = failure
+            context['failure_images'] = failure.images.all()
+        except Failure.DoesNotExist:
+            messages.error(request, 'خرابی یافت نشد.')
+
+    # --- Load Repair by ID ---
+    if request.method == 'POST' and 'load_repair' in request.POST:
+        repair_id = request.POST.get('repair_id')
+        try:
+            repair = Repair.objects.get(id=repair_id)
+            context['repair'] = repair
+            context['repair_images'] = repair.images.all()
+        except Repair.DoesNotExist:
+            messages.error(request, 'تعمیر یافت نشد.')
+
+    # --- Update Repair ---
+    if request.method == 'POST' and 'update_repair' in request.POST:
+        repair_id = request.POST.get('repair_id')
+        try:
+            repair = Repair.objects.get(id=repair_id)
+            for field in ['title', 'location', 'technician', 'description', 'status']:
+                if field in request.POST:
+                    setattr(repair, field, request.POST[field])
+            if 'start_date' in request.POST and request.POST['start_date']:
+                gd = jalali_to_gregorian(request.POST['start_date'])
+                if gd:
+                    repair.start_date = gd.date()
+            if 'start_time' in request.POST:
+                repair.start_time = request.POST['start_time']
+
+            # Images
+            if 'new_repair_images' in request.FILES:
+                for f in request.FILES.getlist('new_repair_images'):
+                    RepairImage.objects.create(repair=repair, image=f)
+            delete_ids = request.POST.getlist('delete_repair_image')
+            RepairImage.objects.filter(id__in=delete_ids).delete()
+
+            repair.save()
+            messages.success(request, 'تعمیر بروزرسانی شد.')
+            context['repair'] = repair
+            context['repair_images'] = repair.images.all()
+        except Repair.DoesNotExist:
+            messages.error(request, 'تعمیر یافت نشد.')
+
+    return render(request, 'maintenance/home/mainEditData.html', context)

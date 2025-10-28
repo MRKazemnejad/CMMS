@@ -19,4 +19,6 @@ urlpatterns = [
 
     path('filter/', views.smart_filter_view, name='smart_filter'),
 
+    path('edit/', views.edit_page, name='edit_page'),
+
 ]
