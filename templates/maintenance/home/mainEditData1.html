@@ -1,0 +1,999 @@
+{% extends "maintenance/layout/base.html" %}
+{% block title %} درخواست‌های مجوز {% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
+    <style>
+        /* تمام استایل‌های قبلی شما بدون تغییر */
+        body, .card, .modal-content {
+            direction: rtl;
+            text-align: right;
+        }
+
+        /* === دقیقاً همون استایل اولیه شما — بدون حتی یک پیکسل تغییر === */
+        .delicious-tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 8px;
+            padding: 14px 16px 10px;
+            margin: 0 0 1.5rem 0;
+            border-bottom: 1px solid #e3e6f0;
+            overflow: hidden; /* بدون اسکرول */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .delicious-tabs .tab-btn {
+            flex: 1; /* هر تب به اندازه خودش و فضای موجود */
+            min-width: 0; /* اجازه کوچک شدن */
+            padding: 12px 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #495057;
+            background: #f8f9fc;
+            border: 1.5px solid #dee2e6;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .delicious-tabs .tab-btn i {
+            font-size: 1.15rem;
+            flex-shrink: 0; /* آیکون کوچک نشه */
+            transition: transform 0.3s ease;
+        }
+
+        .delicious-tabs .tab-btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+
+        /* Hover — دقیقاً همون چیزی که خودت داشتی (بدون خط اضافه!) */
+        .delicious-tabs .tab-btn:hover {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-color: #90caf9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.18);
+        }
+
+        .delicious-tabs .tab-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Active */
+        .delicious-tabs .tab-btn.active {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: white;
+            border-color: #1976d2;
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.35);
+            font-weight: 700;
+        }
+
+        .delicious-tabs .tab-btn.active i {
+            filter: brightness(0) invert(1);
+        }
+
+        /* استایل جدید برای فرم ویرایش خرابی */
+        .failure-search-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .failure-search-box input {
+            font-size: 1.5rem;
+            text-align: center;
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .edit-form-container {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .timepicker-container {
+            position: relative;
+        }
+
+        .timepicker-container .form-control {
+            padding-right: 40px;
+        }
+
+        .timepicker-container i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block page_name %}showpermission{% endblock %}
+
+{% block content %}
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-body account">
+
+                <div class="col-md-10 mx-auto">
+                    <div class="delicious-tabs" id="pills-tab" role="tablist">
+                        <a class="tab-btn active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab">
+                            <span>ویرایش خرابی</span>
+                        </a>
+                        <a class="tab-btn" id="pills-approve-tab" data-toggle="pill" href="#pills-approve" role="tab">
+                            <span>ویرایش تعمیر</span>
+                        </a>
+                        <a class="tab-btn" id="pills-current-tab" data-toggle="pill" href="#pills-current" role="tab">
+                            <span>ویرایش سرویس</span>
+                        </a>
+                        <a class="tab-btn" id="pills-reject-tab" data-toggle="pill" href="#pills-reject" role="tab">
+                            <span>ویرایش سانحه</span>
+                        </a>
+                        <a class="tab-btn" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab">
+                            <span>آرشیو</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="pills-tabContent">
+                    <!-- تب اول: ویرایش خرابی -->
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel">
+
+                        <!-- باکس جستجوی آی‌دی خرابی -->
+                       <div class="failure-search-box">
+                        <h4 class="mb-3">کد خرابی یا شماره لوکوموتیو را وارد کنید</h4>
+                        <div class="input-group col-md-6 mx-auto">
+                            <input type="text" id="failureSearchInput" class="form-control" placeholder="مثلاً: 142 یا 4011">
+                            <div class="input-group-append">
+                                <button class="btn btn-light btn-lg" id="searchFailureBtn">جستجو</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- لیست خرابی‌های لوکوموتیو (در تب خرابی) -->
+                    <div id="failuresListContainer" style="display: none;">
+                        <div class="card shadow-lg border-primary mt-4">
+                            <div class="card-header bg-primary text-white text-center">
+                                <h5>خرابی‌های لوکوموتیو <span id="failuresListTitle"></span></h5>
+                            </div>
+                            <div class="card-body" id="failuresList"></div>
+                        </div>
+                    </div>
+
+                        <!-- فرم ویرایش (ابتدا مخفی) -->
+                        <div class="edit-form-container" id="editFormContainer">
+                            <div class="card border-primary shadow-lg">
+                                <div class="card-header bg-primary text-white text-center">
+                                    <h5>ویرایش خرابی شماره <span id="editingFailureId"></span></h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="editFailureForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" id="failureId" name="failure_id">
+
+                                        <div class="row">
+                                            <div class="col-md-6 form-group">
+                                                <label>لکوموتیو</label>
+                                                <input type="text" id="editLocomotive" class="form-control" disabled>
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label>نوع خرابی</label>
+                                                <select id="editDamageType" name="damage_type" class="form-control"
+                                                        required>
+                                                    <option value="">انتخاب کنید</option>
+                                                    <option value="MECHANICAL">مکانیکی</option>
+                                                    <option value="ELECTRICAL">الکتریکی</option>
+                                                    <option value="BOGIE_CHASSIS">شاسی و بوژی</option>
+                                                    <option value="BRAKE">ترمز</option>
+                                                    <option value="CABIN_AMENITIES">کابین</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 form-group">
+                                                <label>مکان خرابی</label>
+                                                <input type="text" id="editLocation" name="location"
+                                                       class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label>اعزام نیرو از</label>
+                                                <input type="text" id="editDispatchFrom" name="dispatch_from"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 form-group">
+                                                <label>تاریخ گزارش</label>
+                                                <input type="text" id="editReportedDate" name="reported_date"
+                                                       class="form-control" data-jdp>
+                                            </div>
+
+
+                                            <div class="col-md-4 form-group timepicker-container">
+                                                <label for="reportedTime" class="form-label">ساعت گزارش</label>
+                                                <div class="timepicker-container">
+                                                    <input type="time" class="form-control" id="editReportedTime"
+                                                           name="reported_time">
+                                                    <i class="fas fa-clock"></i>
+                                                </div>
+                                                <div class="invalid-feedback">لطفاً ساعت گزارش را وارد کنید.</div>
+                                            </div>
+
+
+                                            <div class="col-md-4 form-group">
+                                                <label>وضعیت حرکت</label>
+                                                <select id="editMoveStatus" name="move_status" class="form-control"
+                                                        required>
+                                                    <option value="ACTIVE">گرم / ادامه سیر</option>
+                                                    <option value="DEACTIVE">سرد</option>
+                                                    <option value="REPAIR">متوقف / اعزام به تعمیرات</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>توضیحات خرابی</label>
+                                            <textarea id="editDescription" name="description" class="form-control"
+                                                      rows="4" required></textarea>
+                                        </div>
+
+                                        <div class="text-center mt-4">
+                                            <button type="submit" class="btn btn-success btn px-5">
+                                                ذخیره تغییرات
+                                            </button>
+
+                                            <button type="button" id="deleteFailureBtn"
+                                                    class="btn btn-danger btn px-5 mx-2">حذف خرابی
+                                            </button>
+
+                                            <button type="button" class="btn btn-secondary btn px-4"
+                                                    id="cancelEditBtn">
+                                                انصراف
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تب دوم: ویرایش تعمیر -->
+                    <div class="tab-pane fade" id="pills-approve">
+                        <!-- جستجوی آی‌دی خرابی -->
+                  <div class="failure-search-box">
+    <h4 class="mb-3">کد خرابی یا شماره لوکوموتیو را وارد کنید</h4>
+    <div class="input-group col-md-6 mx-auto">
+      <input type="text" id="repairSearchInput" class="form-control" placeholder="مثلاً: 142 یا 4011">
+        <div class="input-group-append">
+            <button class="btn btn-light btn-lg" id="loadRepairsBtn">جستجو</button>
+        </div>
+    </div>
+</div>
+
+                        <!-- لیست تعمیرات (بعد از لود شدن) -->
+                        <div id="repairsListContainer" style="display: none;">
+                            <div class="card shadow-lg border-success">
+                                <div class="card-header bg-success text-white text-center">
+                                    <h5>تعمیرات مربوط به خرابی شماره <span id="repairFailureIdDisplay"></span></h5>
+                                </div>
+                                <div class="card-body" id="repairsList">
+                                    <!-- تعمیرات اینجا با آژاکس اضافه می‌شن -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- فرم ویرایش تعمیر (مخفی) -->
+                        <div class="edit-form-container" id="editRepairContainer" style="display: none;">
+                            <div class="card border-warning shadow-lg mt-4">
+                                <div class="card-header bg-warning text-dark text-center">
+                                    <h5>ویرایش تعمیر شماره <span id="editingRepairId"></span></h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="editRepairForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" id="repairId" name="repair_id">
+                                        <div class="row">
+                                            <div class="col-md-6 form-group">
+                                                <label>عنوان تعمیر</label>
+                                                <input type="text" id="editRepairTitle" name="title"
+                                                       class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label>تکنسین</label>
+                                                <input type="text" id="editRepairTechnician" name="technician"
+                                                       class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 form-group">
+                                                <label>محل تعمیر</label>
+                                                <input type="text" id="editRepairLocation" name="location"
+                                                       class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label>وضعیت تعمیر</label>
+                                                <select id="editRepairStatus" name="status" class="form-control"
+                                                        required>
+                                                    <option value="IN_PROGRESS">جاری</option>
+                                                    <option value="Repair">اقدام تعمیراتی</option>
+                                                    <option value="COMPLETED">پایان تعمیرات</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 form-group">
+                                                <label>تاریخ شروع</label>
+                                                <input type="text" id="editRepairStartDate" name="start_date"
+                                                       class="form-control" data-jdp >
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label>ساعت شروع</label>
+                                                <input type="time" id="editRepairStartTime" name="start_time"
+                                                       class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>توضیحات تعمیر</label>
+                                            <textarea id="editRepairDescription" name="description" class="form-control"
+                                                      rows="4" required></textarea>
+                                        </div>
+                                        <div class="text-center mt-4">
+                                            <button type="submit" class="btn btn-success btn px-5">ذخیره تغییرات
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn px-5 mx-2"
+                                                    id="deleteRepairBtn">حذف تعمیر
+                                            </button>
+                                            <button type="button" class="btn btn-secondary btn px-4"
+                                                    id="cancelRepairEditBtn">انصراف
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تب سوم: ویرایش سرویس -->
+<div class="tab-pane fade" id="pills-current" role="tabpanel">
+    <div class="failure-search-box">
+        <h4 class="mb-3">کد سرویس یا شماره لوکوموتیو را وارد کنید</h4>
+        <div class="input-group col-md-6 mx-auto">
+            <input type="text" id="serviceSearchInput" class="form-control" placeholder="مثلاً: S123 یا 4011">
+            <div class="input-group-append">
+                <button class="btn btn-light btn-lg" id="searchServiceBtn">جستجو سرویس</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- لیست سرویس‌های لوکوموتیو -->
+    <div id="servicesListContainer" style="display: none;">
+        <div class="card shadow-lg border-info mt-4">
+            <div class="card-header bg-info text-white text-center">
+                <h5>سرویس‌های  <span id="servicesListTitle"></span></h5>
+            </div>
+            <div class="card-body" id="servicesList"></div>
+        </div>
+    </div>
+
+    <!-- فرم ویرایش سرویس -->
+    <div class="edit-form-container" id="editServiceContainer" style="display: none;">
+        <div class="card border-info shadow-lg mt-4">
+            <div class="card-header bg-info text-white text-center">
+                <h5>ویرایش سرویس شماره <span id="editingServiceId"></span></h5>
+            </div>
+            <div class="card-body">
+                <form id="editServiceForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="serviceId" name="service_id">
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>لکوموتیو</label>
+                            <input type="text" id="editServiceLocomotive" class="form-control" disabled>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>نوع سرویس</label>
+                            <select id="editServiceType" name="service_type" class="form-control" required>
+                                <option value="">انتخاب کنید</option>
+                                <option value="daily">روزانه</option>
+                                <option value="weekly">هفتگی</option>
+                                <option value="monthly">ماهیانه</option>
+                                <option value="quarterly">سه ماهیانه</option>
+                                <option value="semi_annual">شش ماهیانه</option>
+                                <option value="annual">سالانه</option>
+                                <option value="triennial">تعمیر اساسی</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>تاریخ سرویس</label>
+                            <input type="text" id="editServiceDate" name="service_date" class="form-control" data-jdp required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>کیلومتر فعلی</label>
+                            <input type="number" id="editServiceKm" name="current_km" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>توضیحات</label>
+                        <textarea id="editServiceDescription" name="description" class="form-control" rows="4"></textarea>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-success btn px-5">ذخیره تغییرات</button>
+                        <button type="button" id="deleteServiceBtn" class="btn btn-danger btn px-5 mx-2">حذف سرویس</button>
+                        <button type="button" class="btn btn-secondary btn px-4" id="cancelServiceEditBtn">انصراف</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+                    <div class="tab-pane fade" id="pills-reject"></div>
+                    <div class="tab-pane fade" id="pills-contact"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+         // Initialize Jalali Datepicker
+        jalaliDatepicker.startWatch({
+            minDate: "attr",
+            maxDate: "attr"
+        });
+
+    </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // فعال‌سازی تب‌ها
+    document.querySelectorAll('.delicious-tabs .tab-btn').forEach(tab => {
+        tab.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = this.getAttribute('href');
+            document.querySelectorAll('.delicious-tabs .tab-btn').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show', 'active'));
+            this.classList.add('active');
+            document.querySelector(target).classList.add('show', 'active');
+        });
+    });
+
+    // مخفی کردن همه کانتینرها
+    function hideAllContainers() {
+        $('#editFormContainer, #failuresListContainer, #repairsListContainer, #editRepairContainer').hide();
+    }
+
+    // جستجوی خرابی (مشترک)
+    function searchFailures(query, callback) {
+        $.ajax({
+            url: '/maintenance/search-failures/',
+            method: 'GET',
+            data: { q: query },
+            success: callback,
+            error: () => {
+                Swal.fire('خطای سرور', 'ارتباط برقرار نشد', 'error');
+                callback(null);
+            }
+        });
+    }
+
+    // نمایش لیست خرابی‌ها
+    function showFailuresList(failures, type) {
+        const containerId = type === 'failure' ? '#failuresListContainer' : '#repairsListContainer';
+        const listId = type === 'failure' ? '#failuresList' : '#repairsList';
+        const titleId = type === 'failure' ? '#failuresListTitle' : '#repairFailureIdDisplay';
+
+        $(containerId).show();
+        const list = $(listId);
+        list.empty();
+
+        if (!failures || failures.length === 0) {
+            list.html('<p class="text-center text-muted py-4">خرابی ثبت نشده است.</p>');
+            return;
+        }
+
+        $(titleId).text(`لوکوموتیو ${failures[0].locomotive_id}`);
+
+        failures.forEach(f => {
+            list.append(`
+                <div class="card mb-3 border-start border-primary border-5 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 text-primary">خرابی #${f.id}</h6>
+                            <small class="text-muted">
+                                نوع: ${f.damage_type_display || 'نامشخص'} |
+                                تاریخ: ${f.reported_date}
+                            </small>
+                        </div>
+                        <button class="btn btn-success btn-sm select-failure-btn"
+                                data-failure-id="${f.id}"
+                                data-type="${type}">
+                            انتخاب
+                        </button>
+                    </div>
+                </div>
+            `);
+        });
+
+        $(containerId).slideDown(600);
+    }
+
+    // لود مستقیم خرابی
+    function loadFailureDirectly(failureId, type) {
+        $.ajax({
+            url: `/maintenance/failure-edit/${failureId}/`,
+            method: 'GET',
+            success: function (data) {
+                if (!data.success) {
+                    Swal.fire('خطا', data.message || 'خرابی یافت نشد', 'error');
+                    return;
+                }
+
+                const f = data.failure;
+                $('#failureId').val(f.id);
+                $('#editingFailureId').text(f.id);
+                $('#editLocomotive').val(f.locomotive);
+                $('#editDamageType').val(f.damage_type);
+                $('#editLocation').val(f.location);
+                $('#editDispatchFrom').val(f.dispatch_from || '');
+                $('#editReportedDate').val(f.reported_date);
+                $('#editReportedTime').val(f.reported_time);
+                $('#editMoveStatus').val(f.move_status);
+                $('#editDescription').val(f.description);
+
+                hideAllContainers();
+                $('#editFormContainer').slideDown(600);
+            },
+            error: () => Swal.fire('خطا', 'خطا در بارگذاری خرابی', 'error')
+        });
+    }
+
+    // لود تعمیرات یک خرابی
+    function loadRepairsForFailure(failureId) {
+        $.ajax({
+            url: `/maintenance/get-repairs/${failureId}/`,
+            method: 'GET',
+            success: function (data) {
+                hideAllContainers();
+                $('#repairFailureIdDisplay').text(failureId);
+
+                const list = $('#repairsList');
+                list.empty();
+
+                if (!data.success || data.repairs.length === 0) {
+                    list.html('<p class="text-center text-muted py-4">تعمیری ثبت نشده است.</p>');
+                } else {
+                    data.repairs.forEach(r => {
+                        list.append(`
+                            <div class="card mb-3 border-start border-success border-4 shadow-sm">
+                                <div class="card-body d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">${r.title}</h6>
+                                        <small class="text-muted">تکنسین: ${r.technician} | وضعیت: ${r.status_display}</small>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm edit-repair-btn" data-repair-id="${r.id}">
+                                        ویرایش
+                                    </button>
+                                </div>
+                            </div>
+                        `);
+                    });
+                }
+                $('#repairsListContainer').slideDown(600);
+            },
+            error: () => Swal.fire('خطا', 'خطا در بارگذاری تعمیرات', 'error')
+        });
+    }
+
+    // جستجو در تب خرابی
+    $('#searchFailureBtn').on('click', function () {
+        const query = $('#failureSearchInput').val().trim();
+        if (!query) return Swal.fire('خطا', 'شماره خرابی یا لوکوموتیو را وارد کنید', 'warning');
+
+        $(this).prop('disabled', true).html('در حال جستجو...');
+
+        searchFailures(query, data => {
+            $('#searchFailureBtn').prop('disabled', false).html('جستجو');
+            hideAllContainers();
+
+            if (!data || !data.success) {
+                Swal.fire('پیدا نشد', data?.message || 'موردی یافت نشد', 'info');
+                return;
+            }
+
+            if (data.is_direct_failure) {
+                loadFailureDirectly(data.failure.id, 'failure');
+            } else {
+                showFailuresList(data.failures, 'failure');
+            }
+        });
+    });
+
+    // جستجو در تب تعمیر
+    $('#loadRepairsBtn').on('click', function () {
+        const query = $('#repairSearchInput').val().trim();
+        if (!query) return Swal.fire('خطا', 'شماره خرابی یا لوکوموتیو را وارد کنید', 'warning');
+
+        $(this).prop('disabled', true).html('در حال جستجو...');
+
+        searchFailures(query, data => {
+            $('#loadRepairsBtn').prop('disabled', false).html('جستجو تعمیرات');
+            hideAllContainers();
+
+            if (!data || !data.success) {
+                Swal.fire('پیدا نشد', data?.message || 'خرابی یافت نشد', 'info');
+                return;
+            }
+
+            if (data.is_direct_failure) {
+                loadRepairsForFailure(data.failure.id);
+            } else {
+                showFailuresList(data.failures, 'repair');
+            }
+        });
+    });
+
+    // انتخاب خرابی از لیست
+    $(document).on('click', '.select-failure-btn', function () {
+        const failureId = $(this).data('failure-id');
+        const type = $(this).data('type');
+        hideAllContainers();
+
+        if (type === 'repair') {
+            loadRepairsForFailure(failureId);
+        } else {
+            loadFailureDirectly(failureId, 'failure');
+        }
+    });
+
+    // ویرایش تعمیر
+    $(document).on('click', '.edit-repair-btn', function () {
+        const repairId = $(this).data('repair-id');
+
+        $.ajax({
+            url: `/maintenance/get-repair-detail/${repairId}/`,
+            method: 'GET',
+            success: function (data) {
+                if (!data.success) return Swal.fire('خطا', data.message, 'error');
+
+                const r = data.repair;
+                $('#repairId').val(r.id);
+                $('#editingRepairId').text(r.id);
+                $('#editRepairTitle').val(r.title);
+                $('#editRepairTechnician').val(r.technician);
+                $('#editRepairLocation').val(r.location);
+                $('#editRepairStatus').val(r.status);
+                $('#editRepairStartDate').val(r.start_date);
+                $('#editRepairStartTime').val(r.start_time);
+                $('#editRepairDescription').val(r.description);
+
+                hideAllContainers();
+                $('#editRepairContainer').slideDown(600);
+            }
+        });
+    });
+
+    // ذخیره خرابی
+    $('#editFailureForm').on('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        $.ajax({
+            url: "/maintenance/failure-edit-save/",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: res => res.success
+                ? Swal.fire('موفقیت!', 'خرابی ویرایش شد', 'success').then(() => location.reload())
+                : Swal.fire('خطا', res.message, 'error'),
+            error: () => Swal.fire('خطا', 'ذخیره انجام نشد', 'error')
+        });
+    });
+
+    // ذخیره تعمیر
+    $('#editRepairForm').on('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        $.ajax({
+            url: "/maintenance/repair-edit-save/",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: res => res.success
+                ? Swal.fire('موفقیت!', 'تعمیر ویرایش شد', 'success').then(() => location.reload())
+                : Swal.fire('خطا', res.message, 'error'),
+            error: () => Swal.fire('خطا', 'ذخیره انجام نشد', 'error')
+        });
+    });
+
+    // حذف خرابی
+    $(document).on('click', '#deleteFailureBtn', function () {
+        const id = $('#failureId').val();
+        if (!id) return Swal.fire('خطا', 'خرابی بارگذاری نشده', 'error');
+
+        Swal.fire({
+            title: 'حذف خرابی؟',
+            text: 'تمام تعمیرات و عکس‌ها هم حذف می‌شوند!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله، حذف کن',
+            cancelButtonText: 'لغو',
+            reverseButtons: false,
+            customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary' },
+            didOpen: () => document.querySelector('.swal2-popup').style.direction = 'rtl'
+        }).then(r => {
+            if (r.isConfirmed) {
+                $.ajax({
+                    url: `/maintenance/failure-delete/${id}/`,
+                    method: 'POST',
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    success: res => res.success
+                        ? Swal.fire('حذف شد!', '', 'success').then(() => location.reload())
+                        : Swal.fire('خطا', res.message, 'error')
+                });
+            }
+        });
+    });
+
+    // حذف تعمیر
+    $('#deleteRepairBtn').on('click', function () {
+        const id = $('#repairId').val();
+        if (!id) return Swal.fire('خطا', 'تعمیر بارگذاری نشده', 'error');
+
+        Swal.fire({
+            title: 'حذف تعمیر؟',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله',
+            cancelButtonText: 'لغو',
+            reverseButtons: false,
+            customClass: { confirmButton: ' btn btn-danger', cancelButton: 'btn btn-secondary' },
+            didOpen: () => document.querySelector('.swal2-popup').style.direction = 'rtl'
+        }).then(r => {
+            if (r.isConfirmed) {
+                $.ajax({
+                    url: `/maintenance/repair-delete/${id}/`,
+                    method: 'POST',
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    success: res => res.success
+                        ? Swal.fire('حذف شد!', '', 'success').then(() => location.reload())
+                        : Swal.fire('خطا', 'حذف نشد', 'error')
+                });
+            }
+        });
+    });
+
+    // انصراف‌ها
+    $('#cancelEditBtn').on('click', () => {
+        hideAllContainers();
+        $('#failureSearchInput').val('').focus();
+    });
+
+    $('#cancelRepairEditBtn').on('click', () => {
+        hideAllContainers();
+        $('#repairsListContainer').slideDown(400);
+    });
+
+});
+</script>
+
+
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+
+
+    function hideAllContainers() {
+        $('#editFormContainer, #failuresListContainer, #repairsListContainer, #editRepairContainer, ' +
+          '#servicesListContainer, #editServiceContainer').hide();
+    }
+
+    // جستجوی هوشمند سرویس
+    function searchServices(query, callback) {
+        $.ajax({
+            url: '/maintenance/search-services/',
+            method: 'GET',
+            data: { q: query },
+            success: callback,
+            error: () => {
+                Swal.fire('خطای سرور', 'ارتباط برقرار نشد', 'error');
+                callback(null);
+            }
+        });
+    }
+
+function showServicesList(services) {
+    hideAllContainers();
+    $('#servicesListContainer').show();
+    const list = $('#servicesList');
+    list.empty();
+
+    if (!services || services.length === 0) {
+        list.html('<p class="text-center text-muted py-4">سرویسی ثبت نشده است.</p>');
+        return;
+    }
+
+    $('#servicesListTitle').text(`لوکوموتیو ${services[0].locomotive_id}`);
+
+    services.forEach(s => {
+        list.append(`
+            <div class="card mb-3 border-start border-info border-5 shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-info">سرویس #${s.id}</h6>
+                        <small class="text-muted">
+                            نوع: ${s.service_type_display}<br>
+                            تاریخ: ${s.serviced_date} ساعت ${s.serviced_time}<br>
+                            ${s.has_oil_text}
+                        </small>
+                    </div>
+                    <button class="btn btn-success btn-sm select-service-btn" data-service-id="${s.id}">
+                        انتخاب و ویرایش
+                    </button>
+                </div>
+            </div>
+        `);
+    });
+
+    $('#servicesListContainer').slideDown(600);
+}
+
+    function loadServiceDirectly(serviceId) {
+        $.ajax({
+            url: `/maintenance/service-edit/${serviceId}/`,
+            method: 'GET',
+            success: function (data) {
+                if (!data.success) {
+                    Swal.fire('خطا', data.message || 'سرویس یافت نشد', 'error');
+                    return;
+                }
+
+                const s = data.service;
+                $('#serviceId').val(s.id);
+                $('#editingServiceId').text(s.id);
+                $('#editServiceLocomotive').val(s.locomotive);
+                $('#editServiceType').val(s.service_type);
+                $('#editServiceDate').val(s.service_date);
+                $('#editServiceKm').val(s.current_km);
+                $('#editServiceDescription').val(s.description || '');
+
+                hideAllContainers();
+                $('#editServiceContainer').slideDown(600);
+            }
+        });
+    }
+
+    // جستجو در تب سرویس
+    $('#searchServiceBtn').on('click', function () {
+        const query = $('#serviceSearchInput').val().trim();
+        if (!query) return Swal.fire('خطا', 'کد سرویس یا شماره لوکوموتیو را وارد کنید', 'warning');
+
+        $(this).prop('disabled', true).html('در حال جستجو...');
+
+        searchServices(query, data => {
+            $('#searchServiceBtn').prop('disabled', false).html('جستجو سرویس');
+
+            if (!data || !data.success) {
+                Swal.fire('پیدا نشد', data?.message || 'سرویسی یافت نشد', 'info');
+                hideAllContainers();
+                return;
+            }
+
+            if (data.is_direct_service) {
+                loadServiceDirectly(data.service.id);
+            } else {
+                showServicesList(data.services);
+            }
+        });
+    });
+
+    // انتخاب سرویس از لیست
+    $(document).on('click', '.select-service-btn', function () {
+        const serviceId = $(this).data('service-id');
+        hideAllContainers();
+        loadServiceDirectly(serviceId);
+    });
+
+    // ذخیره سرویس
+    $('#editServiceForm').on('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        $.ajax({
+            url: '/maintenance/service-edit-save/',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: res => res.success
+                ? Swal.fire('موفقیت!', 'سرویس با موفقیت ویرایش شد', 'success').then(() => location.reload())
+                : Swal.fire('خطا', res.message, 'error'),
+            error: () => Swal.fire('خطا', 'ذخیره انجام نشد', 'error')
+        });
+    });
+
+    // حذف سرویس
+    $('#deleteServiceBtn').on('click', function () {
+        const id = $('#serviceId').val();
+        if (!id) return Swal.fire('خطا', 'سرویس بارگذاری نشده', 'error');
+
+        Swal.fire({
+            title: 'حذف سرویس؟',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله، حذف کن',
+            cancelButtonText: 'لغو',
+            reverseButtons: true
+        }).then(r => {
+            if (r.isConfirmed) {
+                $.ajax({
+                    url: `/maintenance/service-delete/${id}/`,
+                    method: 'POST',
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    success: res => res.success
+                        ? Swal.fire('حذف شد!', '', 'success').then(() => location.reload())
+                        : Swal.fire('خطا', 'حذف نشد', 'error')
+                });
+            }
+        });
+    });
+
+    $('#cancelServiceEditBtn').on('click', () => {
+        hideAllContainers();
+        $('#serviceSearchInput').val('').focus();
+    });
+
+    // بقیه کدها (خرابی و تعمیر) هم دقیقاً مثل قبل کار می‌کنن — نیازی به تغییر نیست!
+});
+</script>
+{% endblock javascripts %}
+
+

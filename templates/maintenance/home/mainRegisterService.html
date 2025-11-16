@@ -164,7 +164,8 @@
                             </div>
                             <div class="col-md-3 form-group">
                                 <label for="location" class="form-label">مکان سرویس</label>
-                                <input type="text" id="location" name="location" class="form-control" placeholder="مکان سرویس را وارد کنید">
+                                <input type="text" id="location" name="location" class="form-control"
+                                       placeholder="مکان سرویس را وارد کنید">
                                 <div class="invalid-feedback">لطفاً مکان سرویس را وارد کنید.</div>
                             </div>
                         </div>
@@ -186,19 +187,21 @@
                             </div>
                         </div>
                         <!-- Row 4: Checklist Links -->
+
                         <div class="row">
                             <div class="col-md-9 form-group">
-                                <label class="form-label">چک‌لیست‌ها</label>
-                                <div id="checklistLinks" class="checklist-links"></div>
+                                <label for="checklist" class="form-label">جزئیات چک‌لیست (اختیاری)</label>
+                                <textarea id="checklist" name="checklist" class="form-control" rows="5"
+                                          placeholder="مثلاً: فیلتر هوا تعویض شد، روغن موتور چک شد، ترمزها تست شدند..."></textarea>
                             </div>
                         </div>
-                        <!-- Row 5: Image Upload -->
+
                         <div class="row">
-                            <div class="col-md-3 form-group">
-                                <label for="images" class="form-label">آپلود تصاویر (اختیاری)</label>
-                                <input type="file" id="images" name="images" class="form-control-file" accept="image/*"
+                            <div class="col-md-6 form-group">
+                                <label class="form-label">آپلود تصاویر سرویس (اختیاری)</label>
+                                <input type="file" name="images" id="images" class="form-control" accept="image/*"
                                        multiple>
-                                <small class="form-text text-muted">می‌توانید چندین تصویر انتخاب کنید</small>
+                                <small class="text-muted">می‌توانید چندین تصویر انتخاب کنید (حداکثر ۱۰ مگابایت)</small>
                             </div>
                         </div>
                         <!-- Row 6: Submit Button -->
@@ -213,596 +216,66 @@
         </div>
     </div>
 
-    <!-- Modals for Monthly Checklists -->
-    <div class="modal fade" id="modalMotor" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">چک‌لیست موتور (ماهانه)</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>شرح</th>
-                                <th>تایید</th>
-                                <th>عدم تایید</th>
-                                <th>توضیحات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="motorItems">
-                            <!-- Items will be populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
-                    <button type="button" class="btn btn-primary save-checklist" data-sheet="motor">ذخیره</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="modal fade" id="modalSafety" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">چک‌لیست ایمنی (ماهانه)</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>شرح</th>
-                                <th>تایید</th>
-                                <th>عدم تایید</th>
-                                <th>توضیحات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="safetyItems">
-                            <!-- Items will be populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
-                    <button type="button" class="btn btn-primary save-checklist" data-sheet="safety">ذخیره</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="modal fade" id="modalBrake" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">چک‌لیست کمپرسور-ترمز (ماهانه)</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>شرح</th>
-                                <th>تایید</th>
-                                <th>عدم تایید</th>
-                                <th>توضیحات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="brakeItems">
-                            <!-- Items will be populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
-                    <button type="button" class="btn btn-primary save-checklist" data-sheet="brake">ذخیره</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="modal fade" id="modalElectric" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">چک‌لیست برق (ماهانه)</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>شرح</th>
-                                <th>تایید</th>
-                                <th>عدم تایید</th>
-                                <th>توضیحات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="electricItems">
-                            <!-- Items will be populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
-                    <button type="button" class="btn btn-primary save-checklist" data-sheet="electric">ذخیره</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalCabin" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">چک‌لیست کابین (ماهانه)</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>شرح</th>
-                                <th>تایید</th>
-                                <th>عدم تایید</th>
-                                <th>توضیحات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cabinItems">
-                            <!-- Items will be populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
-                    <button type="button" class="btn btn-primary save-checklist" data-sheet="cabin">ذخیره</button>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock content %}
-
 {% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+jalaliDatepicker.startWatch({ minDate: "attr", maxDate: "attr" });
 
+$(document).ready(function () {
 
-    <script>
-        // Checklist data for monthly (hardcoded from extracted items)
-        const checklistData = {
-            monthly: {
-                motor: [
-                    'بازدید روغن موتور',
-                    'بازدید روغن گاورنر',
-                    'بازدید آب مخزن در حالت روشن و خاموش',
-                    'بازدید گیلاس آبنما و مخزن آب',
-                    'سطح روغن استرینر در زیر توری در حد مجاز می باشد',
-                    'سطح توری استرینرعاری از تجمع رسوبات می باشد',
-                    'بازدید چکش سوپاپ   ومرغکها از لحاظ نشتی روغن وعملکرد مناسب',
-                    'بازدید انژکتورها و وضعیت عملکرد انها',
-                    'بازدید میل بادمک ها و وضعیت ظاهری و عملکرد انها',
-                    'بازدید واشر برنجی و لب پریدگی  و سلامت سرسیلندرها',
-                    'بازدید فنر سوپاپ و خار سوپاپ ها',
-                    'بازدید سرسیلند ها از لحاظ کوبش',
-                    'بازدید دربهای ایرباکس و کارتل',
-                    'وضعیت سلامت رینگ و پیستون ها در حالت خاموش',
-                    'وضعیت سلامت سیلندر و سر سیلندردر حالت خاموش',
-                    'وضعیت سلامت یاتاقان های  ثابت و متحرکبه لحاظ پلیسه و رنگ و چرخیدن  بررسی شده است؟',
-                    'بازدید لوله های انشعابی آب سیلندر ها در داخل ایرباکس',
-                    'بازدید لوله سرتاسری داخل ایرباکس',
-                    'بازدید افتر کولرها از طرفین ایرباکس',
-                    'وضعیت نشتی روغن از یاتاقان توربین در قسمت ایرباکس پشت دریچه (16-8بررسی شود',
-                    'بازدید پیچ های کربنات',
-                    'بازدید ایرباکس طرفین موتور از نظر ریزش آب یا روغن از سر سیلندر ها',
-                    'بازدید لوله های آب ورودی و خروجی به افتر کولر',
-                    'بازدید کانالهای طرفین توربوشارژ موتور',
-                    'بازدید کلیه لوله های آب - پمپ های آب - اتصالات مربوطه و  رادیاتورها ( از نظر نشتی آب )',
-                    'بازدید لوله های روغن - پمپ های روغن و اتصالات مربوطه و خنک کننده روغن',
-                    'بازدید فشار عمومی روغن موتور در دنده هشت و خنثی',
-                    'کنترل فشار صافی 7 عددی در حالت خنثی ( 5-7 Psi) و 8 دنده (25psi )',
-                    'وضعیت راک انژکتور روی عدد 1/96 می باشد؟',
-                    'بازدید صافی کوتاه و بلند توربین',
-                    'بازدید فیلتر های دوقلو و بلند سوخت',
-                    'بازدید لوله های سوخت از نظرنشتی',
-                    'بازدید اگزوزها از نظر فرار دود  و بررسی پیچ های ان',
-                    'بازدید لوله روغن متصل به  گاورنر و کابل مربوطه',
-                    'بازدید وضعیت توربین از لحاظ صدای غیر عادی و ایست (بازه ی زمانی مجاز بالای 35 ثانیه)',
-                    'بازدید چرخدنده های عقب موتور از لحاظ صدای  غیر عادی',
-                    'بازدید وضعیت آسپیراتور',
-                    'بازدید منبع اب از نظر سلامت ،تحت فشار بودن و اتصالات',
-                    'ایا دکمه اب دتکتور با تست شیر خروسکی در زمان50-60 ثانیه عمل می کند؟   (در دنده خنثِی)',
-                    'ایا دکمه گاز دتکتور (آزمایش با فشار سنجuشکل)در مکش 0/8 اینچ آب در رنج می باشد  ؟   (در دنده خنثِی)',
-                    'بازدید خنک کننده روغن از نظر سلامت و اتصالات'
-                ],
-                safety: [
-                    'وضعیت سلامت قلاب ها',
-                    'وضعیت صفحه سایشی زیر قلاب',
-                    'عملکرد قلاب با اهرم دستی',
-                    'وضعیت پین قلاب و نگهدارنده پین',
-                    'وضعیت افتادگی قلاب',
-                    'وضعیت ضربه گیر - پیچها و جوشها',
-                    'وضعیت پین پیچ قلاب و مهره و اشپیل',
-                    'وضعیت زنجیر - خوردگی',
-                    'وضعیت پیچهای اطراف تامپون',
-                    'وضعیت افتادگی تامپون',
-                    'وضعیت نظافت سیلندر و پیستون تامپون',
-                    'وضعیت گریسکاری تامپون',
-                    'نداشتن ترک در محل جوش صفحه تامپون و سیلندر',
-                    'وضعیت عملکرد',
-                    'داشتن فنر برگردان زنجیر',
-                    'وضعیت حلقه اتصال زنجیر',
-                    'وضعیت پیچ های سر محور',
-                    'وضعیت درپوش های روغن',
-                    'نداشتن نشتی روغن',
-                    'کنترل پابند و پیچ های آن',
-                    'کنترل جعبه دنده ها و پکینگ ها',
-                    'کنترل خاموت های جعبه دنده',
-                    'کنترل ضربه گیر تراکشن موتور ها',
-                    'وضعیت تاکو سرعت نما',
-                    'وضعیت سلامت لاینرها',
-                    'وضعیت پیچ های لاینر',
-                    'وضعیت واشریک تکه زیر پیچ',
-                    'وضعیت چرخ ها (بریدگی-قطر بانداژ)',
-                    'وضعیت تیزی با گرفتن شابلون',
-                    'وضعیت درب سیلندر و  پیچ های آن',
-                    'وضعیت پیچ نگهدارنده سیلندر به بوژی',
-                    'وضعیت میله کورس',
-                    'وضعیت اشپیل پین اهرم بندی افقی',
-                    'نداشتن نشتی هوا از سیلندر',
-                    'وضعیت اهرم بندی افقی و عمودی',
-                    'وضعیت پین و پیچ های اهرم بندی',
-                    'وضعیت قاب کفش ترمز',
-                    'وضعیت پین و محافظ آن',
-                    'وضعیت گیج سوخت',
-                    'نداشتن نشتی از گیج',
-                    'تمیز بودن گیج و گیلاس',
-                    'وضعیت نشتی از شیر لوله های هوا',
-                    'وضعیت نشتی از مهره ماسوره ها',
-                    'وضعیت نشتی از شیر قطره گیر و مخزن اصلی هوا',
-                    'تخلیه آب از قطره گیر و مخزن اصلی هوا',
-                    'وضعیت سنسور های پشت سپر',
-                    'کنترل کابل های تراکشن موتور',
-                    'بازدید لوله هوای جلو و عقب لکوموتیو و بازدید فانوسک های بوژی ها',
-                    'بازدید پیچ های کپه تراکشن موتور',
-                    'بازدید پیچ های پکینگ تراکشن موتورها',
-                    'وضعیت شاسی',
-                    'وضعیت سپر',
-                    'وضعیت مخزن سوخت',
-                    'وضعیت دماغه کابین',
-                    'وضعیت نردها و پله ها',
-                    'وضعیت بدنه لکوموتیو'
-                ],
-                brake: [
-                    'وضعیت عملکرد PCS و PCR',
-                    'تست گسیختگی',
-                    'کنترل عدم گاز خوردن  و تحریک پس از ترمز سریع',
-                    'ازمایش mv cc',
-                    'ازمایشccs',
-                    'وضعیت عملکرد ترمز سه دنده',
-                    'وضعیت عملکرد ترمز شش دنده',
-                    'وضعیت عملکرد ترمز تدریجی(کم کردن 1/5 بار و ترمز کامل)',
-                    'وضعیت عملکرد سوپاپ توزیعH-5',
-                    'وضعیت عملکرد سوپاپ تسریع',
-                    'وضعیت عملکرد سوپاپ سه قلوی تخلیه J-1',
-                    'وضعیت عملکرد مدار دوبله کردن لکوموتیو',
-                    'وضعیت مدار حمل سرد لکوموتیو',
-                    'وضعیت عملکرد سوپاپ دینامیک',
-                    'وضعیت عملکرد پدال ایمنی و سوپاپ لغو ترمز جریمهp2a',
-                    'وضعیت سلامت لوله ای ترمز و هوای داخل دماغه',
-                    'عملکرد سوپاپ شن پاش',
-                    'وضعیت سلامت مانومتر فشار هوا کابین و تابلوی AC(اختلاف هوا)',
-                    'بازدید فشار روغن کمپرسور و فشار مخزن هوا',
-                    'بازدید وضعیت سطح روغن کمپرسور و سلامت گیج ان',
-                    'بازدید کمپرسور از نظر صدای غیر عادی',
-                    'بازدید کمپرسور از نظر نشتی اب و روغن',
-                    'بازدید لقمه های کوبل کمپرسور',
-                    'بازدید اتصالات کمپرسور(پیچ های پایه)',
-                    'بازدید  و ازمایش سوپاپ اطمینان مخزن هوا 160 پوندی',
-                    'بازدید سوپاپ رادیاتور 55 پوندی'
-                ],
-                electric: [
-                    'عملکرد مدار گاز خوردن',
-                    'عملکرد مدار تحریک',
-                    'عملکرد مدار دینامیک',
-                    'بازدید وضعیت پمپ سوخت',
-                    'بازدید وضعیت پمپ کمکی توربین(در زمان روشن 35 دقیقه و زمان خاموش 35 کار می کند؟',
-                    'بازدید زبانه کنتاکتور استارت',
-                    'وضعیت ظاهری موتور استارت',
-                    'وضعیت اتصالات (کابل ها سرکابل ها)',
-                    'ایا سطح الکترولیت باتریها به انداره ی 1/5 تا 2 سانتیمتر بالاتر از صفحات است؟',
-                    'ایا ولتاژ مجموعه باتریها برابر با 64 ولت می باشد؟',
-                    'وضعیت نظافت جایگاه باطریها',
-                    'لکوموتیو امریکایی ولتاژ بین دو سرتیغه های کلید بالا بین75-125 ولت اندازه گیری شده000000000',
-                    'چراغ خاموش گاورنر خاموش است؟',
-                    'چراغ گرم شدن موتور خاموش است؟',
-                    'چراغ فقدان قدرت و باتری خاموش است؟',
-                    'چراغ عملکرد پمپ کمکی روشن است؟',
-                    'چراغ حد مجاز تحریک خاموش است؟',
-                    'چراغ اتصال به زمین خاموش است؟',
-                    'ایا حداکثر مقاومت رئوستای تنظیم بار1/504 کیلو اهم و حداقل1/496 کیلو اهم می باشد     مقدار اندازه گیری شده..........',
-                    'ایا ولتاژ تنظیم باردر دنده 8بین40تا50 ولت می باشد؟ مقدار اندازه گیری شده..........',
-                    'ایا وضعیت ظاهری موتور پره ای تنظیم بار از نظر نشتی روغن و کوپل کنترل شده و مناسب می باشد.',
-                    'ایا مقاومت عایقی بین کنتاکتورهای تنظیم بار و زمین بزرگتر یا مساوی 1 مگا اهم می باشد      مقدار اندازه گیری شده00000',
-                    'ایا با فشار دادن دکمهFWD  موجود روی پانل.مدار ها به وضعیت پارالل کامل می روند؟',
-                    'ایا با رها کردن دکمهFWD  و فشردن دکمه BACK مدارها به وضعیت سری- پارالل برمیگردند؟',
-                    'ایا زمان تاخیری رلهFTRA در هنگام انتقال مدار از سری به پارالل و برعکس عمل می کند       مجاز 7-11 ثانیه                                   مقدار اندازه گیری شده......',
-                    'ایا سیم ها دارای عایق بندی مناسب می باشند؟',
-                    'ایا سیم ها از لحاظ اثار جرقه زدگی سالم می باشند؟',
-                    'ایا اتصالات برقرار می باشد؟',
-                    'ایا رله های با تاخیر زمانی درست عمل می کنند؟',
-                    'ایا رله های بدون تاخیر زمانی درست عمل می کنند؟',
-                    'ایا زبانه کنتاکتورRVF1سالم است؟',
-                    'ایا زبانه کنتاکتورRVF2سالم است؟',
-                    'ایا زبانه کنتاکتورRVF3 سالم است؟',
-                    'ایا زبانه کنتاکتورRVR4سالم است؟',
-                    'ایا زبانه کنتاکتورRVR5 سالم است؟',
-                    'ایا زبانه کنتاکتورRVR6سالم است؟',
-                    'ایا زبانه کنتاکتورB32 سالم است؟',
-                    'ایا زبانه کنتاکتورB42 سالم است؟',
-                    'ایا زبانه کنتاکتورB51 سالم است؟',
-                    'ایا زبانه کنتاکتورB65 سالم است؟',
-                    'ایا زبانه ها  و جرقه گیر کنتاکتور S14 سالم است؟',
-                    'ایا زبانه ها و جرقه گیر کنتاکتورS25 سالم است؟',
-                    'ایا زبانه ها و جرقه گیر کنتاکتورS36 سالم است؟',
-                    'ایا زبانه ها  و جرقه گیر کنتاکتور P1 سالم است؟',
-                    'ایا زبانه ها  و جرقه گیر کنتاکتور P2 سالم است؟',
-                    'ایا زبانه ها  و جرقه گیر کنتاکتور P3 سالم است؟',
-                    'ایا زبانه ها  و جرقه گیر کنتاکتور P4 سالم است؟',
-                    'ایا زبانه ها  و جرقه گیر کنتاکتور P5 سالم است؟',
-                    'ایا زبانه ها  و جرقه گیر کنتاکتور P6 سالم است؟',
-                    'ایا ترموستات TA محدوده مجاز می باشد؟                                                           دمای وصل 174F          دمای اندازه گیری شده.....                                                دمای قطع 159F        مقدار اندازه گیری شده.......',
-                    'ایا ترموستات TB محدوده مجاز می باشد؟                                                           دمای وصل 182F          دمای اندازه گیری شده.....                                                دمای قطع 167F        مقدار اندازه گیری شده.......',
-                    'ایا ترموستات TC محدوده مجاز می باشد؟                                                            دمای وصل 190F          دمای اندازه گیری شده.....                                                 دمای قطع 175F        مقدار اندازه گیری شده.......',
-                    'ایا ترموستات ETS محدوده مجاز می باشد؟                                                         دمای وصل 210F          دمای اندازه گیری شده.....                                                 دمای قطع 205F        مقدار اندازه گیری شده.......',
-                    'ایا عملکرد ترموستات TA.کنتاکتورAC2 عمل می کند؟',
-                    'ایا عملکرد ترموستات TB.کنتاکتورAC1 عمل می کند؟',
-                    'ایا عملکرد ترموستات TC.کنتاکتورAC2 عمل می کند؟',
-                    'ایا عملکرد ترموستات TA.کنتاکتورAC2 عمل می کند؟',
-                    'ایا عملکرد کنتاکتورAC2  فن2 عمل می کند؟',
-                    'ایا عملکرد کنتاکتورAC1  فن1 عمل می کند؟',
-                    'ایا عملکرد کنتاکتورAC3  فن3 عمل می کند؟',
-                    'جریان مصرفی فن ها در دنده خنثی بین 50 تا 60 امپر',
-                    'ایا با عمل کردن ETS زنگ اخطار به صدا در می اید؟',
-                    'ایا فن دینامیک از لحاظ  ذغال .کموتاتور و صدای یاتاقان ها سالم است؟',
-                    'ایا فن خنک کننده تراکشن موتورها سالم است؟',
-                    'ایا فن اتاق تمیز از لحاظ عملکرد و صدای یاتاقانها سالم است؟',
-                    'ایا فیوزهای  ژنراتور اصلی سالم است؟',
-                    'ایا فیوز  ژنراتور همراه سالم است؟(60-100)',
-                    'ایا فیوز ژنراتورکمکی سالم است؟(30-250)',
-                    'ایا فیوز استارت سالم است؟(800)',
-                    'ایا ولتاژ مرجع اندازه گیری شده با مقدار استاندارد72 ولت مطابق دارد؟                         مقدار اندازه گیری شده.......',
-                    'ایا ولتاژ ژنراتور همراه در دنده1 با مقدار استاندارد 75 ولت مطابقت دارد؟              مقدار اندازه گیری شده...................',
-                    'ایا ولتاژ ژنراتور همراه در دنده8 با مقدار استاندارد 215 ولت مطابقت دارد؟              مقدار اندازه گیری شده...................',
-                    'ایا دریچه ها(از لحاظ ابند بودن)وپیچ های مربوطه مناسب است؟',
-                    'ایا سرکابل ها و کابل ها از نظر ظاهری سالم است؟',
-                    'ایا سطح کلکتور از نظر الودگی و جرقه زدگی مناسب است؟',
-                    'ایا صدای کارکرد رولبرینگ ها عادی است؟'
-                ],
-                cabin: [
-                    'وضعیت عملکرد وسلامت بخاری',
-                    'وضعیت عملکرد وسلامت هیتر',
-                    'وضعیت عملکرد وسلامت منقل',
-                    'وضعیت عملکرد وسلامت یخچال',
-                    'وضعیت عملکرد وسلامت کولر',
-                    'بازدیدعملکرد بوق و زنگ خبر',
-                    'بازدیدعملکرد شن پاش',
-                    'بازدید نورافکن های جلو و عقب',
-                    'بازدید چراغ هالوژن کابین',
-                    'بازدید و کنترل برف پاکن ها',
-                    'بازدید شیشه ها وپنجره های کابین و اینه ها',
-                    'بازدید صندلی های کابین',
-                    'بازدید زیر دستی جالباسی و اینه کابین',
-                    'بازدید وضعیت قفل و درب های کابین',
-                    'بازدید و نظافت کف و بدنه کابین',
-                    'بازدید پنل کنترل و فیوزهای استارت',
-                    'بازدید سرعت نما ( مکانیکی - دیجیتال )',
-                    'کنترل عملکرد تخلیه هوای سیگنال و پدال ایمنی',
-                    'کنترل بوق سیگنال وپدال ایمنی'
-                ]
-            }
-            // Add other types like daily, etc., when provided
-        };
-
-        // Stored checklist responses
-        const checklistResponses = {};
-
-        // Load locomotives via AJAX (existing)
-        $(document).ready(function () {
-            $.ajax({
-                url: '{% url "maintenance:mainGetLocomotives" %}',
-                type: 'GET',
-                dataType: 'json',
-                success: function (response) {
-                    const select = $('#locomotiveId');
-                    select.find('option:not(:first)').remove();
-                    response.locomotives.forEach(loco => {
-                        select.append(`<option value="${loco.id}">${loco.name}</option>`);
-                    });
-                },
-                error: function (xhr) {
-                    Swal.fire({
-                        title: 'خطا!',
-                        text: 'خطا در بارگذاری لیست لکوموتیوها',
-                        icon: 'error',
-                        confirmButtonText: 'باشه'
-                    });
-                }
-            });
-
-            jalaliDatepicker.startWatch({
-                minDate: "attr",
-                maxDate: "attr"
-            });
-
-            // On service type change, show links
-            $('#serviceType').on('change', function () {
-                const type = $(this).val();
-                const linksDiv = $('#checklistLinks');
-                linksDiv.empty().hide();
-
-                if (type && checklistData[type]) {
-                    const sheets = {
-                        motor: 'موتور',
-                        safety: 'ایمنی',
-                        brake: 'کمپرسور-ترمز',
-                        electric: 'برق',
-                        cabin: 'کابین'
-                    };
-                    for (let sheetKey in sheets) {
-                        linksDiv.append(`<a href="#" class="checklist-link" data-toggle="modal" data-target="#modal${sheetKey.charAt(0).toUpperCase() + sheetKey.slice(1)}">${sheets[sheetKey]}</a>`);
-                    }
-                    linksDiv.show();
-                }
-            });
-
-            // Populate items in modals on show
-            $('[id^=modal]').on('show.bs.modal', function () {
-                const sheet = $(this).attr('id').replace('modal', '').toLowerCase();
-                const itemsBody = $(`#${sheet}Items`);
-                itemsBody.empty();
-                const type = $('#serviceType').val();
-                if (type && checklistData[type][sheet]) {
-                    checklistData[type][sheet].forEach((item, index) => {
-                        itemsBody.append(`
-                            <tr>
-                                <td>${item}</td>
-                                <td><input type="checkbox" class="confirmed" data-index="${index}"></td>
-                                <td><input type="checkbox" class="not-confirmed" data-index="${index}"></td>
-                                <td><textarea class="notes" data-index="${index}" rows="1"></textarea></td>
-                            </tr>
-                        `);
-                    });
-                }
-            });
-
-            // Save checklist in modal
-            $('.save-checklist').on('click', function () {
-                const sheet = $(this).data('sheet');
-                const responses = [];
-                $(`#${sheet}Items tr`).each(function () {
-                    const index = $(this).find('.confirmed').data('index');
-                    const confirmed = $(this).find('.confirmed').is(':checked');
-                    const notConfirmed = $(this).find('.not-confirmed').is(':checked');
-                    const notes = $(this).find('.notes').val();
-                    responses.push({index, confirmed, notConfirmed, notes});
-                });
-                checklistResponses[sheet] = responses;
-                $(this).closest('.modal').modal('hide');
-                Swal.fire({
-                    title: 'ذخیره شد!',
-                    text: 'چک‌لیست ذخیره شد.',
-                    icon: 'success',
-                    confirmButtonText: 'باشه'
-                });
-            });
-
-            // Handle form submission with validation
-            $('#submitBtn').on('click', function () {
-                // Reset validation
-                $('#serviceForm .form-control, #serviceForm select').removeClass('is-invalid');
-
-                // Required fields
-                const requiredFields = [
-                    {id: 'locomotiveId', label: 'شناسه لکوموتیو'},
-                    {id: 'serviceType', label: 'نوع سرویس'},
-                    {id: 'location', label: 'مکان سرویس'},
-                    {id: 'servicedDate', label: 'تاریخ سرویس'},
-                    {id: 'servicedTime', label: 'ساعت سرویس'}
-                ];
-
-                let emptyFields = [];
-                requiredFields.forEach(field => {
-                    const input = document.getElementById(field.id);
-                    const value = input.value.trim();
-                    if (!value || (input.tagName === 'SELECT' && (value === '0' || value === ''))) {
-                        input.classList.add('is-invalid');
-                        emptyFields.push(field.label);
-                    }
-                });
-
-                if (emptyFields.length > 0) {
-                    Swal.fire({
-                        title: 'خطا!',
-                        html: `لطفاً فیلدهای زیر را پر کنید:<br>${emptyFields.join('<br>')}`,
-                        icon: 'error',
-                        confirmButtonText: 'باشه'
-                    });
-                    return;
-                }
-
-                // Checklist validation: check if at least one item completed per sheet
-                const type = $('#serviceType').val();
-                let incompleteSheets = [];
-                if (type === 'monthly') {
-                    for (let sheet in checklistResponses) {
-                        const responses = checklistResponses[sheet] || [];
-                        const hasCompleted = responses.some(r => r.confirmed || r.notConfirmed || r.notes.trim());
-                        if (!hasCompleted) {
-                            incompleteSheets.push(sheet);
-                        }
-                    }
-                }
-
-                {#if (incompleteSheets.length > 0) {#}
-                {#    Swal.fire({#}
-                {#        title: 'خطا!',#}
-                {#        text: 'حداقل یک آیتم از چک‌لیست‌های زیر باید تکمیل شود: ' + incompleteSheets.join(', '),#}
-                {#        icon: 'error',#}
-                {#        confirmButtonText: 'باشه'#}
-                {#    });#}
-                {#    return;#}
-                {#}#}
-
-                // Prepare form data
-                const formData = new FormData($('#serviceForm')[0]);
-                const images = document.getElementById('images').files;
-                for (let i = 0; i < images.length; i++) {
-                    formData.append('images', images[i]);
-                }
-                formData.append('checklist_responses', JSON.stringify(checklistResponses));
-
-                // Send AJAX request
-                $.ajax({
-                    url: '',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            Swal.fire({
-                                title: 'موفقیت!',
-                                text: 'سرویس با موفقیت ثبت شد.',
-                                icon: 'success',
-                                confirmButtonText: 'باشه'
-                            }).then(() => {
-                                $('#serviceForm')[0].reset();
-                                $('#checklistLinks').empty().hide();
-                                {#checklistResponses = {};#}
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'خطا!',
-                                text: response.message,
-                                icon: 'error',
-                                confirmButtonText: 'باشه'
-                            });
-                        }
-                    },
-                    error: function (xhr) {
-                        Swal.fire({
-                            title: 'خطا!',
-                            text: xhr.responseJSON ? xhr.responseJSON.message : 'خطا در ثبت سرویس',
-                            icon: 'error',
-                            confirmButtonText: 'باشه'
-                        });
-                    }
-                });
-            });
+    // لود لوکوموتیوها
+    $.get('{% url "maintenance:mainGetLocomotives" %}', function(res) {
+        const select = $('#locomotiveId');
+        select.find('option:not(:first)').remove();
+        res.locomotives.forEach(loco => {
+            select.append(`<option value="${loco.id}">${loco.name}</option>`);
         });
-    </script>
+    }).fail(() => {
+        Swal.fire('خطا', 'بارگذاری لیست لکوموتیوها ناموفق بود', 'error');
+    });
+
+    // ثبت سرویس
+    $('#submitBtn').on('click', function () {
+        const btn = $(this);
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> در حال ثبت...');
+
+        const formData = new FormData($('#serviceForm')[0]);
+
+        $.ajax({
+            url: '/maintenance/save-service-request/',  // این URL رو در urls.py تعریف کن
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: function (res) {
+                if (res.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'موفقیت!',
+                        text: res.message,
+                        timer: 3000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        {#window.location.href = '/maintenance/service-list/'; // یا هر صفحه‌ای که می‌خوای#}
+                    });
+                } else {
+                    Swal.fire('خطا', res.message, 'error');
+                }
+            },
+            error: function () {
+                Swal.fire('خطای سرور', 'ارتباط برقرار نشد', 'error');
+            },
+            complete: function () {
+                btn.prop('disabled', false).html('ثبت سرویس');
+            }
+        });
+    });
+});
+</script>
 {% endblock javascripts %}
+

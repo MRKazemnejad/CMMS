@@ -110,21 +110,43 @@ class RepairImage(Image):
         verbose_name = "Repair Image"
         verbose_name_plural = "Repair Images"
 
+
 # Service model to store regular service details
+SERVICE_TYPE_CHOICES = [
+    ('daily', 'روزانه'),
+    ('weekly', 'هفتگی'),
+    ('monthly', 'ماهانه'),
+    ('quarterly', 'سه ماهه'),
+    ('semi_annual', 'شش ماهه'),
+    ('annual', 'سالانه'),
+    ('triennial', 'سه سالانه'),
+]
+
 class Service(models.Model):
-    locomotive = models.ForeignKey(Locomotive, on_delete=models.CASCADE, related_name='services', verbose_name="Locomotive")
-    checklist = models.TextField(verbose_name="Checklist Details")
-    hasOil=models.BooleanField(default=False,null=True)
-    serviced_date = models.DateField(default=timezone.now, verbose_name="Serviced Date")
-    serviced_time = models.TimeField(default=timezone.now, verbose_name="Serviced Time")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    locomotive = models.ForeignKey(
+        Locomotive,null=True,
+        on_delete=models.CASCADE,
+        related_name='services',
+        verbose_name="لکوموتیو"
+    )
+    service_type = models.CharField(
+        max_length=20,null=True,
+        choices=SERVICE_TYPE_CHOICES,
+        verbose_name="نوع سرویس"
+    )
+    checklist = models.TextField(verbose_name="جزئیات چک‌لیست", blank=True, null=True)
+    hasOil = models.BooleanField(default=False, null=True, verbose_name="تعویض روغن")
+    serviced_date = models.DateField(default=timezone.now,null=True, verbose_name="تاریخ سرویس")
+    serviced_time = models.TimeField(default=timezone.now,null=True, verbose_name="ساعت سرویس")
+    created_at = models.DateTimeField(auto_now_add=True,null=True, verbose_name="تاریخ ثبت")
 
     def __str__(self):
-        return f"Service {self.id} - {self.locomotive.locomotive_id}"
+        return f"سرویس {self.get_service_type_display()} - {self.locomotive.locomotive_id} - #{self.id}"
 
     class Meta:
-        verbose_name = "Service"
-        verbose_name_plural = "Services"
+        verbose_name = "سرویس"
+        verbose_name_plural = "سرویس‌ها"
+        ordering = ['-serviced_date', '-serviced_time']
 
 # ServiceImage model to store multiple images for a service
 class ServiceImage(Image):

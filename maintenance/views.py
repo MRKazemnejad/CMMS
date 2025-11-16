@@ -1,9 +1,11 @@
+import traceback
+
 import jdatetime
 from django.http import FileResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import json
-from maintenance.models import Locomotive, Failure, FailureImage, Repair, RepairImage,Service,Incident
+from maintenance.models import Locomotive, Failure, FailureImage, Repair, RepairImage,Service,Incident,ServiceImage
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render,get_object_or_404
@@ -13,9 +15,12 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 from django.forms.models import model_to_dict
-from maintenance.utility import dateToGrgorian,jalali_to_gregorian
+from maintenance.utility import dateToGrgorian,jalali_to_gregorian,dateToJalali1
 from django.db.models import Q
 from django.contrib import messages
+from django.views.decorators.http import require_http_methods
+import uuid
+from django.db import transaction
 
 
 
@@ -236,6 +241,12 @@ def mainRegisterFailure(request):
 
     context = {'segment': 'failure'}
     return render(request, 'maintenance/home/mainRegisterFailure.html', context)
+
+@login_required
+def mainRegisterFailure1(request):
+
+    context = {'segment': 'failure1'}
+    return render(request, 'maintenance/home/mainRegisterFailure1.html', context)
 
 @login_required
 def mainRegisterFailure_submit(request):
@@ -757,7 +768,10 @@ EDIT_MODELS = {
     },
 }
 
-def edit_page(request):
+
+
+
+def edit_page1(request):
     context = {
         'damage_types': Failure.DAMAGE_TYPES,
         'move_statuses': Failure.MOVE_STATUS,
@@ -843,4 +857,566 @@ def edit_page(request):
         except Repair.DoesNotExist:
             messages.error(request, 'تعمیر یافت نشد.')
 
-    return render(request, 'maintenance/home/mainEditData.html', context)
+    return render(request, 'maintenance/home/mainEditData1.html', context)
+
+
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_failure_for_edit(request, failure_id):
+
+    try:
+        failure = get_object_or_404(Failure, id=failure_id)
+
+        # تبدیل تاریخ و زمان به فرمت مناسب برای input
+        data = {
+            'success': True,
+            'failure': {
+                'id': failure.id,
+                'locomotive': f"{failure.locomotive.locomotive_id} - {failure.locomotive.model}",
+                'damage_type': failure.damage_type,
+                'location': failure.location,
+                'dispatch_from': failure.dispatch_from or '',
+                'description': failure.description,
+                'reported_date': dateToJalali1(failure.reported_date),  # فرمت برای jdp
+                'reported_time': failure.reported_time.strftime('%H:%M'),
+                'move_status': failure.move_status,
+            }
+        }
+        return JsonResponse(data)
+
+    except Failure.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'خرابی با این شناسه یافت نشد یا حذف شده است.'
+        }, status=200)
+
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'message': 'مشکلی پیش آمده است.'
+        }, status=404)
+
+
+@login_required
+@require_http_methods(["POST"])
+def save_failure_edit(request):
+
+
+
+    try:
+        # دریافت داده‌ها از فرم
+        failure_id = request.POST.get('failure_id')
+        print(f'failure id:{failure_id}')
+        if not failure_id:
+            return JsonResponse({'success': False, 'message': 'شناسه خرابی الزامی است.'}, status=400)
+
+        failure = get_object_or_404(Failure, id=failure_id)
+        print(f'gh:{failure}')
+        # بروزرسانی فیلدها
+        failure.damage_type = request.POST.get('damage_type')
+        failure.location = request.POST.get('location', '').strip()
+        failure.dispatch_from = request.POST.get('dispatch_from', '').strip() or None
+        failure.description = request.POST.get('description', '').strip()
+        failure.reported_date = dateToGrgorian(request.POST.get('reported_date'))
+        failure.reported_time = request.POST.get('reported_time')
+        failure.move_status = request.POST.get('move_status')
+
+        # اعتبارسنجی ساده (می‌تونی با Form یا Serializer پیشرفته‌تر کنی)
+        if not all([failure.damage_type, failure.location, failure.description,
+                    failure.reported_date, failure.reported_time, failure.move_status]):
+            return JsonResponse({'success': False, 'message': 'همه فیلدهای الزامی باید پر شوند.'}, status=400)
+
+        failure.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'خرابی با موفقیت ویرایش شد.',
+            'failure_id': failure.id
+        })
+
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'message': 'خطا در ذخیره تغییرات. لطفاً دوباره تلاش کنید.'
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_failure(request, failure_id):
+
+    try:
+        failure = get_object_or_404(Failure, id=failure_id)
+
+        # پاک کردن تمام تعمیرات مرتبط
+        failure.repairs.all().delete()  # این تمام Repair و RepairImage رو هم پاک می‌کنه چون CASCADE داره
+
+        # پاک کردن تمام عکس‌های خرابی
+        failure.images.all().delete()  # FailureImage ها پاک می‌شن
+
+        # در آخر خود خرابی رو پاک کن
+        failure.delete()
+
+        return JsonResponse({'success': True, 'message': 'خرابی با موفقیت حذف شد.'})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': 'خطا در حذف خرابی.'}, status=500)
+
+
+
+# دریافت لیست تعمیرات یک خرابی
+def get_repairs(request, failure_id):
+    try:
+        failure = Failure.objects.get(id=failure_id)
+        repairs = failure.repairs.all()
+        data = {
+            'success': True,
+            'repairs': [{
+                'id': r.id,
+                'title': r.title,
+                'technician': r.technician,
+                'status': r.status,
+                'status_display': r.get_status_display(),
+            } for r in repairs]
+        }
+        return JsonResponse(data)
+    except Failure.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'خرابی یافت نشد'}, status=200)
+
+# دریافت جزئیات یک تعمیر
+def get_repair_detail(request, repair_id):
+    try:
+        repair = Repair.objects.get(id=repair_id)
+        data = {
+            'success': True,
+            'repair': {
+                'id': repair.id,
+                'title': repair.title,
+                'technician': repair.technician,
+                'location': repair.location,
+                'status': repair.status,
+                'start_date': dateToJalali1(repair.start_date),
+                'start_time': repair.start_time.strftime('%H:%M'),
+                'description': repair.description,
+            }
+        }
+        return JsonResponse(data)
+    except Repair.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'تعمیر یافت نشد'}, status=200)
+
+@login_required
+@require_http_methods(["POST"])
+def repair_edit_save(request):
+    try:
+        print('&&&&&&&&&&')
+        repair_id = request.POST.get('repair_id')
+        if not repair_id:
+            return JsonResponse({'success': False, 'message': 'شناسه تعمیر الزامی است.'}, status=400)
+
+        repair = get_object_or_404(Repair, id=repair_id)
+
+        repair.title = request.POST.get('title')
+        repair.technician = request.POST.get('technician')
+        repair.location = request.POST.get('location')
+        repair.status = request.POST.get('status')
+        repair.description = request.POST.get('description')
+
+        # تاریخ و ساعت شروع
+        if request.POST.get('start_date'):
+            repair.start_date = dateToGrgorian(request.POST.get('start_date'))
+        if request.POST.get('start_time'):
+            repair.start_time = request.POST.get('start_time')
+
+        repair.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'تعمیر با موفقیت ویرایش شد.'
+        })
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({'success': False, 'message': 'خطا در ذخیره تعمیر.'}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def repair_delete(request, repair_id):
+    try:
+        repair = get_object_or_404(Repair, id=repair_id)
+        repair.delete()
+        return JsonResponse({'success': True, 'message': 'تعمیر با موفقیت حذف شد.'})
+    except:
+        return JsonResponse({'success': False, 'message': 'خطا در حذف تعمیر.'})
+
+
+
+
+def search_failures(request):
+    """
+    جستجوی هوشمند:
+    - اگر عدد وارد شده آی‌دی خرابی باشد → مستقیم خرابی رو برمی‌گردونه
+    - اگر شماره لوکوموتیو باشد → لیست خرابی‌های اون لوکوموتیو
+    """
+    q = request.GET.get('q', '').strip()
+    if not q:
+        return JsonResponse({'success': False, 'message': 'جستجو خالی است'})
+
+    # مرحله ۱: آیا این عدد آی‌دی خرابی هست؟
+    if q.isdigit():
+        try:
+            failure_id = int(q)
+            failure = Failure.objects.select_related('locomotive').get(id=failure_id)
+            return JsonResponse({
+                'success': True,
+                'is_direct_failure': True,
+                'failure': {
+                    'id': failure.id,
+                    'locomotive': f"{failure.locomotive.locomotive_id} - {failure.locomotive.model}",
+                    'damage_type': failure.damage_type,
+                    'location': failure.location,
+                    'dispatch_from': failure.dispatch_from or '',
+                    'description': failure.description,
+                    'reported_date': failure.reported_date.strftime('%Y/%m/%d'),
+                    'reported_time': failure.reported_time.strftime('%H:%M'),
+                    'move_status': failure.move_status,
+                }
+            })
+        except Failure.DoesNotExist:
+            pass  # ادامه بده، شاید شماره لوکوموتیو باشه
+
+    # مرحله ۲: جستجو بر اساس شماره لوکوموتیو (حتی اگر بخشی از شماره باشه)
+    failures = Failure.objects.select_related('locomotive').filter(
+        locomotive__locomotive_id__icontains=q
+    ).order_by('-reported_date')
+
+    if not failures.exists():
+        return JsonResponse({
+            'success': False,
+            'message': 'هیچ خرابی با این شماره لوکوموتیو یا آی‌دی یافت نشد.'
+        })
+
+    failures_list = []
+    for f in failures:
+        failures_list.append({
+            'id': f.id,
+            'locomotive_id': f.locomotive.locomotive_id,
+            'damage_type_display': f.get_damage_type_display(),
+            'reported_date': f.reported_date.strftime('%Y/%m/%d'),
+            'move_status_display': f.get_move_status_display(),
+        })
+
+    return JsonResponse({
+        'success': True,
+        'is_direct_failure': False,
+        'failures': failures_list
+    })
+
+
+# جستجوی سرویس
+def search_services(request):
+    q = request.GET.get('q', '').strip()
+    if q.isdigit() and len(q) > 3:  # احتمالاً کد سرویس
+        try:
+            service = Service.objects.select_related('locomotive').get(id=int(q))
+            return JsonResponse({
+                'success': True,
+                'is_direct_service': True,
+                'service': {
+                    'id': service.id,
+                    'locomotive': f"{service.locomotive.locomotive_id} - {service.locomotive.model}",
+                    'service_type': service.service_type,
+                    'service_date': service.service_date.strftime('%Y/%m/%d'),
+                    'current_km': service.current_km,
+                    'description': service.description or '',
+                }
+            })
+        except Service.DoesNotExist:
+            pass
+
+    services = Service.objects.select_related('locomotive').filter(
+        locomotive__locomotive_id__icontains=q
+    ).order_by('-service_date')[:20]
+
+    data = [{
+        'id': s.id,
+        'locomotive_id': s.locomotive.locomotive_id,
+        'service_type_display': s.get_service_type_display(),
+        'service_date': s.service_date.strftime('%Y/%m/%d'),
+        'current_km': s.current_km,
+    } for s in services]
+
+    return JsonResponse({
+        'success': True,
+        'is_direct_service': False,
+        'services': data
+    })
+
+
+
+
+# maintenance/views.py
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+from datetime import datetime
+from .models import Service, Locomotive
+import traceback
+
+# ------------------------------------------------------------------
+# ۱. جستجوی هوشمند سرویس (کد سرویس یا شماره لوکوموتیو)
+# ------------------------------------------------------------------
+@login_required
+def search_services(request):
+    q = request.GET.get('q', '').strip()
+    if not q:
+        return JsonResponse({'success': False, 'message': 'جستجو خالی است'})
+
+    # مرحله ۱: جستجو با آی‌دی سرویس
+    if q.isdigit():
+        try:
+            service_id = int(q)
+            service = Service.objects.select_related('locomotive').get(id=service_id)
+            return JsonResponse({
+                'success': True,
+                'is_direct_service': True,
+                'service': _serialize_service(service)
+            })
+        except (Service.DoesNotExist, ValueError):
+            pass  # ادامه بده
+
+    # مرحله ۲: جستجو با شماره لوکوموتیو
+    services = Service.objects.select_related('locomotive').filter(
+        locomotive__locomotive_id__icontains=q
+    ).order_by('-serviced_date')[:30]
+
+    service_list = []
+    for s in services:
+        service_list.append({
+            'id': s.id,
+            'locomotive_id': s.locomotive.locomotive_id,
+            'service_type_display': s.get_service_type_display() if hasattr(s, 'get_service_type_display') else str(s.service_type),
+            'serviced_date': dateToJalali1(s.serviced_date),  # مثلاً 1403/08/25
+            'serviced_time': s.serviced_time.strftime('%H:%M') if s.serviced_time else 'نامشخص',
+            'hasOil': s.hasOil,  # True/False
+            'has_oil_text': 'تعویض روغن: بله' if s.hasOil else 'تعویض روغن: خیر',
+        })
+
+    print(f'services:{service_list}')
+    if not service_list:
+        return JsonResponse({
+            'success': False,
+            'message': 'هیچ سرویسی برای این لوکوموتیو یافت نشد.'
+        })
+
+    return JsonResponse({
+        'success': True,
+        'is_direct_service': False,
+        'services': service_list
+    })
+
+
+
+
+
+# ------------------------------------------------------------------
+# ۲. لود جزئیات سرویس برای ویرایش
+# ------------------------------------------------------------------
+@login_required
+def service_edit_detail(request, pk):
+    try:
+        service = get_object_or_404(Service, id=pk)
+        return JsonResponse({
+            'success': True,
+            'service': _serialize_service(service)
+        })
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'message': 'سرویس یافت نشد یا حذف شده است.'
+        }, status=404)
+
+
+# ------------------------------------------------------------------
+# ۳. ذخیره تغییرات سرویس
+# ------------------------------------------------------------------
+@login_required
+@require_http_methods(["POST"])
+def service_edit_save(request):
+    try:
+        service_id = request.POST.get('service_id')
+        if not service_id:
+            return JsonResponse({'success': False, 'message': 'شناسه سرویس الزامی است.'}, status=400)
+
+        service = get_object_or_404(Service, id=service_id)
+
+        # تبدیل تاریخ شمسی به میلادی
+        jalali_date = request.POST.get('service_date')
+        if jalali_date:
+
+            try:
+                service.service_date = dateToGrgorian(jalali_date)
+            except:
+                return JsonResponse({'success': False, 'message': 'فرمت تاریخ نامعتبر است.'}, status=400)
+        else:
+            return JsonResponse({'success': False, 'message': 'تاریخ سرویس الزامی است.'}, status=400)
+
+        service.service_type = request.POST.get('service_type')
+        current_km = request.POST.get('current_km')
+        if current_km:
+            service.current_km = int(current_km)
+        service.description = request.POST.get('description', '').strip()
+
+        # اعتبارسنجی ساده
+        if not all([service.service_type, service.current_km is not None]):
+            return JsonResponse({'success': False, 'message': 'همه فیلدهای الزامی را پر کنید.'}, status=400)
+
+        service.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'سرویس با موفقیت ویرایش شد.',
+            'service_id': service.id
+        })
+
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'message': 'خطا در ذخیره سرویس.'
+        }, status=500)
+
+
+# ------------------------------------------------------------------
+# ۴. حذف سرویس
+# ------------------------------------------------------------------
+@login_required
+@require_http_methods(["POST"])
+def service_delete(request, pk):
+    try:
+        service = get_object_or_404(Service, id=pk)
+        service.delete()
+        return JsonResponse({
+            'success': True,
+            'message': 'سرویس با موفقیت حذف شد.'
+        })
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'message': 'خطا در حذف سرویس.'
+        }, status=500)
+
+
+# ------------------------------------------------------------------
+# تابع کمکی: سریالایز کردن سرویس
+# ------------------------------------------------------------------
+def _serialize_service(service):
+    return {
+        'id': service.id,
+        'locomotive': f"{service.locomotive.locomotive_id} - {service.locomotive.model}",
+        'service_type': service.service_type,
+        'serviced_date': dateToJalali1(service.serviced_date),
+        'serviced_time': service.serviced_time.strftime('%H:%M') if service.serviced_time else '',
+        'hasOil': service.hasOil,
+        'checklist': service.checklist or '',
+    }
+
+
+
+@login_required
+@require_http_methods(["POST"])
+@transaction.atomic
+def save_service_request(request):
+    try:
+        # ---------- دریافت داده‌ها ----------
+        locomotive_id = request.POST.get('locomotive_id')           # مثلاً 4011
+        service_type = request.POST.get('service_type')             # جدید: روزانه، ماهانه، ...
+        checklist = request.POST.get('checklist', '').strip()
+        has_oil = request.POST.get('has_oil') == 'on'
+        serviced_date_str = request.POST.get('serviced_date')
+        serviced_time_str = request.POST.get('serviced_time')
+
+        # ---------- اعتبارسنجی ----------
+        if not all([locomotive_id, service_type, serviced_date_str, serviced_time_str]):
+            return JsonResponse({
+                'success': False,
+                'message': 'نوع سرویس، لکوموتیو، تاریخ و ساعت الزامی هستند.'
+            }, status=400)
+
+        # ---------- تبدیل تاریخ شمسی به میلادی ----------
+        try:
+            serviced_date = dateToGrgorian(serviced_date_str)
+            if not serviced_date:
+                raise ValueError("تاریخ نامعتبر")
+        except:
+            return JsonResponse({
+                'success': False,
+                'message': 'فرمت تاریخ اشتباه است. مثال: 1403/08/25'
+            }, status=400)
+
+        # ---------- تبدیل زمان ----------
+        try:
+            serviced_time = datetime.strptime(serviced_time_str, '%H:%M').time()
+        except:
+            return JsonResponse({
+                'success': False,
+                'message': 'فرمت ساعت اشتباه است. مثال: 14:30'
+            }, status=400)
+
+        # ---------- پیدا کردن لوکوموتیو ----------
+        try:
+            locomotive = Locomotive.objects.get(locomotive_id=locomotive_id)
+        except Locomotive.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'لکوموتیو با این شماره یافت نشد.'
+            }, status=400)
+
+        # ---------- ایجاد سرویس (با service_type) ----------
+        service = Service.objects.create(
+            locomotive=locomotive,
+            service_type=service_type,        # این خط اضافه شد!
+            checklist=checklist,
+            hasOil=has_oil,
+            serviced_date=serviced_date,
+            serviced_time=serviced_time
+        )
+
+        # ---------- ذخیره تصاویر ----------
+        images_count = 0
+        if 'images' in request.FILES:
+            for file in request.FILES.getlist('images'):
+                # نام فایل یکتا (اختیاری، ولی خوبه برای مدیریت)
+                ext = file.name.split('.')[-1].lower() if '.' in file.name else 'jpg'
+                unique_name = f"service_{service.id}_{uuid.uuid4().hex[:12]}.{ext}"
+
+                # تغییر نام فایل قبل از ذخیره (اختیاری، ولی حرفه‌ای)
+                file.name = unique_name
+
+                # ذخیره تصویر با مدل ServiceImage
+                ServiceImage.objects.create(
+                    service=service,
+                    image=file  # این فیلد از کلاس Image میاد و کاملاً کار می‌کنه
+                )
+                images_count += 1
+
+        return JsonResponse({
+            'success': True,
+            'message': f'سرویس {service.get_service_type_display()} با موفقیت ثبت شد. {images_count} تصویر آپلود شد.',
+            'service_id': service.id
+        })
+
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'message': 'خطا در ثبت سرویس.'
+        }, status=500)

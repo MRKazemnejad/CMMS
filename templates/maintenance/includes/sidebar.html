@@ -33,6 +33,11 @@
                     </a>
                     <ul class="collapse list-unstyled pl-4 w-100 {% if segment in 'failure repair service crash' %}show{% else %}{% endif %}"
                         id="failurpart">
+{#                      <li class="nav-item ">#}
+{#                            <a class="nav-link pl-3 {% if segment in 'failure1' %}active{% else %}{% endif %}"#}
+{#                               href="{% url 'maintenance:mainRegisterFailure1' %}"><span#}
+{#                                    class="ml-1 item-text">ثبت خرابی1</span></a>#}
+{#                        </li>#}
                         <li class="nav-item ">
                             <a class="nav-link pl-3 {% if segment in 'failure' %}active{% else %}{% endif %}"
                                href="{% url 'maintenance:mainRegisterFailure' %}"><span
@@ -68,9 +73,11 @@
             </li>
 
 
+
+
          <li class="nav-item mb-2">
-                <a class="nav-link {% if segment in 'edit' %}active{% else %}{% endif %}"
-                   href="{% url 'maintenance:edit_page' %}" aria-expanded="false">
+                <a class="nav-link {% if segment in 'edit1' %}active{% else %}{% endif %}"
+                   href="{% url 'maintenance:edit_page1' %}" aria-expanded="false">
                     <i class="fe fe-edit fe-16"></i>
                     <span class="ml-3 item-text">ویرایش اطلاعات</span><span class="sr-only">(current)</span>
                 </a>

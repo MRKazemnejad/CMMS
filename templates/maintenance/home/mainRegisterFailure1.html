@@ -1,0 +1,591 @@
+{% extends "maintenance/layout/base.html" %}
+{% block title %} درخواست‌های مجوز {% endblock %}
+{% block stylesheets %}
+    <!-- Include Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Right-align text for Persian */
+        body, .card, .modal-content {
+            direction: rtl;
+            text-align: right;
+        }
+
+        /* Style for slim card in modal */
+        .modal-card {
+            margin-bottom: 1rem;
+        }
+
+        .modal-card .card-body {
+            padding: 0.5rem;
+        }
+
+        .modal-card .action-icon {
+            margin-left: 0.5rem;
+            color: #6c757d;
+            text-decoration: none;
+        }
+
+        .modal-card .action-icon:hover {
+            color: #007bff;
+        }
+
+        .vertical-divider {
+            border-left: 1px solid #ccc;
+            height: 1.5rem;
+            margin: 0 0.5rem;
+        }
+
+        /* Slimmer permission cards */
+        .permission-card .card-body {
+            padding: 0.75rem;
+        }
+
+        /* Hover effect for permission cards */
+        .permission-card {
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .permission-card:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        /* Spacing between card content */
+        .permission-card .card-text span {
+            margin-left: 1rem;
+        }
+
+        /* Checkbox styling */
+        .checkbox-container {
+            margin-left: 0.5rem;
+        }
+
+        /* View link styling */
+        .view-link {
+            margin-right: 0.5rem;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .view-link:hover {
+            text-decoration: underline;
+        }
+
+        .search-form .form-control,
+        .search-form .form-select {
+            width: auto;
+        }
+
+        /* Separator styling */
+        .search-separator {
+            margin: 1rem 0;
+        }
+
+        /* Workflow section */
+        .workflow-section {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .workflow-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            max-width: 100%;
+        }
+
+        .workflow-item .arrow {
+            margin: 0 0.5rem;
+        }
+
+        .workflow-item .arrow.completed {
+            color: #28a745;
+        }
+
+        .workflow-item .arrow.pending {
+            color: #6c757d;
+        }
+
+        .custom-btn {
+            min-width: 80px;
+            padding: 5px 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+            font-size: 0.85rem;
+            margin: 0 4px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap; /* اجازه می‌دهد دکمه‌ها در موبایل به خط بعدی برن */
+            justify-content: center; /* وسط‌چین کردن دکمه‌ها */
+            gap: 8px; /* فاصله بین دکمه‌ها */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .permission-card .card-body {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .permission-card .card-text span {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+
+            .workflow-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .workflow-item .arrow {
+                margin: 0.5rem 0;
+                transform: rotate(90deg);
+            }
+
+            .checkbox-container {
+                margin-bottom: 0.5rem;
+            }
+
+            .search-form .form-control,
+            .search-form .form-select {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* Custom styles for table header and separator */
+        .table-header-light-gray {
+            background-color: #e9ecef;
+            color: #212529;
+        }
+
+        /* Style for separator after status */
+        .details-separator {
+            margin: 1.5rem 0;
+            border-top: 2px solid #ddd;
+        }
+
+        /* Ensure table is responsive and fits within modal */
+        .table-responsive {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Style table cells for better alignment */
+        .table th,
+        .table td {
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        /* Style total row */
+        .table-light td {
+            font-weight: bold;
+        }
+
+        /* Style for manager reject select */
+        .manager-reject-select-container {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .persian-number {
+            font-family: 'B Yekan', sans-serif;
+            unicode-bidi: embed;
+        }
+
+        /* Ensure buttons are visible */
+        .current-only {
+            display: none; /* Initially hidden, controlled by JS */
+        }
+
+        .approve-tab-only {
+            display: none; /* Initially hidden, controlled by JS */
+        }
+
+        /* NEW TAB STYLE */
+        {#******************************************************************************************************************#}
+        /* === تب‌های دلنشین + ریسپانسیو بدون اسکرول === */
+        .delicious-tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 8px;
+            padding: 14px 16px 10px;
+            margin: 0 0 1.5rem 0;
+            border-bottom: 1px solid #e3e6f0;
+            overflow: hidden; /* بدون اسکرول */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .delicious-tabs .tab-btn {
+            flex: 1; /* هر تب به اندازه خودش و فضای موجود */
+            min-width: 0; /* اجازه کوچک شدن */
+            padding: 12px 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #495057;
+            background: #f8f9fc;
+            border: 1.5px solid #dee2e6;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .delicious-tabs .tab-btn i {
+            font-size: 1.15rem;
+            flex-shrink: 0; /* آیکون کوچک نشه */
+            transition: transform 0.3s ease;
+        }
+
+        .delicious-tabs .tab-btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+
+        /* Hover */
+        .delicious-tabs .tab-btn:hover {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-color: #90caf9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.18);
+        }
+
+        .delicious-tabs .tab-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Active */
+        .delicious-tabs .tab-btn.active {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: white;
+            border-color: #1976d2;
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.35);
+            font-weight: 700;
+        }
+
+        .delicious-tabs .tab-btn.active i {
+            filter: brightness(0) invert(1);
+        }
+
+
+        .delicious-tabs .tab-btn,
+        .delicious-tabs .tab-btn span,
+        .delicious-tabs .tab-btn i {
+            text-decoration: none !important;
+            border-bottom: none !important;
+            outline: none !important;
+        }
+
+        .delicious-tabs .tab-btn.active {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+
+        /* === ریسپانسیو هوشمند === */
+        @media (max-width: 992px) {
+            .delicious-tabs {
+                padding: 12px 12px 8px;
+                gap: 6px;
+            }
+
+            .delicious-tabs .tab-btn {
+                padding: 10px 6px;
+                font-size: 0.88rem;
+                border-radius: 14px;
+            }
+
+            .delicious-tabs .tab-btn i {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .delicious-tabs {
+                padding: 10px 8px 6px;
+                gap: 5px;
+            }
+
+            .delicious-tabs .tab-btn {
+                padding: 9px 5px;
+                font-size: 0.82rem;
+                border-radius: 12px;
+            }
+
+            .delicious-tabs .tab-btn i {
+                font-size: 1.05rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .delicious-tabs {
+                padding: 8px 6px 4px;
+                gap: 4px;
+            }
+
+            .delicious-tabs .tab-btn {
+                padding: 7px 4px;
+                font-size: 0.76rem;
+                border-radius: 11px;
+            }
+
+            .delicious-tabs .tab-btn i {
+                font-size: 0.95rem;
+            }
+
+            /* متن خیلی بلند رو مخفی نکن، فقط کوچیک کن */
+            .delicious-tabs .tab-btn span {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .delicious-tabs .tab-btn {
+                padding: 6px 3px;
+                font-size: 0.7rem;
+            }
+
+            .delicious-tabs .tab-btn i {
+                font-size: 0.9rem;
+            }
+
+            .delicious-tabs .tab-btn span {
+                font-size: 0.65rem;
+            }
+        }
+
+        /* Card hover effect (except when checkbox is checked) */
+        .permission-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #e0e0e0 !important;
+        }
+
+        .permission-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+            border-color: #007bff !important;
+        }
+
+        .permission-card:has(.permission-checkbox:checked) {
+            border-color: #28a745 !important;
+            background-color: rgba(40, 167, 69, 0.05);
+        }
+    </style>
+{% endblock stylesheets %}
+{% block page_name %}showpermission{% endblock %}
+{% block content %}
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-body">
+
+
+                <div class="col-md-8">
+                    <div class="delicious-tabs" id="pills-tab" role="tablist">
+                        <a class="tab-btn active" id="pills-home-tab" data-toggle="pill" href="#pills-home"
+                           role="tab" aria-controls="pills-home" aria-selected="true">
+                            <i class="fas fa-inbox"></i>
+                            <span>ثبت خرابی</span>
+                        </a>
+                        <a class="tab-btn" id="pills-approve-tab" data-toggle="pill" href="#pills-approve"
+                           role="tab" aria-controls="pills-approve" aria-selected="false">
+                            <i class="fas fa-check-double"></i>
+                            <span>ثبت تعمیر</span>
+                        </a>
+                        <a class="tab-btn" id="pills-current-tab" data-toggle="pill" href="#pills-current"
+                           role="tab" aria-controls="pills-current" aria-selected="false">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>ثبت سرویس</span>
+                        </a>
+                        <a class="tab-btn" id="pills-reject-tab" data-toggle="pill" href="#pills-reject"
+                           role="tab" aria-controls="pills-reject" aria-selected="false">
+                            <i class="fas fa-ban"></i>
+                            <span>ثبت سانحه</span>
+                        </a>
+                        <a class="tab-btn" id="pills-contact-tab" data-toggle="pill" href="#pills-contact"
+                           role="tab" aria-controls="pills-contact" aria-selected="false">
+                            <i class="fas fa-archive"></i>
+                            <span>آرشیو</span>
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="tab-content mb-1 account" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                         aria-labelledby="pills-home-tab">
+
+                        <div class="col-12">
+
+                            <div class="form-container account">
+                                <!-- Row 1: Locomotive ID, Damage Type, Location -->
+                                <div class="row">
+                                    <div class="col-md-3 form-group">
+                                        <label for="locomotiveId" class="form-label">لکوموتیو</label>
+                                        <select id="locomotiveId" class="form-control" aria-label="انتخاب لکوموتیو">
+                                            <option value="" selected>یک لکوموتیو انتخاب کنید</option>
+                                        </select>
+                                        <div class="invalid-feedback">لطفاً یک لکوموتیو انتخاب کنید.</div>
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label for="damageType" class="form-label">نوع خرابی</label>
+                                        <select id="damageType" class="form-control" aria-label="انتخاب نوع خرابی">
+                                            <option value="0" selected>نوع خرابی را انتخاب کنید</option>
+                                            <option value="MECHANICAL">مکانیکی</option>
+                                            <option value="ELECTRICAL">برقی</option>
+                                            <option value="BOGIE_CHASSIS">بوژی و شاسی</option>
+                                            <option value="BRAKE">ترمز</option>
+                                            <option value="CABIN_AMENITIES">کابین و رفاهی</option>
+                                        </select>
+                                        <div class="invalid-feedback">لطفاً نوع خرابی را انتخاب کنید.</div>
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label for="location" class="form-label">مکان خرابی</label>
+                                        <input type="text" id="location" class="form-control"
+                                               placeholder="مکان خرابی را وارد کنید">
+                                        <div class="invalid-feedback">لطفاً مکان خرابی را وارد کنید.</div>
+                                    </div>
+                                </div>
+                                <!-- Row 2: Reported Date, Reported Time, Move Status -->
+                                <div class="row">
+                                    <div class="col-md-3 form-group">
+                                        <label for="reportedDate" class="form-label">تاریخ گزارش</label>
+                                        <input type="text" id="reportedDate" class="form-control" data-jdp
+                                               placeholder="تاریخ را وارد کنید">
+                                        <div class="invalid-feedback">لطفاً تاریخ گزارش را وارد کنید.</div>
+                                    </div>
+                                    <div class="col-md-3 form-group timepicker-container">
+                                        <label for="reportedTime" class="form-label">ساعت گزارش</label>
+                                        <div class="timepicker-container">
+                                            <input type="time" class="form-control" id="reportedTime">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="invalid-feedback">لطفاً ساعت گزارش را وارد کنید.</div>
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label for="moveStatus" class="form-label">وضعیت</label>
+                                        <select id="moveStatus" name="moveStatus" class="form-control"
+                                                aria-label="انتخاب نوع خرابی">
+                                            <option value="0" selected>نوع وضعیت را انتخاب کنید</option>
+                                            <option value="ACTIVE">گرم /ادامه سیر</option>
+                                            <option value="DEACTIVE">سرد</option>
+                                            <option value="REPAIR">متوقف/اعزام به تعمیرات</option>
+                                        </select>
+                                        <div class="invalid-feedback">لطفاً وضعیت را انتخاب کنید.</div>
+                                    </div>
+                                </div>
+                                <!-- Row 3: Dispatch From -->
+                                <div class="row">
+                                    <div class="col-md-3 form-group">
+                                        <label for="dispatchFrom" class="form-label">اعزام نیرو از</label>
+                                        <input type="text" id="dispatchFrom" name="dispatchFrom"
+                                               class="form-control" placeholder="اعزام نیرو ...">
+                                        <div class="invalid-feedback">لطفاً محل اعزام نیرو را وارد کنید.</div>
+                                    </div>
+                                </div>
+                                <!-- Row 4: Description -->
+                                <div class="row">
+                                    <div class="col-md-9 form-group">
+                                        <label for="description" class="form-label">توضیحات خرابی</label>
+                                        <textarea id="description" class="form-control" rows="4"
+                                                  placeholder="توضیحات خرابی را وارد کنید"></textarea>
+                                        <div class="invalid-feedback">لطفاً توضیحات خرابی را وارد کنید.</div>
+                                    </div>
+                                </div>
+                                <!-- Row 5: Image Upload, Submit Button -->
+                                <div class="row">
+                                    <div class="col-md-3 form-group">
+                                        <label for="images" class="form-label">آپلود تصاویر</label>
+                                        <input type="file" id="images" class="form-control-file" accept="image/*"
+                                               multiple>
+                                        <small class="form-text text-muted">می‌توانید چندین تصویر انتخاب
+                                            کنید</small>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 form-group d-flex align-items-end">
+                                        <button id="submitBtn" class="btn btn-primary w-100">ثبت خرابی</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="tab-pane fade" id="pills-current" role="tabpanel" aria-labelledby="pills-current-tab">
+
+
+                    </div>
+
+
+                    <div class="tab-pane fade" id="pills-reject" role="tabpanel" aria-labelledby="pills-reject-tab">
+
+
+                    </div>
+
+
+                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+
+                    </div>
+
+                    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+{% block javascripts %}
+
+
+
+    {#****************************************************** NEW TAB ACTIVATION *********************************************#}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.delicious-tabs .tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('href');
+
+                    // حذف active از همه
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show', 'active'));
+
+                    // فعال کردن تب کلیک‌شده
+                    this.classList.add('active');
+                    const pane = document.querySelector(target);
+                    if (pane) {
+                        pane.classList.add('show', 'active');
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock javascripts %}
+
+
+
+
