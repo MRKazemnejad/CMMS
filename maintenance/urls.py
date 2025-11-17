@@ -41,4 +41,6 @@ urlpatterns = [
     path('service-delete/<int:pk>/', views.service_delete, name='service_delete'),
     path('save-service-request/', views.save_service_request, name='save_service_request'),
 
+
+
 ]

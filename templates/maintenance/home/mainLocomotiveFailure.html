@@ -1,5 +1,5 @@
 {% extends "maintenance/layout/base.html" %}
-
+{% load persian_number %}
 {% block title %} خرابی‌های لکوموتیو {{ locomotive.locomotive_id }} {% endblock %}
 
 {% block stylesheets %}
@@ -94,6 +94,83 @@
             max-height: 80vh;
             overflow-y: auto;
         }
+
+
+
+        /* === دقیقاً همون استایل اولیه شما — بدون حتی یک پیکسل تغییر === */
+        .delicious-tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 8px;
+            padding: 14px 16px 10px;
+            margin: 0 0 1.5rem 0;
+            border-bottom: 1px solid #e3e6f0;
+            overflow: hidden; /* بدون اسکرول */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .delicious-tabs .tab-btn {
+            flex: 1; /* هر تب به اندازه خودش و فضای موجود */
+            min-width: 0; /* اجازه کوچک شدن */
+            padding: 12px 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #495057;
+            background: #f8f9fc;
+            border: 1.5px solid #dee2e6;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .delicious-tabs .tab-btn i {
+            font-size: 1.15rem;
+            flex-shrink: 0; /* آیکون کوچک نشه */
+            transition: transform 0.3s ease;
+        }
+
+        .delicious-tabs .tab-btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+
+        /* Hover — دقیقاً همون چیزی که خودت داشتی (بدون خط اضافه!) */
+        .delicious-tabs .tab-btn:hover {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-color: #90caf9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.18);
+        }
+
+        .delicious-tabs .tab-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Active */
+        .delicious-tabs .tab-btn.active {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: white;
+            border-color: #1976d2;
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.35);
+            font-weight: 700;
+        }
+
+        .delicious-tabs .tab-btn.active i {
+            filter: brightness(0) invert(1);
+        }
+
     </style>
 {% endblock stylesheets %}
 
@@ -103,12 +180,40 @@
             <div class="col-12">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h5 class="page-title account mb-3">خرابی‌های لکوموتیو {{ locomotive.locomotive_id }}</h5>
+                        <h5 class="page-title account text-center mb-3">سوابق لکوموتیو{{ locomotive.locomotive_id }}</h5>
+
+                         <div class="col-md-10 mx-auto">
+                    <div class="delicious-tabs" id="pills-tab" role="tablist">
+                        <a class="tab-btn active text-decoration-none" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab">
+                            <span>سابقه خرابی</span>
+                        </a>
+                        <a class="tab-btn text-decoration-none" id="pills-approve-tab" data-toggle="pill" href="#pills-approve" role="tab">
+                            <span>سابقه سرویس</span>
+                        </a>
+                        <a class="tab-btn text-decoration-none" id="pills-current-tab" data-toggle="pill" href="#pills-current" role="tab">
+                            <span>رزرو</span>
+                        </a>
+                        <a class="tab-btn text-decoration-none" id="pills-reject-tab" data-toggle="pill" href="#pills-reject" role="tab">
+                            <span>رزرو</span>
+                        </a>
+                        <a class="tab-btn text-decoration-none" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab">
+                            <span>آرشیو</span>
+                        </a>
+                    </div>
+                </div>
+
+
                         {% url 'maintenance:mainLocomotiveFailure' locomotive_id=locomotive.id as original_url %}
                           {% with view_name='mainLocomotiveFailure' model_name='failure' template_name='maintenance/home/mainLocomotiveFailure.html'  locomotive_id=locomotive.id original_url=original_url%}
                           {% include 'maintenance/includes/filter.html' %}
                           {% endwith %}
-                        <div class="row my-2">
+
+
+                 <div class="tab-content" id="pills-tabContent">
+
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel">
+
+                         <div class="row my-2">
                             {% for failure in failures %}
                                 <div class="col-12 mb-3 permission-item">
                                     <div class="card shadow-sm permission-card w-100"
@@ -133,7 +238,7 @@
                                                 <span>تاریخ خرابی: <strong class="mx-2">{{ failure.reported_date }}</strong></span>
                                                 <span>توضیحات: <strong class="mx-2">{{ failure.description|truncatechars:50 }}</strong></span>
                                                 <span>وضعیت: <strong class="mx-2">{{ failure.inRepair|yesno:"جاری,پایان‌یافته" }}</strong></span>
-{#                                                <span>وضعیت حرکت: <strong class="mx-2">{{ failure.move_status }}</strong></span>#}
+                                                <span>وضعیت حرکت: <strong class="mx-2">{{ failure.move_status }}</strong></span>
                                             </p>
                                         </div>
                                     </div>
@@ -142,11 +247,69 @@
                                 <p class="no-repairs-message">هیچ خرابی‌ای برای این لکوموتیو ثبت نشده است.</p>
                             {% endfor %}
                         </div>
+
+                    </div>
+
+                    <div class="tab-pane fade" id="pills-approve">
+                      <div class="row my-2">
+        {% for service in locomotive.services.all %}
+        <div class="col-12 mb-3 permission-item">
+            <div class="card shadow-sm permission-card w-100"
+                 data-service-id="{{ service.id }}"
+                 data-service-type="{{ service.get_service_type_display }}"
+                 data-serviced-date="{{ service.serviced_date }}"
+                 data-serviced-time="{{ service.serviced_time|time:"H:i" }}"
+                 data-has-oil="{{ service.hasOil|yesno:"بله,خیر" }}"
+                 data-checklist="{{ service.checklist|default:'' }}"
+                 data-created-at="{{ service.created_at|date:"Y/m/d" }}" data-serviced-date-jalali="{{ service.serviced_date|dateToJalali }}" data-created-at-jalali="{{ service.created_at|dateToJalali }}">
+
+
+
+
+                <div class="card-body">
+                    <p class="card-text account">
+                        <span>کد سرویس: <strong class="mx-2">#{{ service.id }}</strong></span>
+                        <span>نوع سرویس:
+                            <strong class="mx-2">
+                                <span class="badge badge-info">{{ service.get_service_type_display }}</span>
+                            </strong>
+                        </span>
+                        <span>تاریخ سرویس: <strong class="mx-2">{{ service.serviced_date|dateToJalali }}</strong></span>
+                        <span>ساعت: <strong class="mx-2">{{ service.serviced_time|time:"H:i" }}</strong></span>
+                        <span>تعویض روغن:
+                            <strong class="mx-2">
+                                {% if service.hasOil %}
+                                    <span class="badge badge-success">بله</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">خیر</span>
+                                {% endif %}
+                            </strong>
+                        </span>
+                        {% if service.checklist %}
+                        <span>چک‌لیست: <strong class="mx-2 text-success">دارد</strong></span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="no-repairs-message">هیچ سرویسی برای این لکوموتیو ثبت نشده است.</p>
+        {% endfor %}
+    </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-current" role="tabpanel"></div>
+                    <div class="tab-pane fade" id="pills-reject"></div>
+                    <div class="tab-pane fade" id="pills-contact"></div>
+
+                </div>
+
+
+
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div>م
 
     <!-- Modal for showing failure details -->
     <div class="modal fade" id="failureModal" tabindex="-1" role="dialog" aria-labelledby="failureModalLabel" aria-hidden="true">
@@ -218,6 +381,56 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Modal برای جزئیات سرویس -->
+<div class="modal fade" id="serviceModal" tabindex="-1" role="dialog" aria-labelledby="serviceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="serviceModalLabel">جزئیات سرویس #<span id="service-id"></span></h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                <fieldset class="fieldset-container" style="border-color: #17a2b8; background-color: #e8f4f8;">
+                    <legend>اطلاعات سرویس</legend>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>کد سرویس:</strong> <span id="s-id"></span></div>
+                        <div class="col-md-6"><strong>نوع سرویس:</strong> <span id="s-type" class="badge badge-info font-weight-bold px-3 py-2"></span></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>تاریخ سرویس:</strong> <span id="s-date"></span></div>
+                        <div class="col-md-6"><strong>ساعت سرویس:</strong> <span id="s-time"></span></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>تعویض روغن:</strong> <span id="s-oil"></span></div>
+                        <div class="col-md-6"><strong>تاریخ ثبت:</strong> <span id="s-created"></span></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12"><strong>چک‌لیست و توضیحات:</strong></div>
+                        <div class="col-12">
+                            <div id="s-checklist" style="background:#f8f9fa; padding:15px; border-radius:8px; min-height:80px; white-space: pre-line;"></div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- تصاویر سرویس -->
+                <div class="mt-4">
+                    <strong>تصاویر سرویس:</strong>
+                    <div id="service-images" class="d-flex flex-wrap mt-2"></div>
+                    <div id="no-service-images" class="no-repairs-message mt-2" style="display:none;">
+                        هیچ عکسی برای این سرویس ثبت نشده است.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 
 {% block javascripts %}
@@ -241,7 +454,7 @@
             console.log("Bootstrap modal available:", typeof $.fn.modal !== 'undefined');
 
             // Handle click on permission card
-            $('.permission-card').on('click', function (e) {
+            $('.permission-card[data-failure-id]').on('click', function (e) {
                 e.preventDefault();
                 console.log("Card clicked, failureId:", $(this).data('failure-id'));
 
@@ -401,4 +614,133 @@
     </script>
 
 
+<script>
+// مودال جزئیات سرویس
+$(document).on('click', '.permission-card[data-service-id]', function(e) {
+    e.stopPropagation();
+
+    const serviceId = $(this).data('service-id');
+    const type = $(this).data('service-type');
+    const date = $(this).data('serviced-date');
+    const time = $(this).data('serviced-time');
+    const oil = $(this).data('has-oil');
+    const checklist = $(this).data('checklist') || 'ثبت نشده';
+    const created = $(this).data('created-at');
+
+    // پر کردن اطلاعات
+    $('#service-id, #s-id').text(serviceId);
+    $('#s-type').text(type);
+
+    $('#s-time').text(time);
+    $('#s-oil').html(oil === 'بله'
+        ? '<span class="badge badge-success">بله</span>'
+        : '<span class="badge badge-secondary">خیر</span>');
+    $('#s-date').text($(this).data('serviced-date-jalali') || date);
+    $('#s-created').text($(this).data('created-at-jalali') || created);
+    $('#s-checklist').text(checklist);
+
+    // تصاویر — فرض می‌کنیم تصاویر در data-images باشه (مثل خرابی)
+    const images = $(this).data('images') ? $(this).data('images').split(',').filter(Boolean) : [];
+    const imgContainer = $('#service-images');
+    imgContainer.empty();
+
+    if (images.length > 0) {
+        images.forEach(url => {
+            const img = $('<img>').addClass('thumbnail m-2')
+                .attr('src', url)
+                .css({width:'120px', height:'120px', objectFit:'cover', borderRadius:'8px', cursor:'pointer'})
+                .on('click', function() {
+                    $('#full-image').attr('src', url);
+                    $('#fullImageModal').modal('show');
+                });
+            imgContainer.append(img);
+        });
+        $('#no-service-images').hide();
+    } else {
+        $('#no-service-images').show();
+    }
+
+    $('#serviceModal').modal('show');
+});
+</script>
+
+
+    {#****************************************************** NEW TAB ACTIVATION *********************************************#}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.delicious-tabs .tab-btn');
+            const panes = document.querySelectorAll('.tab-pane');
+
+            // تابع فعال کردن تب
+            function activateTab(targetHref) {
+                // حذف active از همه تب‌ها و پنل‌ها
+                tabs.forEach(t => t.classList.remove('active'));
+                panes.forEach(p => p.classList.remove('show', 'active'));
+
+                // پیدا کردن تب و پنل مربوطه
+                const activeTab = document.querySelector(`.tab-btn[href="${targetHref}"]`);
+                const activePane = document.querySelector(targetHref);
+
+                if (activeTab) activeTab.classList.add('active');
+                if (activePane) {
+                    activePane.classList.add('show', 'active');
+                }
+
+                // اگر دیتاتیبل یا AJAX داری، اینجا لود کن
+                // مثلاً: if (targetHref === '#pills-home') loadPendingContracts();
+            }
+
+            // === رویداد کلیک ===
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('href');
+                    activateTab(target);
+
+                    // اگر از URL hash استفاده می‌کنی (اختیاری)
+                    history.pushState(null, null, target);
+                });
+            });
+
+            // === فعال کردن تب اول در لود صفحه (این خط حیاتی بود!) ===
+            const initialTab = document.querySelector('.tab-btn.active');
+            if (initialTab) {
+                const initialHref = initialTab.getAttribute('href');
+                activateTab(initialHref);
+            } else {
+                // اگر هیچ تب active نبود، اولین تب رو فعال کن
+                if (tabs.length > 0) {
+                    activateTab(tabs[0].getAttribute('href'));
+                }
+            }
+
+            // === پشتیبانی از hash در URL (مثلاً ?tab=#pills-contracted) ===
+            if (window.location.hash) {
+                const hashTab = document.querySelector(`.tab-btn[href="${window.location.hash}"]`);
+                if (hashTab) {
+                    activateTab(window.location.hash);
+                }
+            }
+        });
+    </script>
+
+
 {% endblock javascripts %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
