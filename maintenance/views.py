@@ -909,12 +909,12 @@ def save_failure_edit(request):
     try:
         # دریافت داده‌ها از فرم
         failure_id = request.POST.get('failure_id')
-        print(f'failure id:{failure_id}')
+
         if not failure_id:
             return JsonResponse({'success': False, 'message': 'شناسه خرابی الزامی است.'}, status=400)
 
         failure = get_object_or_404(Failure, id=failure_id)
-        print(f'gh:{failure}')
+
         # بروزرسانی فیلدها
         failure.damage_type = request.POST.get('damage_type')
         failure.location = request.POST.get('location', '').strip()
@@ -923,6 +923,12 @@ def save_failure_edit(request):
         failure.reported_date = dateToGrgorian(request.POST.get('reported_date'))
         failure.reported_time = request.POST.get('reported_time')
         failure.move_status = request.POST.get('move_status')
+        in_repair_status=request.POST.get('under_repair')
+
+        if in_repair_status=='true':
+            failure.inRepair =True
+        else:
+            failure.inRepair = False
 
         # اعتبارسنجی ساده (می‌تونی با Form یا Serializer پیشرفته‌تر کنی)
         if not all([failure.damage_type, failure.location, failure.description,
@@ -1012,7 +1018,7 @@ def get_repair_detail(request, repair_id):
 @require_http_methods(["POST"])
 def repair_edit_save(request):
     try:
-        print('&&&&&&&&&&')
+
         repair_id = request.POST.get('repair_id')
         if not repair_id:
             return JsonResponse({'success': False, 'message': 'شناسه تعمیر الزامی است.'}, status=400)
@@ -1030,6 +1036,12 @@ def repair_edit_save(request):
             repair.start_date = dateToGrgorian(request.POST.get('start_date'))
         if request.POST.get('start_time'):
             repair.start_time = request.POST.get('start_time')
+
+        # تاریخ و ساعت پایان
+        if request.POST.get('end_date'):
+            repair.end_date = dateToGrgorian(request.POST.get('end_date'))
+        if request.POST.get('end_time'):
+            repair.end_time = request.POST.get('end_time')
 
         repair.save()
 

@@ -39,6 +39,7 @@ class Failure(models.Model):
         ('ACTIVE', 'گرم / ادامه سیر'),
         ('DEACTIVE', 'سرد'),
         ('REPAIR', 'متوقف / اعزام به تعمیرات'),
+        ('INDEPOT', 'دپو/رفع عیب'),
     )
 
     locomotive = models.ForeignKey(Locomotive, on_delete=models.CASCADE, related_name='failures', verbose_name="Locomotive")
